@@ -107,8 +107,8 @@ author:
   name             : "Tolerblanc"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "I am an **amazing** person."
-  location         : "Somewhere"
-  email            :
+  location         : "Seoul, Korea"
+  email            : "hihj070914@icloud.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -290,3 +290,4 @@ defaults:
       comments: # true
       share: true
       related: true
+      mathjax: true
