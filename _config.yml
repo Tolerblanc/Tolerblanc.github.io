@@ -20,7 +20,7 @@ title                    : "인생은 B와 D사이 Code다"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Tolerblanc"
-description              : "노션 -> 블로그 이주중 \n내 오답이 노트를 찾았나봐"
+description              : "노션 -> 블로그 이주중"
 url                      : "https://Tolerblanc.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "Tolerblanc/Tolerblanc.github.io"
