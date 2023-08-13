@@ -12,7 +12,7 @@
 
 #theme                  : "minimal-mistakes-jekyll"
 remote_theme             : "mmistakes/minimal-mistakes@4.24.0"
-minimal_mistakes_skin    : "contrast" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
 locale                   : "ko-KR"
@@ -20,7 +20,7 @@ title                    : "Test Title"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Tolerblanc"
-description              : "Blog For Archieving"
+description              : "내 오답이 노트를 찾았나봐"
 url                      : "https://Tolerblanc.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "Tolerblanc/Tolerblanc.github.io"
@@ -288,6 +288,6 @@ defaults:
       author_profile: true
       read_time: true
       comments: # true
-      share: true
+      share: # true
       related: true
       mathjax: true

@@ -1,10 +1,8 @@
 # main links
 main:
-  - title: "About"
+  - title: "Home"
+    url: https://Tolerblanc.github.io
+  - title: "Category"
+    url: /categories/
+  - title: "Github"
     url: https://github.com/Tolerblanc
-  # - title: "Sample Posts"
-  #   url: /year-archive/
-  # - title: "Sample Collections"
-  #   url: /collection-archive/
-  - title: "Sitemap"
-    url: /sitemap/
