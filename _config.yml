@@ -106,13 +106,13 @@ analytics:
 author:
   name             : "Tolerblanc"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
+  bio              : "내 오답이 노트를 찾았나봐"
   location         : "Seoul, Korea"
   email            : "hihj070914@icloud.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:hihj070914@icloud.com"
+      # url: "mailto:hihj070914@icloud.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
