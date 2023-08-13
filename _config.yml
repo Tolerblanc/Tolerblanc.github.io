@@ -15,7 +15,7 @@ remote_theme             : "mmistakes/minimal-mistakes@4.24.0"
 minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
-locale                   : "ko-KR"
+locale                   : "en-US"
 title                    : "인생은 B와 D사이 Code다"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
