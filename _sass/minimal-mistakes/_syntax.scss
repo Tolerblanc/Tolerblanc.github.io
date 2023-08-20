@@ -44,6 +44,8 @@ figure.highlight {
     &.code,
     &.rouge-code {
       padding-left: 1em;
+      background: $base02;
+      color: $base08;
     }
   }
 
