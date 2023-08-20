@@ -132,10 +132,19 @@ lst.sort(reverse=True)
 print(lst[k - 1][1])
 ```
 
-### strict weak ordering?
+### strict weak ordering
 
 [영문 위키](https://en.wikipedia.org/wiki/Weak_ordering)에 자세히 나와있다. 
 
+어떤 이항연산 $R$에 대하여, 다음 4가지 조건을 만족할 때 **strict weak ordering**을 만족한다.
+
+1. 비반사성(irreflexivity): 모든 $x$에 대해 $R(x, x)$는 거짓
+2. 비대칭성(asymmetry): 모든 $x$, $y$에 대해 $R(x, y)$가 참이면 $R(y, x)$는 거짓
+3. 추이성(transitivity): 모든 $x$, $y,$ $z$에 대해 $R(x, y)$와 $R(y, z)$가 참이면 $R(x, z)$는 참
+4. 비비교성의 추이성(transitivity of incomparability): 모든 $x$, $y$, $z$에 대해 $R(x, y)$와 $R(y, x)$가 거짓이고 $R(y, z)$와 $R(z, y)$가 거짓이면 $R(x, z)$와 $R(z, x)$는 거짓
+
+쉽게 풀이하면, 논리 연산이 삼단 논법을 만족해야 하며, 역이 성립해야 한다.
+`<=`, `>=` 연산을 $R$에 대입해보면, 위 4가지 가정이 하나도 성립하지 않음을 이해할 수 있다.
 ## 1주차 마무리 후기
 
 확실히 초반부 문제들 보다는 난이도가 상승한 모습이다. 이번주만 보면 월~금으로 갈수록 난이도가 올라가는 모습인데, 다음주 완전 탐색 유형도 이런식일지 궁금해진다. 문제가 무지막지하게 어렵다 이런건 아닌데, 생각보다 복습하게 되는 키워드들이 많다. 모쪼록 성실히 완주해서, 공부도 하고 후기도 적고 네이버페이 포인트도 타야겠다 +_+
