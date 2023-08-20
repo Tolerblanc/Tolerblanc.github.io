@@ -15,6 +15,7 @@ related: true
 ---
 
 ## 구름톤 챌린지란?
+
 [구름](https://goorm.co/)에서 진행하는 알고리즘 문제풀이 챌린지이다. 예전에 웹IDE를 알아보다가 구름이란 회사를 알게 된  것 같은데, 그 때와는 달리 프로그래머스마냥 알고리즘 문제풀이, 웹 컨테이너, 강의 등등 다방면으로 사업을 확장한 상태이다.
 
 20일(5일 * 4주)동안 진행되며, 주차별 문제 유형은 아래와 같다.
@@ -52,7 +53,7 @@ print(int(w * (1 + (r / 30))))
 입출력 예제는 아래와 같다.
 ![Day02 예제](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/a07e6593-9726-47ef-b1ea-1470284ebad4)
 
-초기 시간에 $c_i$분씩 계속 더해서 출력하면 되는 문제이다. 이것도 단순 구현으로 쉽게 풀이할 수 있다.
+초기 시간에 \\(c_i)\\분씩 계속 더해서 출력하면 되는 문제이다. 이것도 단순 구현으로 쉽게 풀이할 수 있다.
 
 ```python
 import sys
@@ -62,16 +63,16 @@ n = int(input())
 t, m = map(int, input().split())
 
 def add_time(t, m, a):
-	m += a
-	while (m >= 60):
-		m -= 60
-		t += 1
-		if (t >= 24):
-			t -= 24
-	return t, m
+    m += a
+    while (m >= 60):
+        m -= 60
+        t += 1
+        if (t >= 24):
+            t -= 24
+    return t, m
 
 for _ in range(n):
-	t, m = add_time(t, m, int(input()))
+    t, m = add_time(t, m, int(input()))
 print(t, m)
 ```
 
@@ -96,15 +97,15 @@ input = sys.stdin.readline
 t = int(input().rstrip())
 answer = 0
 for _ in range(t):
-	n1, op, n2 = input().split()
-	if op == '+':
-		answer += int(n1) + int(n2)
-	elif op == '-':
-		answer += int(n1) - int(n2)
-	elif op == '*':
-		answer += int(n1) * int(n2)
-	elif op == '/':
-		answer += int(n1) // int(n2)
+    n1, op, n2 = input().split()
+    if op == '+':
+        answer += int(n1) + int(n2)
+    elif op == '-':
+        answer += int(n1) - int(n2)
+    elif op == '*':
+        answer += int(n1) * int(n2)
+    elif op == '/':
+        answer += int(n1) // int(n2)
 print(answer)
 ```
 
@@ -113,7 +114,7 @@ print(answer)
 
 ```python
 for _ in range(t):
-	answer += int(eval(input().strip()))
+    answer += int(eval(input().strip()))
 print(answer)
 ```
 
