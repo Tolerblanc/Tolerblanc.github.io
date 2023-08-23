@@ -46,8 +46,10 @@ figure.highlight {
     &.code,
     &.rouge-code {
       padding-left: 1em;
-      background: $base02;
-      color: $base08;
+      //background: $base02;
+      //color: $base08;
+      color: #337ab7;
+      background-color: #333333;
     }
   }
 
