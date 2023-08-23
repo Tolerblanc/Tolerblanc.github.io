@@ -115,24 +115,22 @@ print(answer)
 입출력 예제는 아래와 같다.
 ![Day08예제](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/e81d66cb-8c07-469c-971f-bc8db743a0cb)
 
-어제 문제처럼 게임을 변형한 것 같다. 갑자기 그리디 문제가 나왔다???
+23일 오후에 아래 예제와 함께 테스트케이스가 추가되었다.
+![Day08추가예제](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/81c0a651-9b39-4235-9e6d-e2e746795aaf)
+
+어제 문제처럼 게임을 변형한 것 같다. 갑자기 그리디 문제가 나왔다(???)
 
 ```python
 import sys
 input = sys.stdin.readline
 
 pain = int(input())
-answer = 0
-while (pain != 0):
-    if (pain >= 14):
-        pain -= 14
-        answer += 1
-    elif (pain >= 7):
-        pain -= 14
-        answer += 1
-    elif (pain >= 1):
-        pain -= 1
-        answer += 1
+
+answer = pain // 14
+pain %= 14
+answer += pain // 7
+pain %= 7
+answer += pain
 print(answer)
 ```
 
