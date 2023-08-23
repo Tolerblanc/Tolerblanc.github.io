@@ -5,7 +5,7 @@ excerpt: "구름톤 챌린지 1주차 후기 (1)"
 categories:
   - 9oormthon_challenge
 tags:
-  - 9oormthon_challenge, Algorithm
+  - [9oormthon_challenge, Algorithm]
 
 date : 2023-08-19
 last_modified_at: 2023-08-20

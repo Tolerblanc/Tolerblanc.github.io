@@ -4,5 +4,7 @@ main:
     url: https://Tolerblanc.github.io
   - title: "Category"
     url: /categories/
+  - title: "Tags"
+    url: /tags/
   - title: "Github"
     url: https://github.com/Tolerblanc
