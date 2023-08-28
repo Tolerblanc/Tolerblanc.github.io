@@ -3,14 +3,15 @@ title: "[구름톤 챌린지] 2주차 Day09 ~ Day10 학습 일기"
 excerpt: "구름톤 챌린지 2주차 후기 (2)"
 
 categories:
-    - 9oormthon_challenge
+  - 9oormthon_challenge
 tags:
-    - [9oormthon_challenge, Algorithm]
+  - [9oormthon_challenge, Algorithm]
 
 date: 2023-08-27
 last_modified_at: 2023-08-27
 
 toc: true
+toc_sticky: true
 related: true
 ---
 

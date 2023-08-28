@@ -3,14 +3,15 @@ title: "MergeInsertionSort (Ford-Johnson Algorithm) 를 구현하기 전에"
 excerpt: "42 Cursus - CPP Module 09를 하고 계신가요?"
 
 categories:
-    - Algorithm
+  - Algorithm
 tags:
-    - [42Seoul, Algorithm]
+  - [42Seoul, Algorithm]
 
 date: 2023-08-27
 last_modified_at: 2023-08-27
 
 toc: true
+toc_sticky: true
 related: true
 ---
 
