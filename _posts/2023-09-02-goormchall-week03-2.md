@@ -7,8 +7,8 @@ categories:
 tags:
     - [9oormthon_challenge, Algorithm]
 
-date: 2023-08-31
-last_modified_at: 2023-08-31
+date: 2023-09-02
+last_modified_at: 2023-09-02
 
 toc: true
 toc_sticky: true
