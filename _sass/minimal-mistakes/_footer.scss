@@ -85,6 +85,9 @@
 }
 
 .back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
     display: block;
     clear: both;
     color: lighten($text-color, 50%);
