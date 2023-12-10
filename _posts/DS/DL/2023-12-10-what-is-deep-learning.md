@@ -37,12 +37,12 @@ related: true
 
 활성화 함수(Activation Function)라는 것을 사용하면, 연속적인 값을 항상 이산적인 값으로 바꿔줄 수 있다. 활성화 함수를 어떤 것을 사용하느냐에 따라 다르겠지만, 제일 간단한 계단 함수를 알아보자.
 
-\\( \begin{align}
+\\( \begin{aligned}
 H(x) = \begin{cases} 
 0 & \text{if } x < 0 \\
 1 & \text{if } x \geq 0 
 \end{cases}
-\end{align} \\)
+\end{aligned} \\)
 
 0보다 작을 때는 0이, 그 반대의 경우에는 1이 나오는 함수이다. 이 함수에는 어떤 값을 집어넣어도 0아니면 1이 나온다. 지금까지 언급한 내용을 한 장으로 정리하면 아래와 같다.
 
