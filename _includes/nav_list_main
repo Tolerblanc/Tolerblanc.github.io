@@ -112,10 +112,11 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+        <span class="nav__sub-title">Personal</span>
             <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "woowa_precourse" %}
-                        <li><a href="/categories/woowa-precourse" class="">우테코 프리코스 6기 ({{category[1].size}})</a></li>
+                    {% if category[0] == "Retrospective" %}
+                        <li><a href="/categories/retrospective" class="">회고 ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
