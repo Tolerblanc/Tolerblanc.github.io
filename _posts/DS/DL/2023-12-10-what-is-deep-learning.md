@@ -40,7 +40,7 @@ related: true
 \\[
 \displaystyle
 \begin{aligned}
-H(x) = \begin{cases}
+H(x) = \displaystyle \begin{cases}
 0 & \text{if } x < 0 \\
 1 & \text{if } x \geq 0
 \end{cases}
