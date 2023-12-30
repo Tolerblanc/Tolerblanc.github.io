@@ -3,7 +3,7 @@ title: "kqueue() 논문 번역"
 excerpt: "kqueue()가 개발된 배경과 원리를 알아보자"
 
 categories:
-    - OS
+    - UNIX
 tags:
     - [42Seoul, OS, UNIX, IO_multiplexing]
 
