@@ -33,11 +33,32 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Java" %}
-                        <li><a href="/categories/java" class="">Java ({{category[1].size}})</a></li>
+                    <li><a href="/categories/java" class="">Java ({{category[1].size}})</a></li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+        <span class="nav__sub-title">Computer Science</span>
+            <ul>
+                {% for category in site.categories %}
+                {% if category[0] == "Algorithm" %}
+                <li><a href="/categories/algorithm" class="">Algorithm ({{category[1].size}})</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "Design Pattern" %}
+                        <li><a href="/categories/design_pattern" class="">Design Pattern ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Computer Science</span>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "Data Structure" %}
+                        <li><a href="/categories/data_structure" class="">Data Structure ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "OS" %}
@@ -48,14 +69,7 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "UNIX" %}
-                        <li><a href="/categories/os" class="">UNIX ({{category[1].size}})</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <ul>
-                {% for category in site.categories %}
-                    {% if category[0] == "Design Pattern" %}
-                        <li><a href="/categories/design_pattern" class="">Design Pattern ({{category[1].size}})</a></li>
+                        <li><a href="/categories/unix" class="">UNIX ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -81,14 +95,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Algorithm</span>
-            <ul>
-                {% for category in site.categories %}
-                    {% if category[0] == "Algorithm" %}
-                        <li><a href="/categories/algorithm" class="">Algorithm ({{category[1].size}})</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+        <span class="nav__sub-title">Problem Solving</span>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "BOJ" %}
@@ -96,7 +103,28 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Mathematics</span>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "Programmers" %}
+                        <li><a href="/categories/baekjoon" class="">Programmers ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "LeetCode" %}
+                        <li><a href="/categories/leetcode" class="">LeetCode ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "SWEA" %}
+                        <li><a href="/categories/sw_expert_academy" class="">SWEA ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        <!-- <span class="nav__sub-title">Mathematics</span>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Linear Algebra" %}
@@ -110,12 +138,19 @@
                         <li><a href="/categories/statistics" class="">Statistics ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
+            </ul> -->
         <span class="nav__sub-title">Activities</span>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "9oormthon_challenge" %}
                         <li><a href="/categories/goormchall" class="">구름톤 챌린지 ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "42Seoul" %}
+                        <li><a href="/categories/42seoul" class="">42서울 ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
