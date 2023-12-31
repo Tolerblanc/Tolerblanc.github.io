@@ -8,7 +8,7 @@ tags:
   - [42Seoul, Algorithm]
 
 date: 2023-08-27
-last_modified_at: 2023-08-27
+last_modified_at: 2024-01-01
 
 toc: true
 toc_sticky: true
@@ -24,10 +24,10 @@ related: true
 [L. Ford, S. Johnson, A tournament problem, American Mathematical Monthly 66 (1959) 387–389.](https://www.jstor.org/stable/2308750) 에서 제시된 Ford-Johnson 알고리즘은 본래 Steinhaus가 제시한 `토너먼트 문제`의 최적 해결법으로써 제시되었다. (`토너먼트 문제` : "모든 선수의 순위를 매기기에 항상 충분한 최소 경기 수는 얼마인가?")
 
 Steinhaus는 해당 문제에 대한 귀납적 해결 방안을 같이 제안했는데, 이는 다음과 같다. 처음 \\(k\\)명의 플레이어가 순위를 매긴 후, \\(k + 1\\)번째 플에이어가 순위가 매겨진 \\(k\\)명의 중간 플레이어와 매칭되고, '반감' 과정을 (역: 이진 탐색과 비슷한 방식이다.) 통해 해당 플레이어의 최종 순위를 매긴다. 같은 방식으로 그 이후의 플레이어 순위를 결정한다. 이러한 과정을 반복하면, 한 플레이어를 \\( S(k) = 1 + \[\log_2k\]\\) 번의 매칭으로 순위를 결정할 수 있으며, 플레이어 \\(n\\) 명에 대한 매칭 수의 상한\\(M(n)\\)을 찾을 수 있다.
-\\( M(n) = 1 + nS(n) - 2^{S(n)}\\)
+\\[ M(n) = 1 + nS(n) - 2^{S(n)} \\]
 
 위 방식보다 더 최적임이 증명된 방법이 바로 Ford-Johnson 알고리즘이며, 초기 제시 논문에서 매칭 수의 상한 \\(M(n)\\)이 근삿값으로 제시되었다.
-\\( M(n) \sim n \log_2n - 0.915n + O(\log_2n)\\)
+\\[ M(n) \sim n \log_2n - 0.915n + O(\log_2n) \\]
 한 눈에 확 적어졌다고 알아보긴 어렵지만, 수식의 자세한 유도 과정이 궁금한 사람은 [여기](https://www.jstor.org/stable/2308750)를 참조하자.
 
 Ford-Johnson 알고리즘이 제안된지 약 10년만에 [D. Knuth, The Art of Computer Programming, Volume 3, Section 5.3.1 (1968).](https://www2.warwick.ac.uk/fac/sci/dcs/teaching/material/cs341/FJ.pdf)에서 이진 삽입 과정에서 쓰이는 최대 비교 상한과 더불어, 초기에 근삿값으로 제시되었던 매칭 수의 상한까지 계산되었다. 삽입 시 야콥스탑 수열을 따르는게 왜 최적인지 설명해주는 글이므로, 한 번쯤 읽어보는 것을 추천한다.

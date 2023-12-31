@@ -8,7 +8,7 @@ tags:
     - [DeepLearning, Optimization, CV, NLP]
 
 date: 2023-12-10
-last_modified_at: 2023-12-10
+last_modified_at: 2024-01-01
 
 toc: true
 toc_sticky: true
@@ -39,7 +39,7 @@ related: true
 
 \\[
 H(x) = \displaystyle \begin{cases}
-0 & \text{if } x < 0 \\
+0 & \text{if } x < 0 \\\\  
 1 & \text{if } x \geq 0
 \end{cases}
 \\]
