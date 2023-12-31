@@ -21,7 +21,7 @@ title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Tolerblanc"
 description              : |
-  오늘 걸어가는 이 길은 가고자 했던 길의 어디쯤일까
+    오늘 걸어가는 이 길은 가고자 했던 길의 어디쯤일까
 
 url                      : "https://Tolerblanc.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
@@ -108,7 +108,9 @@ analytics:
 author:
   name             : "Tolerblanc"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "노션 -> 블로그 이주중"
+  bio              : |
+    미친듯이 화이팅
+
   location         : "Seoul, Korea"
   email            : "hihj070914@icloud.com"
   links:
