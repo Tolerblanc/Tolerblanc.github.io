@@ -20,7 +20,9 @@ title                    : "인생은 B와 D사이 Code다"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Tolerblanc"
-description              : "노션 -> 블로그 이주중"
+description              : |
+  오늘 걸어가는 이 길은 가고자 했던 길의 어디쯤일까
+
 url                      : "https://Tolerblanc.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "Tolerblanc/Tolerblanc.github.io"
@@ -61,9 +63,9 @@ atom_feed:
   hide                   : # true, false (default)
 search                   : # true, false (default)
 search_full_content      : # true, false (default)
-search_provider          : # lunr (default), algolia, google
+search_provider          : lunr # lunr (default), algolia, google
 lunr:
-  search_within_pages    : # true, false (default)
+  search_within_pages    : true
 algolia:
   application_id         : # YOUR_APPLICATION_ID
   index_name             : # YOUR_INDEX_NAME
@@ -140,7 +142,7 @@ footer:
       # url:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url:
+      url: "https://github.com/Tolerblanc"
     - label: "GitLab"
       icon: "fab fa-fw fa-gitlab"
       # url:

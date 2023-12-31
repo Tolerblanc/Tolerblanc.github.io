@@ -1,10 +1,10 @@
 # main links
 main:
   - title: "Home"
-    url: https://Tolerblanc.github.io
+    url: /
   - title: "Category"
     url: /categories/
   - title: "Tags"
     url: /tags/
-  - title: "Github"
-    url: https://github.com/Tolerblanc
+  - title: "Search"
+    url: /search/
