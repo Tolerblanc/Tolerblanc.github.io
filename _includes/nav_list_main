@@ -106,7 +106,7 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Programmers" %}
-                        <li><a href="/categories/baekjoon" class="">Programmers ({{category[1].size}})</a></li>
+                        <li><a href="/categories/programmers" class="">Programmers ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
