@@ -45,27 +45,27 @@
                 {% endif %}
                 {% endfor %}
             </ul>
-            <ul>
+            <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Design Pattern" %}
                         <li><a href="/categories/design_pattern" class="">Design Pattern ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
-            <ul>
+            </ul> -->
+            <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Data Structure" %}
                         <li><a href="/categories/data_structure" class="">Data Structure ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
-            <ul>
+            </ul> -->
+            <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "OS" %}
                         <li><a href="/categories/os" class="">OS ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
+            </ul> -->
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "UNIX" %}
@@ -73,14 +73,30 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Data Science</span>
+        <span class="nav__sub-title">Dev & Frameworks</span>
+            <!-- <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "Django" %}
+                        <li><a href="/categories/django" class="">Django ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul> -->
+        <span class="nav__sub-title">Devops</span>
             <ul>
+                {% for category in site.categories %}
+                    {% if category[0] == "Docker" %}
+                        <li><a href="/categories/docker" class="">Docker ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        <span class="nav__sub-title">Data Science</span>
+            <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "ML" %}
                         <li><a href="/categories/ml" class="">Machine Learning ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
+            </ul> -->
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "DL" %}
@@ -88,13 +104,13 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            <ul>
+            <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "NLP" %}
                         <li><a href="/categories/nlp" class="">NLP ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
-            </ul>
+            </ul> -->
         <span class="nav__sub-title">Problem Solving</span>
             <ul>
                 {% for category in site.categories %}
@@ -127,7 +143,7 @@
         <!-- <span class="nav__sub-title">Mathematics</span>
             <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "Linear Algebra" %}
+                    {% if category[0] == "Linear_Algebra" %}
                         <li><a href="/categories/linear-algebra" class="">Linear Algebra ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
