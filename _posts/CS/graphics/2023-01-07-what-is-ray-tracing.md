@@ -149,7 +149,7 @@ t_ray	get_primary_ray(t_camera cam, t_scalar w, t_scalar h)
 
 위 과정을 C 코드로 옮기면 아래와 같은 함수로 구현할 수 있다.
 
-```C
+```c
 int	check_sphere_hit(t_ray ray, t_sphere *sp)
 {
 	t_vec	  ray2center;
@@ -175,7 +175,7 @@ int	check_sphere_hit(t_ray ray, t_sphere *sp)
 
 \\( \vec{P} - \vec{C} = \vec{N} \\) 단, \\( \vec{N} \\) 은 법선벡터이며, 아래에선 정규화를 통해 정규법선벡터를 구한다.
 
-```C
+```c
 int	get_sphere_color(t_ray ray, t_sphere *sp, double lrr)
 {
 	t_vec	normal;
@@ -195,7 +195,7 @@ int	get_sphere_color(t_ray ray, t_sphere *sp, double lrr)
 
 카메라도 있고, 빛도 있고, 물체도 있다. 하지만 물체가 여러 개일 경우 고려할 점이 많아진다. 어떤 물체가 더 앞에 있는지, (뒤에 있는 물체는 아예 고려하지 않아도 된다.) 어떤 물체가 카메라보다 뒤에 있는지 (이 또한 렌더 대상이 아니기 때문에 고려하지 않아도 된다.) 에 대한 정보를 체크해야 한다. 따라서 아래와 같은 구조체를 사용하여, 충돌 시점의 정보를 저장할 것이다.
 
-```C
+```c
 struct s_hit_record
 {
     t_point3    p;
@@ -220,7 +220,7 @@ struct s_hit_record
 
 실제로 구해야 하는 것은 __Outside Normal__ 인데, 법선 벡터를 구하다 보면 __Local Normal__ 과 같이 벡터의 방향이 반대가 되는 경우가 있다. 이를 보정하기 위하여 아래와 같은 함수로 `front_face`를 체크한다.
 
-```C
+```c
 void	set_face_normal(t_ray ray, t_hit_record *rec)
 {
 	if (vec_dot(ray.dir, rec->normal) < 0)
@@ -234,7 +234,7 @@ void	set_face_normal(t_ray ray, t_hit_record *rec)
 
 앞서 구현했던 `check_sphere_hit` 함수를 개선해보자. 우선, 판별식을 짝수 공식으로 변경할 수 있다. 또한 `t_hit_record` 구조체를 도입했기 때문에 값을 채워 넣어줘야 한다. 값을 채우는 과정에서, 두 근이 `[tmin, tmax]` 범위를 넘어가는지 체크해주었다. 근이 범위 밖에 존재하는 경우, 아예 충돌하지 않는 것으로 체크한다. 
 
-```C
+```c
 int	check_sphere_hit(t_ray ray, t_sphere *sp, t_hit_record *rec)
 {
 	t_vec	ray2center;
@@ -284,7 +284,7 @@ int	check_sphere_hit(t_ray ray, t_sphere *sp, t_hit_record *rec)
 
 어느 한 교점에 도달한 빛은 _Ambient_ + \\( \sum \\) (_Specular_ + _Diffuse_) 로 계산할 수 있다. 여러 광원이 존재할 경우 모든 광원에 대해 Specular 와 Diffuse를 고려하여 합한 후 Ambient를 고려해야 하지만, 단광원임을 가정하였기 때문에 _Ambient_ + (_Specular_ + _Diffuse_)로 계산할 것이다. 코드로 옮기면 다음과 같다.
 
-```C
+```c
 t__color	phong_lighting(t_info *info, t_ray ray, t_hit_record *rec)
 {
 	t_vec	light;
@@ -300,7 +300,7 @@ t__color	phong_lighting(t_info *info, t_ray ray, t_hit_record *rec)
 
 ### Ambient Lighting
 
-```C
+```c
 info->light.ambient = color_to_vec(info->light.al_color);
 info->light.ambient = vec_mul(info->light.ambient, info->light.al_ratio);
 ```
@@ -319,7 +319,7 @@ info->light.ambient = vec_mul(info->light.ambient, info->light.al_ratio);
 
 - 사이의 각도를 표현하는 \\( \cos \theta \\) 값을 통해 (내적 결과) `diffuse_strength`를 계산하고, 이를 빛의 색(백색광만 고려하였다.)에다 가중치로 곱한다.
 
-```C
+```c
 t_vec	get_point_light(t_info *info, t_ray ray, t_hit_record *rec)
 {
 	t_vec	result;
@@ -350,7 +350,7 @@ t_vec	get_point_light(t_info *info, t_ray ray, t_hit_record *rec)
 
 최종적인 `get_point_light` 함수는 다음과 같다.
 
-```C
+```c
 t_vec	get_specular_light(t_ray ray, t_vec light_dir, t_hit_record *rec)
 {
 	t_vec	view_dir;
