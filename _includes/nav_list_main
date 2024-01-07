@@ -68,6 +68,13 @@
             </ul> -->
             <ul>
                 {% for category in site.categories %}
+                    {% if category[0] == "Graphics" %}
+                        <li><a href="/categories/graphics" class="">Graphics ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
                     {% if category[0] == "UNIX" %}
                         <li><a href="/categories/unix" class="">UNIX ({{category[1].size}})</a></li>
                     {% endif %}
