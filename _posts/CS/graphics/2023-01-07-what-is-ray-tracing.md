@@ -277,9 +277,9 @@ int	check_sphere_hit(t_ray ray, t_sphere *sp, t_hit_record *rec)
 
 ![phong](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/031d7184-cb60-4092-b5de-7188097f9d2f)
 
-- Ambient Lighting : 주변 조명, 밝은 낮 어두운 그늘에 들어가도 물체가 보이는 것처럼, 공기 중 산란되어 존재하는 빛으로 인해 물체가 밝아지는 것을 묘사
-- Diffuse Lighting : 난반사 역할, 광선이 물체에 비스듬하게 들어올 수록 단위 면적 당 들어오는 광선 수가 적다는 논리를 적용함
-- Specular Lighting : 정반사 역할, 물체의 반짝이는 하이라이팅을 표현
+- **Ambient Lighting** : 주변 조명, 밝은 낮 어두운 그늘에 들어가도 물체가 보이는 것처럼, 공기 중 산란되어 존재하는 빛으로 인해 물체가 밝아지는 것을 묘사
+- **Diffuse Lighting** : 난반사 역할, 광선이 물체에 비스듬하게 들어올 수록 단위 면적 당 들어오는 광선 수가 적다는 논리를 적용함
+- **Specular Lighting** : 정반사 역할, 물체의 반짝이는 하이라이팅을 표현
 - 실제 퐁 조명 모델은 방사광(Emission)도 존재하지만 생략함. 계산의 편의를 위해 단광원으로 가정함. 
 
 어느 한 교점에 도달한 빛은 _Ambient_ + \\( \sum \\) (_Specular_ + _Diffuse_) 로 계산할 수 있다. 여러 광원이 존재할 경우 모든 광원에 대해 Specular 와 Diffuse를 고려하여 합한 후 Ambient를 고려해야 하지만, 단광원임을 가정하였기 때문에 _Ambient_ + (_Specular_ + _Diffuse_)로 계산할 것이다. 코드로 옮기면 다음과 같다.
@@ -297,6 +297,8 @@ t__color	phong_lighting(t_info *info, t_ray ray, t_hit_record *rec)
 	return (vec_to_color(light));
 }
 ```
+
+현실세계의 모든 물리 법칙을 반영하지는 않기 때문에, 물리 기반 렌더링(PBR)과 같은 더 복잡한 모델에 비해 사실적이지 않은 결과를 만들 수 있다. 하지만 PBR과 비교해서 그렇다는거지 퐁 조명 모델 자체도 훌륭한 결과를 낼 수 있다. 또한, 퐁 조명 모델 조차 계산 집약적이라서 실시간으로 수많은 광원을 처리하기에는 무리가 있다.
 
 ### Ambient Lighting
 
@@ -340,7 +342,7 @@ t_vec	get_point_light(t_info *info, t_ray ray, t_hit_record *rec)
 
 ### Specular Lighting
 
-- _Specular_는 교점에서 카메라를 향하는 벡터(`view_dir`)와, 위 코드의 `light_dir`을 법선을 기준으로 대칭시킨 벡터(`reflect_dir`)의 사이각에 따른 코사인값, 물체의 반짝거리는 정도를 나타내는 값(SPECULAR_BRIGHTNESS), [0,1] 사이의 임의 값으로 설정되는 specular 강도(SPECULAR_STRENGTH)의 연산을 통해 결정된다.
+- _Specular_ 는 교점에서 카메라를 향하는 벡터(`view_dir`)와, 위 코드의 `light_dir`을 법선을 기준으로 대칭시킨 벡터(`reflect_dir`)의 사이각에 따른 코사인값, 물체의 반짝거리는 정도를 나타내는 값(SPECULAR_BRIGHTNESS), [0,1] 사이의 임의 값으로 설정되는 _Specular_ 강도(SPECULAR_STRENGTH)의 연산을 통해 결정된다.
 
 \\[ \text{Specular} = \text{SPECULAR\_STRENGTH} * (\text{view\_dir} \cdot \text{reflect\_dir})^{\text{SPECULAR\_BRIGHTNESS}} \\]
 
@@ -390,7 +392,288 @@ t_vec	get_point_light(t_info *info, t_ray ray, t_hit_record *rec)
 
 ## Hard Shadow
 
+![hard and soft](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/1b106d99-535a-4abc-bc01-928eb308706e)
+
+- 위 그림의 왼쪽이 `Hard Shadow`, 오른쪽이 `Soft Shadow`이다. 
+- 현실세계의 그림자는 Soft Shadow이다. 위 그림을 잘 보면 그림자의 경계가 뭉개지는 것을 볼 수 있다.
+- 보다 덜 사실적이지만, 적은 연산량으로 현실세계와 비슷한 그림자를 구현할 수 있는 Hard Shadow를 구현할 것이다.
+
+![hard shadow](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/c442d974-8e91-41fd-a42a-bef4dddd794f)
+
+- 위 그림과 같이, object와 광원 사이 또 다른 object가 존재한다면, 그림자가 생긴다고 볼 수 있다.
+- object의 교점으로 부터 광원방향의 ray를 쐈을 때 충돌하는 물체가 있다면, 그림자가 생긴다고 판단할 것이다.
+
+```c
+int	in_shadow(t_info *info, t_ray light_ray, double light_len)
+{
+	t_hit_record	rec;
+
+	rec.tmin = 0;
+	rec.tmax = light_len;
+	if (check_ray_hit(light_ray, info, &rec) != -1)
+		return (1);
+	return (0);
+}
+```
+
+위 함수를 `get_point_light()`에 적용하여, 충돌을 감지하는 경우에 대해 검은색을 반환하도록 처리해준다.
+
 ## Camera Expansion
+
+빛과 여러 물체, 주변광과 정반사 및 난반사, 그림자 등 많은 요소를 고려할 수 있게 되었다. 마지막으로 원점에 고정하였던 카메라를 이동 시킬 수 있도록 수정하고, 시야각을 고려해보자.
+
+### Camera Orientation
+
+![orientation](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/b9a0fd90-db31-4117-9da6-6a3bb65dddd2)
+
+- 이제 카메라의 시점과 방향을 고려해보자. 위 그림에서 `lookfrom`을 카메라의 시점, `lookfrom→lookat` 벡터를 카메라의 방향벡터로 볼 것이다.
+- 따라서 카메라의 방향벡터는 `lookat - lookfrom` 으로 볼 수 있을 것이다. 이것을 \\( -w \\) 라고 하자.
+- 카메라의 시점을 중심, \\( w \\) 를 법선벡터로 갖는 한 평면을 생각해보자. 이 평면에서, 정규직교기저 \\( v, u \\) 를 정의할 수 있을 것이다.
+- 또한, 3차원 공간에 대한 직교기저를 표현하기 위해서 \\( \text{v}_\text{up} \\) 이라는 벡터도 정의할 것이다.
+- 어떠한 벡터든, \\( (v, w) \\)를 정규직교기저로 하는 평면에 투영시키면 `vup`을 얻을 수 있다. 우리는 계산을 편리하게 하기 위해서, miniRT 내에서 절대적 상단이라고 취급할 수 있는 (0,1,0)을 \\( \text{v}_\text{up} \\) 으로 사용할 것이다.
+- \\( (\text{v}_\text{up}, u, w) \\) 가 한 평면에 존재한다는 사실을 잊어서는 안된다.
+- 실제 연산 과정에서는, \\( \text{v}_\text{up} \\) 과 \\( w \\) 가 정의된 상태에서, 정규직교기저 \\( u,v \\)를 역산할 것이다.
+    
+\\[ u = \text{v}_\text{up} \otimes w \\]
+→ 외적의 기하학적 성질로 인하여, \\( (\text{v}_\text{up}, w) \\) 두 벡터에 수직이며, 오른손 법칙으로 휘감는 방향의 벡터를 구할 수 있다.
+    
+\\[ v = w \otimes u \\] 
+→ 외적의 기하학적 성질로 인하여, \\( (w, u) \\) 두 벡터에 수직이며, 오른손 법칙으로 휘감는 방향의 벡터를 구할 수 있다. 벡터 외적은 순서에 민감한 연산이다. 오른손 법칙으로 인해 방향이 완전 달라지기 때문이다.
+    
+- 구한 정규직교기저 \\( (u,v) \\) 를 Viewport의 방향벡터로 적용시켜준다.
+- 코드로 구현하면 아래와 같다.
+
+```c
+void	set_viewport_plane(t_camera *cam)
+{
+	t_vec	vup;
+	t_vec	temp;
+	t_vec	orient;
+
+	vup = new_vector(0, 1, 0);
+	orient = vec_mul(cam->orient, -1);
+	temp = vec_prod(vup, orient);
+	cam->vp.horizontal = vec_normalize(vec_mul(temp, cam->vp.width));
+	temp = vec_prod(orient, temp);
+	cam->vp.vertical = vec_normalize(vec_mul(temp, cam->vp.height));
+	cam->vp.left_bot = vec_sub(cam->viewpoint, \
+								vec_mul(cam->vp.horizontal, 0.5));
+	cam->vp.left_bot = vec_sub(cam->vp.left_bot, \
+								vec_mul(cam->vp.vertical, 0.5));
+	cam->vp.left_bot = vec_sub(cam->vp.left_bot, orient);
+}
+```
+
+### Camera Viewing Geometry (FOV)
+
+![fov](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/fd68a268-ecdd-4ad8-bcf4-a124e1051a82)
+
+- Horizontal Field Of View(HFOV)만 주어지는 경우가 있을 수 있다.
+- HFOV가 정해지면 VFOV(Vertical Field Of View) 또한 결정되므로, 카메라에 적용하기 쉽게 VFOV로 변환하여 저장하고 계산할 것이다.
+- 디스플레이 크기를 고정으로 생각하면, 종횡비(aspect_ratio)를 구할 수 있다. 종횡비를 \\( h \\) 라고 하면,
+    
+    \\[ h = \text{screen\_width} / \text{screen\_height} \\]
+    
+- 주어지는 HFOV 값은 각도이므로, 라디안으로 변환하면,
+    
+    \\[ HFOV_{rad} = HFOV_{deg} \times \pi / 180 \\]
+    
+- hFOV값을 vFOV 값으로 변환하고, 다시 각도로 변환시켜주자.
+
+    \\[ VFOV_{rad} = 2 \times \arctan (\tan(\displaystyle\frac{HFOV}{2} \times h)) \\]
+    
+    \\[ VFOV_{deg} = VFOV_{rad} \times 180 / \pi \\]
+
+- 계산한 VFOV값으로, Viewport의 길이를 변환시켜 시야각(FOV)을 적용할 것이다.
+- \\( h \\) 를 종횡비가 아닌, 시야각에 대한 높이비 로 다시 정의하면,
+    
+    \\[ h = \tan (\displaystyle\frac{\theta}{2}) \\]
+    
+- 기존 2로 잡아놨던 Viewport의 높이에 \\( h \\) 를 곱해줄 것이다. ( \\( \theta \\) 는 라디안)
+
+코드로 구현하면 아래와 같다.
+
+```c
+info->camera.vp.height = 2.0 * tan((info->camera.vfov * PI / 180) / 2.0);
+info->camera.vp.width = info->camera.vp.height * info->aspect_ratio;
+```
+
+## Ray - Plane & Cylinder Intersection
+
+간단한 레이트레이싱을 위한 요소로 빛, 카메라, 주변광, 난반사, 정반사, 물체 충돌 등 여러가지 요소를 고려해보았다. 위 요소를 모두 적용하면 아래와 같은 이미지를 렌더할 수 있게 된다!
+
+![mimiRT](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/6f50c622-52d4-435e-8bab-a534e0a1495d)
+
+이제 평면과 원기둥을 고려해볼 것이다. [Ray-Sphere Intersection](#ray-sphere-intersection)과 같은 원리로, Ray의 \\( t \\)를 구하여 도형과 레이의 교점을 구할 것이다.
+- \\( P(t) = O + D*t \\) 에서 도형의 중심점을 \\( C \\)라고 하면, \\( P - C = D*t + X \\)로 정리할 수 있으며, \\( X = O-C \\)를 구하는 과정이 된다.
+
+### Ray - Plane
+
+![ray-plane](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/bd4b766d-61c9-4efd-a6ca-f54f74f755de)
+
+- 평면의 중심점인 \\( C \\) 와, 법선벡터 \\( V \\) 를 통해 하나의 평면을 결정할 수 있다.
+- Ray가 평면과 충돌하는 교점을 \\( P \\) 라고 하면, \\( \vec{CP} \\)는 \\( V \\)와 수직일 것이다. 따라서 다음이 성립한다.
+    
+\\[ (P-C) \cdot V = 0 \\]
+
+위 식을 전개하면,
+
+\\[ (D*t + X) \cdot V = 0 \\]
+
+\\[ (D \cdot V*t) = -X \cdot V \\] 
+
+위 식에서 \\(D \cdot V = 0 \\)인지 체크해야 한다.
+
+\\[ t = -X \cdot V /  D \cdot V \\]
+    
+- \\( D \cdot V \\) 와 \\( X\cdot V \\)의 부호 또한 다른지 체크해야 한다. 그렇지 않으면, \\( t \\) 가 음수가 된다.
+- \\( D \cdot V = 0 \\)인 경우와 \\( t<0 \\)인 경우는 충돌하지 않는 경우이다.
+- 교점에서의 법선벡터는 평면의 법선벡터와 같으며, \\( D \cdot V < 0 \\) 인 경우는 평면의 법선벡터의 반대방향이다.
+
+코드로 구현하면 다음과 같다.
+
+```c
+int	check_plane_hit(t_ray ray, t_plane *pl, t_hit_record *rec)
+{
+	t_vec	ray2center;
+	double	t;
+
+	ray2center = vec_sub(ray.orig, pl->center);
+	if (vec_dot(ray.dir, pl->normal) == 0)
+		return (-1);
+	t = vec_dot(vec_mul(ray2center, -1), pl->normal);
+	if (vec_dot(ray.dir, pl->normal) == 0)
+		return (-1);
+	t /= vec_dot(ray.dir, pl->normal);
+	if (t <= 0)
+		return (-1);
+	rec->dist = t;
+	rec->p = ray_at(ray, t);
+	rec->normal = pl->normal;
+	if (vec_dot(ray.dir, pl->normal) < 0)
+		rec->normal = vec_mul(rec->normal, -1);
+	rec->albedo = color_to_vec(pl->color);
+	set_face_normal(ray, rec);
+	return (1);
+}
+```
+
+### Ray - Cylinder
+
+진짜 찐찐막으로, 제일 복잡한 원기둥 충돌 처리를 해보자.
+
+![ray-cylinder](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/d83a9acf-cf6b-40e6-97f1-1c8cd08b2e8b)
+
+- 원통의 경우가 제일 복잡하다. 두 밑면과 옆면을 따로 생각할 것이다. 옆면 부터 보자.
+- 마찬가지로, 레이와 원기둥의 교점을 \\( P \\) 로 볼 것이다.
+추가로, \\( P \\)로 부터 원기둥의 중심축으로 내린 수선의 발을 \\( A \\), 
+원기둥의 중심점으로 부터 중심축의 방향벡터의 반대 방향으로 나아간 원기둥의 밑면의 중심을 \\( C \\),
+\\( C \\) 로부터 원기둥 중심축의 방향벡터 방향으로 나아간 원기둥의 밑면의 중심을 \\( L \\) 이라 하자.
+- \\( C \\) 로 부터 \\( A \\) 를 다시 정의할 수 있다. \\( m \\) 은 \\( V \\) 에 대한 가중치이다.
+\\[ A = C + V*m \\]
+이때, \\( L = C + V*\max{m} \\) 이므로, \\( \max{m} = h \\)인 것을 알 수 있다. ( \\( h \\)는 원기둥 높이 ) 따라서 \\( m \in [0, h] \\) 이다.
+    
+- 위 정의들을 통해 두 가지 성질을 도출해낼 수 있다.
+    1. \\( (P-A) \cdot V = 0 \\)
+    2. \\( \text{len}(P-A) = r \\)
+
+- 1번 성질을 먼저 풀어보자.
+    \\[ (P - A) \cdot V = 0 \\]
+    \\[ (P - C - V*m) \cdot V = 0 \\]
+    \\[ (P-C) \cdot V = m*(V\cdot V) = m \\]
+( \\( V \\)는 방향벡터이므로, 길이 및 자기자신의 내적값이 1이다.)
+    \\[ m = (D*t + X) \cdot V \\]
+    \\[ m = D\cdot V*t + X\cdot V \\]
+    
+    추가로, \\( (P-A) \\) 를 정규화 하면 법선벡터를 구할 수 있다.
+    
+- 2번 성질도 풀어보자.
+    
+    \\[ \text{len}(P-A) = r \\]
+    \\[ \text{len}(P-C-V*m) = r \\]
+    \\[ \text{dot}\{Dt+X - V(D\cdot V*t + X\cdot V)\} = r^2 \\]
+    ( \\( \text{dot} \\) = 자기 자신의 내적)
+    \\[ \text{dot}\{(D-V*(D\cdot V))*t + (X-V*(X \cdot V) \} = r^2 \\]
+    
+    \\[ \text{dot}(A-V*(A \cdot V)) = A \cdot A - (A \cdot V)^2 \\]
+를 이용하여 위 식을 쭉 전개하고, 그 결과를 \\( a*t^2 + b*t + c = 0 \\) 라고 하였을 때,
+    
+    \\[ a = D \cdot D - (D \cdot V)^2 \\]
+    \\[ c = X\cdot X - (X\cdot V)^2 - r^2 \\]
+    \\[ b = 2 * (D-V*(D\cdot V)) \cdot (X-V*(X\cdot V)) \\]
+    \\[ b = 2 * (D\cdot X - (D \cdot V) *( X \cdot V)) \\]
+    \\[ \displaystyle \frac{b}{2} = D \cdot X - (D\cdot V) * (X \cdot V) \\]
+    
+    \\[ D_{iscreminant} = \displaystyle(\frac{b}{2})^2 - a*c > 0 \\]
+    
+- 구와 같이 판별식이 양수인 경우, 레이와 물체가 충돌한다고 간주하고, 근의 공식을 통해 \\( t \\) 를 구하여 그 중 작은 근을 충돌 위치로 판별했었다.
+- 원기둥 또한 같은 원리로 작은 근을 구하면 옆면 중 눈에 보이는 부분을 구할 수 있다.
+- 다만, \\( m \in [0, h] \\) 인지 검사를 한 번 해줘야한다. 그렇지 않으면 높이가 무한한 원기둥을 볼 수 있다.
+- \\( m \notin [0, h] \\) 중에서, 특정한 \\( m \\) 원기둥의 밑면을 가리키게 된다. 범위를 벗어나는 \\( m \\) 중 원기둥의 밑면을 찾아보자.
+- 원기둥의 밑면은 중심이 \\( C \\) 또는 \\( L \\) 이고, 법선벡터가 \\( -V \\) 또는 \\( V \\) 일 것이다.
+
+위 내용을 코드로 구현하면 아래와 같다.
+```c
+double	cylinder_discriminant(t_ray ray, t_vec ray2cap, \
+								t_cylinder *cy, double *half_b)
+{
+	double	a;
+	double	c;
+
+	*half_b = vec_dot(ray.dir, ray2cap) - (vec_dot(ray.dir, cy->axis) * \
+		vec_dot(ray2cap, cy->axis));
+	a = vec_dot(ray.dir, ray.dir) - pow(vec_dot(ray.dir, cy->axis), 2);
+	c = vec_dot(ray2cap, ray2cap) - \
+		pow(vec_dot(ray2cap, cy->axis), 2) - cy->rsquare;
+	return (*half_b * *half_b - a * c);
+}
+
+int	check_cylinder_hit(t_ray ray, t_cylinder *cy, t_hit_record *rec)
+{
+	double	half_b;
+	double	discriminant;
+	double	other_root;
+	double	a;
+
+	discriminant = cylinder_discriminant(ray, \
+		vec_sub(ray.orig, cy->cap_point), cy, &half_b);
+	a = vec_dot(ray.dir, ray.dir) - pow(vec_dot(ray.dir, cy->axis), 2);
+	if (discriminant <= 0)
+		return (-1);
+	rec->dist = (-half_b - sqrt(discriminant)) / a;
+	other_root = (-half_b + sqrt(discriminant)) / a;
+	rec->p = ray_at(ray, rec->dist);
+	if (!(cylinder_normal(ray, cy, rec, other_root)))
+		return (-1);
+	rec->albedo = color_to_vec(cy->color);
+	set_face_normal(ray, rec);
+	return (1);
+}
+
+int	cylinder_normal(t_ray ray, t_cylinder *cy, t_hit_record *rec, double root)
+{
+	double	m;
+
+	rec->normal = vec_sub(rec->p, cy->cap_point);
+	m = vec_dot(ray.dir, vec_mul(cy->axis, rec->dist)) + \
+		vec_dot(vec_sub(ray.orig, cy->center), cy->axis);
+	if (m < 0 || m > cy->height || \
+		rec->dist < rec->tmin || rec->dist > rec->tmax)
+	{
+		rec->dist = root;
+		rec->p = ray_at(ray, rec->dist);
+		rec->normal = vec_sub(rec->p, cy->cap_point);
+		m = vec_dot(ray.dir, vec_mul(cy->axis, rec->dist)) + \
+		vec_dot(vec_sub(ray.orig, cy->center), cy->axis);
+		if (m < 0 || m > cy->height || \
+			rec->dist < rec->tmin || rec->dist > rec->tmax)
+			return (0);
+	}  
+	rec->normal = vec_sub(rec->normal, vec_mul(cy->axis, m));
+	rec->normal = vec_normalize(rec->normal);
+	return (1);
+}
+```
 
 ## Reference
 
