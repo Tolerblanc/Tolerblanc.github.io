@@ -59,7 +59,7 @@ related: true
 - \\( t \\)는 실수 범위의 매개변수: 양수일 경우, 시점 기준 방향벡터가 가리키는 방향으로 빛이 이동한다. 음수일 경우 그 반대.
 
 C 코드로 작성하면 다음과 같다.
-```C
+```c
 typedef struct s_ray
 {
 	t_point	orig;
@@ -104,7 +104,7 @@ t_point	ray_at(t_ray ray, t_scalar s)
 
 카메라 원점으로부터 출발하는 빛(레이)를 `primary_ray`라고 하자. (반사가 한 번도 되지 않았다는 뜻이다.) 아래의 `get_primary_ray` 함수는 카메라가 쏘는 각 빛의 벡터를 얻을 수 있는 함수이다.
 
-```C
+```c
 t_ray	get_primary_ray(t_camera cam, t_scalar w, t_scalar h)
 {
 	t_ray	result;
@@ -119,6 +119,7 @@ t_ray	get_primary_ray(t_camera cam, t_scalar w, t_scalar h)
 } 
 //w, h는 각각 width, height에 해당하는 가중치 이다.
 ```
+
 `cam.vp`는 뷰포트, `cam.viewpoint`는 카메라의 좌표 (현재는 원점으로 고정) 이다. 방향벡터를 결정하기 위해서, (뷰포트의 왼쪽 아래 꼭짓점 + width + height - 카메라 좌표)를 계산 후 정규화한다.
 
 ## Ray-Sphere Intersection
@@ -131,11 +132,11 @@ t_ray	get_primary_ray(t_camera cam, t_scalar w, t_scalar h)
 
 - 하지만 우리는 벡터를 통해 계산할 것이므로 구 경계의 한 점 \\(P=(x, y, z) \\) 를 생각하면, \\( P \\)로 부터 구의 중점으로 가는 벡터의 크기는 반지름과 같을 것이다. 이를 수식으로 표현하면 다음과 같다.
 
-\\[ ||\vec{CP}|| =||P-C|| = r^2 \\]
+\\[ \|\| \vec{CP} \|\| = \|\|P-C\|\| = r^2 \\]
 
 - 좀 더 확장하여 \\( P \\) 를 레이의 도착지점으로 보면, \\( P(t) = A + tB \\) 로 치환할 수 있다.
     
-\\[ |A + tB - C||A + tB - C| = r^2 \\]
+\\[ \|A + tB - C\| \cdot \|A + tB - C\| = r^2 \\]
     
 \\[ A\cdot A + tA\cdot B - A \cdot C + tA\cdot B + t^2 B \cdot B - tB\cdot C - A\cdot C -tB\cdot C + C \cdot C = r^2 \\]
 
@@ -145,7 +146,7 @@ t_ray	get_primary_ray(t_camera cam, t_scalar w, t_scalar h)
 
 - 판별식을 사용하여 2개의 실근을 가질 때를 조사하면, 레이와 구가 충돌하는 지점을 구할 수 있다.
 
-\\[ D_{iscriminant} = 4 * ||B \cdot (A - C)|| - 4 * B \cdot B * (A-C)\cdot (A-C) > 0 \\]
+\\[ D_{iscriminant} = 4 * \|\|B \cdot (A - C)\|\| - 4 * B \cdot B * (A-C)\cdot (A-C) > 0 \\]
 
 위 과정을 C 코드로 옮기면 아래와 같은 함수로 구현할 수 있다.
 
@@ -273,7 +274,7 @@ int	check_sphere_hit(t_ray ray, t_sphere *sp, t_hit_record *rec)
 
 이 모든 요소를 고려하려면 컴퓨팅 성능이 매우 많이 필요하고, 구현하기도 힘들다. 따라서 간단한 물리 법칙에 기반한 `Phong Lighting Model`을 사용할 것이다.
 
-아래와 같이 _Ambient Lighting_, _Diffuse Lighing_, _Specular Lighting_을 모두 합산한 것이 **Phong Lighting Model** 이다.
+아래와 같이 _Ambient Lighting_, _Diffuse Lighing_, _Specular Lighting_ 을 모두 합산한 것이 **Phong Lighting Model** 이다.
 
 ![phong](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/031d7184-cb60-4092-b5de-7188097f9d2f)
 
@@ -430,12 +431,14 @@ int	in_shadow(t_info *info, t_ray light_ray, double light_len)
 - 따라서 카메라의 방향벡터는 `lookat - lookfrom` 으로 볼 수 있을 것이다. 이것을 \\( -w \\) 라고 하자.
 - 카메라의 시점을 중심, \\( w \\) 를 법선벡터로 갖는 한 평면을 생각해보자. 이 평면에서, 정규직교기저 \\( v, u \\) 를 정의할 수 있을 것이다.
 - 또한, 3차원 공간에 대한 직교기저를 표현하기 위해서 \\( \text{v}_\text{up} \\) 이라는 벡터도 정의할 것이다.
-- 어떠한 벡터든, \\( (v, w) \\)를 정규직교기저로 하는 평면에 투영시키면 `vup`을 얻을 수 있다. 우리는 계산을 편리하게 하기 위해서, miniRT 내에서 절대적 상단이라고 취급할 수 있는 (0,1,0)을 \\( \text{v}_\text{up} \\) 으로 사용할 것이다.
+- 어떠한 벡터든, \\( (v, w) \\)를 정규직교기저로 하는 평면에 투영시키면 \\(  \text{v}_\text{up} \\) 을 얻을 수 있다. 
+- 우리는 계산을 편리하게 하기 위해서, 절대적 상단이라고 취급할 수 있는 (0,1,0)을 \\( \text{v}_\text{up} \\) 으로 사용할 것이다.
 - \\( (\text{v}_\text{up}, u, w) \\) 가 한 평면에 존재한다는 사실을 잊어서는 안된다.
 - 실제 연산 과정에서는, \\( \text{v}_\text{up} \\) 과 \\( w \\) 가 정의된 상태에서, 정규직교기저 \\( u,v \\)를 역산할 것이다.
     
 \\[ u = \text{v}_\text{up} \otimes w \\]
-→ 외적의 기하학적 성질로 인하여, \\( (\text{v}_\text{up}, w) \\) 두 벡터에 수직이며, 오른손 법칙으로 휘감는 방향의 벡터를 구할 수 있다.
+
+→ 외적의 기하학적 성질로 인하여, \\( ( \text{v}_\text{up}, w) \\) 두 벡터에 수직이며, 오른손 법칙으로 휘감는 방향의 벡터를 구할 수 있다.
     
 \\[ v = w \otimes u \\] 
 → 외적의 기하학적 성질로 인하여, \\( (w, u) \\) 두 벡터에 수직이며, 오른손 법칙으로 휘감는 방향의 벡터를 구할 수 있다. 벡터 외적은 순서에 민감한 연산이다. 오른손 법칙으로 인해 방향이 완전 달라지기 때문이다.
@@ -505,7 +508,8 @@ info->camera.vp.width = info->camera.vp.height * info->aspect_ratio;
 ![mimiRT](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/6f50c622-52d4-435e-8bab-a534e0a1495d)
 
 이제 평면과 원기둥을 고려해볼 것이다. [Ray-Sphere Intersection](#ray-sphere-intersection)과 같은 원리로, Ray의 \\( t \\)를 구하여 도형과 레이의 교점을 구할 것이다.
-- \\( P(t) = O + D*t \\) 에서 도형의 중심점을 \\( C \\)라고 하면, \\( P - C = D*t + X \\)로 정리할 수 있으며, \\( X = O-C \\)를 구하는 과정이 된다.
+- \\( P(t) = O + D*t \\) 에서 도형의 중심점을 \\( C \\)라고 하면, 
+\\( P - C = D*t + X \\)로 정리할 수 있으며, \\( X = O-C \\)를 구하는 과정이 된다.
 
 ### Ray - Plane
 
@@ -570,42 +574,60 @@ int	check_plane_hit(t_ray ray, t_plane *pl, t_hit_record *rec)
 원기둥의 중심점으로 부터 중심축의 방향벡터의 반대 방향으로 나아간 원기둥의 밑면의 중심을 \\( C \\),
 \\( C \\) 로부터 원기둥 중심축의 방향벡터 방향으로 나아간 원기둥의 밑면의 중심을 \\( L \\) 이라 하자.
 - \\( C \\) 로 부터 \\( A \\) 를 다시 정의할 수 있다. \\( m \\) 은 \\( V \\) 에 대한 가중치이다.
+
 \\[ A = C + V*m \\]
+
 이때, \\( L = C + V*\max{m} \\) 이므로, \\( \max{m} = h \\)인 것을 알 수 있다. ( \\( h \\)는 원기둥 높이 ) 따라서 \\( m \in [0, h] \\) 이다.
-    
+
 - 위 정의들을 통해 두 가지 성질을 도출해낼 수 있다.
     1. \\( (P-A) \cdot V = 0 \\)
     2. \\( \text{len}(P-A) = r \\)
 
 - 1번 성질을 먼저 풀어보자.
-    \\[ (P - A) \cdot V = 0 \\]
-    \\[ (P - C - V*m) \cdot V = 0 \\]
-    \\[ (P-C) \cdot V = m*(V\cdot V) = m \\]
+
+\\[ (P - A) \cdot V = 0 \\]
+
+\\[ (P - C - V*m) \cdot V = 0 \\]
+
+\\[ (P-C) \cdot V = m*(V\cdot V) = m \\]
+
 ( \\( V \\)는 방향벡터이므로, 길이 및 자기자신의 내적값이 1이다.)
-    \\[ m = (D*t + X) \cdot V \\]
-    \\[ m = D\cdot V*t + X\cdot V \\]
+
+\\[ m = (D*t + X) \cdot V \\]
+
+\\[ m = D\cdot V*t + X\cdot V \\]
     
-    추가로, \\( (P-A) \\) 를 정규화 하면 법선벡터를 구할 수 있다.
+추가로, \\( (P-A) \\) 를 정규화 하면 법선벡터를 구할 수 있다.
     
 - 2번 성질도 풀어보자.
-    
-    \\[ \text{len}(P-A) = r \\]
-    \\[ \text{len}(P-C-V*m) = r \\]
-    \\[ \text{dot}\{Dt+X - V(D\cdot V*t + X\cdot V)\} = r^2 \\]
-    ( \\( \text{dot} \\) = 자기 자신의 내적)
-    \\[ \text{dot}\{(D-V*(D\cdot V))*t + (X-V*(X \cdot V) \} = r^2 \\]
-    
-    \\[ \text{dot}(A-V*(A \cdot V)) = A \cdot A - (A \cdot V)^2 \\]
-를 이용하여 위 식을 쭉 전개하고, 그 결과를 \\( a*t^2 + b*t + c = 0 \\) 라고 하였을 때,
-    
-    \\[ a = D \cdot D - (D \cdot V)^2 \\]
-    \\[ c = X\cdot X - (X\cdot V)^2 - r^2 \\]
-    \\[ b = 2 * (D-V*(D\cdot V)) \cdot (X-V*(X\cdot V)) \\]
-    \\[ b = 2 * (D\cdot X - (D \cdot V) *( X \cdot V)) \\]
-    \\[ \displaystyle \frac{b}{2} = D \cdot X - (D\cdot V) * (X \cdot V) \\]
-    
-    \\[ D_{iscreminant} = \displaystyle(\frac{b}{2})^2 - a*c > 0 \\]
-    
+
+\\[ \text{len}(P-A) = r \\]
+
+\\[ \text{len}(P-C-V*m) = r \\]
+
+\\[ \text{dot} \\{Dt+X - V(D\cdot V*t + X\cdot V) \\} = r^2 \\]
+
+( \\( \text{dot} \\) = 자기 자신의 내적)
+
+\\[ \text{dot} \\{ (D-V*(D\cdot V)) \*t + (X-V \* (X \cdot V)) \\} = r^2 \\]
+
+
+\\[ \text{dot}(A-V*(A \cdot V)) = A \cdot A - (A \cdot V)^2 \\]
+
+를 이용하여 위 식을 쭉 전개하고, 그 결과를 \\( a\*t^2 + b\*t + c = 0 \\) 라고 하였을 때,
+
+\\[ a = D \cdot D - (D \cdot V)^2 \\]
+
+\\[ c = X\cdot X - (X\cdot V)^2 - r^2 \\]
+
+\\[ b = 2 \* (D-V \* (D \cdot V)) \cdot (X-V \* (X \cdot V)) \\]
+
+\\[ b = 2 * (D\cdot X - (D \cdot V) *( X \cdot V)) \\]
+
+\\[ \displaystyle \frac{b}{2} = D \cdot X - (D\cdot V) * (X \cdot V) \\]
+
+\\[ D_{iscreminant} = \displaystyle(\frac{b}{2})^2 - a*c > 0 \\]
+
 - 구와 같이 판별식이 양수인 경우, 레이와 물체가 충돌한다고 간주하고, 근의 공식을 통해 \\( t \\) 를 구하여 그 중 작은 근을 충돌 위치로 판별했었다.
 - 원기둥 또한 같은 원리로 작은 근을 구하면 옆면 중 눈에 보이는 부분을 구할 수 있다.
 - 다만, \\( m \in [0, h] \\) 인지 검사를 한 번 해줘야한다. 그렇지 않으면 높이가 무한한 원기둥을 볼 수 있다.
@@ -678,5 +700,7 @@ int	cylinder_normal(t_ray ray, t_cylinder *cy, t_hit_record *rec, double root)
 ## Reference
 
 <https://github.com/GaepoMorningEagles/mini_raytracing_in_c/>
+
 <https://learnopengl.com/Lighting/Basic-Lighting>
+
 <https://raytracing.github.io/>
