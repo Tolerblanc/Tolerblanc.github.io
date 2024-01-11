@@ -1,6 +1,6 @@
 ---
 title: "도커를 사용하기 위한 간략한 개념 및 명령어 정리"
-excerpt: "ㄹ"
+excerpt: "도커 찍먹을 위한 문서"
 
 categories:
     - Docker
