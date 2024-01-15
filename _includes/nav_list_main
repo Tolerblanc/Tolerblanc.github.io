@@ -80,7 +80,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Dev & Frameworks</span>
+        <!-- <span class="nav__sub-title">Dev & Frameworks</span> -->
             <!-- <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "Django" %}
