@@ -1,6 +1,6 @@
 ---
 title: "동기와 비동기, 블로킹과 논블로킹"
-excerpt: ""
+excerpt: "다양한 동시성 컨셉들에 대해 알아보자"
 
 categories:
     - OS
