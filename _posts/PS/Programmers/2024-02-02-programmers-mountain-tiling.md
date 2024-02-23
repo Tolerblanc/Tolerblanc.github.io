@@ -55,6 +55,8 @@ related: true
 - 카카오 인턴 코테 마지막 문제. 시간 갈아넣고도 아예 못푼 문제 ㅠㅠ
 - 타일링 DP 문제인데, 특이하게도 타일이 삼각형이다. 타일에 번호를 다음과 같이 붙이고 시작한다.
 
+![image](https://github.com/Tolerblanc/Tolerblanc.github.io/assets/52883827/6ca2f195-54b0-4fd6-b68e-44047b8d74d4)
+
 ## 처음 생각했던 방법
 
 - 3번 타일을 사용하는 경우와 그렇지 않은 경우로 나누어 생각했었다.
