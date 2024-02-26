@@ -8,7 +8,7 @@ tags:
     - [Python, PS]
 
 date: 2024-02-04
-last_modified_at: 2024-02-04
+last_modified_at: 2024-02-26
 
 toc: true
 toc_sticky: true
@@ -431,7 +431,7 @@ n = 4
 
 # 모든 부분집합을 순회하기 위한 초기 flag 값 설정: 2^n - 1
 # 이는 모든 비트를 1로 설정하여, 집합의 모든 원소를 포함하는 상태를 나타냄
-bitArray = (1 << n) - 1
+bitArray = (1 << n) - 1
 
 # 2번 비트 클리어
 bitArray &= ~(1 << 2)
@@ -442,11 +442,11 @@ origin = bitArray
 # bitArray가 0이 될 때까지 반복
 while bitArray > 0:
     # 현재 bitArray에 대응하는 부분집합 생성 
-    subset = [i for i in range(n) if flag & (1 << i)]
+    subset = [i for i in range(n) if bitArray & (1 << i)]
     subsets.append(subset) 
     
-    # bitArraydhk bitArray - 1을 AND 연산 
-    flag = (flag - 1) & origin
+    # bitArray와 bitArray - 1을 AND 연산 
+    bitArray = (bitArray - 1) & origin
 
 print(subsets)
 '''
