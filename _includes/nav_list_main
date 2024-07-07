@@ -179,6 +179,13 @@
             </ul>
             <ul>
                 {% for category in site.categories %}
+                    {% if category[0] == "혼공학습단" %}
+                        <li><a href="/categories/hongong" class="">혼공학습단 ({{category[1].size}})</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for category in site.categories %}
                     {% if category[0] == "42Seoul" %}
                         <li><a href="/categories/42seoul" class="">42서울 ({{category[1].size}})</a></li>
                     {% endif %}
