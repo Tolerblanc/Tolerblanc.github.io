@@ -198,7 +198,7 @@ INSERT INTO member (mem_id, mem_name, mem_number, addr, phone1, phone2, height, 
 VALUES ('NJS', '뉴진스', 5, '서울', '02', '12345678', 170, '2022.07.22');
 ```
 
-이 명령어는 `member` 테이블에 `뉴이스트`라는 이름의 그룹을 추가한다.
+이 명령어는 `member` 테이블에 `뉴진스`라는 이름의 그룹을 추가한다.
 
 ### 언제 쓰이는가?
 
