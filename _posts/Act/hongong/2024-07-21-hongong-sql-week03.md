@@ -26,7 +26,7 @@ related: true
 
 # MySQL의 데이터 형식
 
-### 정수형
+## 정수형
 
 정수형 데이터는 숫자를 저장하는 데 사용되며, 소수점 이하의 숫자를 저장하지 않는다. MySQL에서 주로 사용하는 정수형 데이터 형식은 TINYINT, SMALLINT, MEDIUMINT, INT, BIGINT 등이 있다. 각 형식은 저장할 수 있는 값의 범위와 크기가 다르다.
 
@@ -41,7 +41,7 @@ INSERT INTO example_int (small_num, big_num) VALUES (32000, 9223372036854775807)
 
 ```
 
-### 문자형
+## 문자형
 
 문자형 데이터는 텍스트 데이터를 저장하는 데 사용된다. MySQL에서 주로 사용하는 문자형 데이터 형식은 CHAR, VARCHAR, TEXT, BLOB 등이 있다. CHAR와 VARCHAR는 고정 길이와 가변 길이 문자열을 저장하는 데 사용되고, TEXT와 BLOB은 대량의 텍스트와 바이너리 데이터를 저장하는 데 사용된다.
 
@@ -56,7 +56,7 @@ INSERT INTO example_char (name, description) VALUES ('Alice', 'This is a descrip
 
 ```
 
-### 대량 데이터
+## 대량 데이터
 
 대량 데이터는 BLOB과 TEXT 형식을 사용하여 저장할 수 있다. BLOB(Binary Large Object)는 바이너리 데이터를 저장하는 데 사용되며, TEXT는 대량의 텍스트 데이터를 저장하는 데 사용된다. BLOB은 TINYBLOB, BLOB, MEDIUMBLOB, LONGBLOB로 세분화되며, TEXT도 마찬가지로 TINYTEXT, TEXT, MEDIUMTEXT, LONGTEXT로 세분화된다.
 
@@ -70,7 +70,7 @@ INSERT INTO example_blob (data) VALUES (LOAD_FILE('/path/to/file'));
 
 ```
 
-### 실수형
+## 실수형
 
 실수형 데이터는 소수점을 포함한 숫자를 저장하는 데 사용된다. MySQL에서 주로 사용하는 실수형 데이터 형식은 FLOAT, DOUBLE, DECIMAL 등이 있다. FLOAT와 DOUBLE은 부동 소수점 숫자를 저장하는 데 사용되며, DECIMAL은 고정 소수점 숫자를 저장하는 데 사용된다.
 
@@ -86,7 +86,7 @@ INSERT INTO example_float (float_num, double_num, decimal_num) VALUES (3.14, 123
 
 ```
 
-### 날짜형
+## 날짜형
 
 날짜형 데이터는 날짜와 시간을 저장하는 데 사용된다. MySQL에서 주로 사용하는 날짜형 데이터 형식은 DATE, TIME, DATETIME, TIMESTAMP, YEAR 등이 있다. 각 형식은 날짜와 시간 데이터를 저장하는 방식이 다르다.
 
@@ -102,7 +102,7 @@ INSERT INTO example_date (event_date, event_time, event_timestamp) VALUES ('2024
 
 ```
 
-### 변수의 사용 (PREPARE-EXECUTE 포함)
+## 변수의 사용
 
 MySQL에서 변수를 사용하는 방법은 크게 두 가지로 나눌 수 있다: 사용자 정의 변수와 준비된 문(PREPARE-EXECUTE)을 사용하는 방법이다. 사용자 정의 변수는 `SET` 명령을 사용하여 선언하고, 준비된 문은 `PREPARE`와 `EXECUTE` 명령을 사용하여 실행할 수 있다.
 
@@ -119,7 +119,7 @@ DEALLOCATE PREPARE stmt;
 
 ```
 
-### 데이터 형 변환
+## 데이터 형 변환
 
 MySQL에서는 데이터를 다양한 형식으로 변환할 수 있다. `CAST`와 `CONVERT` 함수를 사용하여 데이터 형식을 변환할 수 있다.
 
@@ -136,6 +136,8 @@ SELECT num_str, CAST(num_str AS UNSIGNED) AS num FROM example_conversion;
 ```
 
 위와 같이 `CAST`와 `CONVERT` 함수를 이용하는 형 변환을 **명시적 형 변환(Explicit Conversion)** 이라고 한다. 반대로 **암시적 형 변환(Implicit Convertion)** 이 이뤄지는 경우가 있다. 예를 들어 문자열 끼리 덧셈을 수행한다거나(숫자로 변경되어 연산됨), 정수형끼리 `CONCAT` (문자열로 변경되여 연결됨) 하는 경우가 있다.
+
+
 
 # 조인 (Join)
 
@@ -235,7 +237,7 @@ CROSS JOIN Orders;
 
 스토어드 프로시저는 미리 작성된 SQL 쿼리와 제어 흐름 구조를 포함한 프로그램 코드 블록으로, 데이터베이스 서버에 저장되어 필요할 때 호출하여 실행할 수 있다. 이를 통해 데이터베이스 작업의 효율성을 높이고, 반복적인 작업을 자동화할 수 있다. 마지막 목차는 스토어드 프로시저의 기본 SQL 프로그래밍에 초점을 맞추어 조건문, 변수, 동적 SQL, CASE, WHILE 문을 사용하는 방법을 알아보자.
 
-### 조건문
+## 조건문
 
 조건문은 특정 조건에 따라 코드의 실행 흐름을 제어하는 데 사용된다. 스토어드 프로시저에서 IF...ELSE 구조를 사용하여 조건문을 작성할 수 있다.
 
@@ -263,7 +265,7 @@ DELIMITER ;
 
 이 예제는 제품의 재고를 확인하는 스토어드 프로시저를 정의한다. 재고가 10개 이상이면 "Stock is sufficient", 그렇지 않으면 "Stock is low"라는 메시지를 반환한다.
 
-### 변수
+## 변수
 
 변수는 프로시저 내에서 값을 저장하고 조작하는 데 사용된다. 변수는 DECLARE 문을 사용하여 선언하고, SET 문을 사용하여 값을 할당할 수 있다.
 
@@ -284,7 +286,7 @@ DELIMITER ;
 
 이 예제는 가격을 입력받아 10% 할인된 가격을 계산하여 반환하는 스토어드 프로시저를 정의한다.
 
-### 동적 SQL
+## 동적 SQL
 
 동적 SQL은 실행 시점에 SQL 쿼리를 생성하고 실행하는 방법이다. PREPARE, EXECUTE, DEALLOCATE PREPARE 문을 사용하여 동적 SQL을 작성할 수 있다.
 
@@ -306,7 +308,7 @@ DELIMITER ;
 
 이 예제는 테이블 이름을 입력받아 해당 테이블의 모든 데이터를 동적으로 조회하는 스토어드 프로시저를 정의한다.
 
-### CASE 문
+## CASE 문
 
 CASE 문은 여러 조건을 검사하여 조건에 맞는 값을 반환하는 데 사용된다. 이는 IF...ELSEIF...ELSE 구조와 유사하다.
 
@@ -330,7 +332,7 @@ DELIMITER ;
 
 이 예제는 점수를 입력받아 점수에 따라 학점을 반환하는 스토어드 프로시저를 정의한다.
 
-### WHILE 문
+## WHILE 문
 
 WHILE 문은 조건이 참인 동안 반복적으로 코드를 실행하는 데 사용된다.
 
