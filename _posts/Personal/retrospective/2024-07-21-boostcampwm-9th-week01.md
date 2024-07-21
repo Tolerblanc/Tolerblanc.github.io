@@ -1,6 +1,6 @@
 ---
 title: "[boostcamp] 부스트캠프 웹/모바일 9기 챌린지 1주차 회고"
-excerpt: ""
+excerpt: "K-P-T 형식에 맞추어 지난 일주일 간의 학습을 되돌아보자"
 
 categories:
     - Retrospective
