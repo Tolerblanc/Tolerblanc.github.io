@@ -477,3 +477,5 @@ Node.js의 가장 큰 강점 중 하나는 단일 스레드로도 높은 동시�
 [로우 레벨로 살펴보는 Node.js 이벤트 루프](https://evan-moon.github.io/2019/08/01/nodejs-event-loop-workflow/#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A3%A8%ED%94%84%EB%8A%94-%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8-%EC%97%94%EC%A7%84-%EB%82%B4%EB%B6%80%EC%97%90-%EC%9E%88%EB%8B%A4)
 
 [Design overview - libuv documentation](https://docs.libuv.org/en/stable/design.html)
+
+[Uncovering the Depths of NodeJS Internals: From JavaScript to Low-Level C & C++ Implementations](https://www.linkedin.com/pulse/uncovering-depths-nodejs-internals-from-javascript-c-sutradhar/)
