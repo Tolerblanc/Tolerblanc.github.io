@@ -1,6 +1,6 @@
 ---
-title: “NestJS 해체분석기 2 - 동적 모듈(Dynamic Module)과 프로바이더 스코프(Provider Scope)”
-excerpt: “NestJS의 확장성과 유연성을 책임지는 두 키워드에 대해”
+title: NestJS 해체분석기 2 - 동적 모듈(Dynamic Module)과 프로바이더 스코프(Provider Scope)
+excerpt: NestJS의 확장성과 유연성을 책임지는 두 키워드에 대해
 categories:
     - JavaScript
 tags:
