@@ -1,6 +1,6 @@
 ---
 title: NestJS 해체분석기 3 -  미들웨어(Middleware), 가드(Guard), 인터셉터(Interceptor)
-excerpt:
+excerpt: NestJS가 제공하는 관점 지향 프로그래밍(AOP) 구현의 핵심
 categories:
     - JavaScript
 tags:
