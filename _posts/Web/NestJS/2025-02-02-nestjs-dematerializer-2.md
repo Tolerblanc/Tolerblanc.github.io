@@ -14,6 +14,11 @@ toc_sticky: true
 related: true
 ---
 
+<div class="notice--info" markdown="1">
+👨‍💻 개인 공부 기록용 블로그 입니다. <br/>
+💡 틀린 내용이나 오타는 댓글, 메일로 제보해주시면 감사하겠습니다!!  (__)
+</div>
+
 ## Introduction
 
 지난 [1편](https://tolerblanc.github.io/javascript/nestjs-demeterializer-1/)에서는 NestJS가 어떤 철학과 배경을 가지고 만들어졌는지, 그리고 모듈 시스템과 DI(의존성 주입)가 어떻게 돌아가는지를 살펴보았다. 이번에는 한 걸음 더 깊이 들어가서, NNestJS의 확장성과 유연성을 책임지는 두 가지 핵심 개념인 **동적 모듈(Dynamic Module)**과 **프로바이더 스코프(Provider Scope)**에 대해 구체적으로 알아볼 것이다. 동적 모듈은 환경별로 다른 설정이 필요하거나 테스트를 위해 특정 기능을 모킹(Mocking)해야 할 때 유용하다. 프로바이더 스코프는 인스턴스의 생명주기를 세밀하게 제어할 수 있게 해주어, 메모리 관리나 요청별 상태 관리에 있어 큰 도움이 된다.

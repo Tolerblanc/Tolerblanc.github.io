@@ -14,6 +14,11 @@ toc_sticky: true
 related: true
 ---
 
+<div class="notice--info" markdown="1">
+👨‍💻 개인 공부 기록용 블로그 입니다. <br/>
+💡 틀린 내용이나 오타는 댓글, 메일로 제보해주시면 감사하겠습니다!!  (__)
+</div>
+
 ## Introduction
 
 지난 [2편](https://tolerblanc.github.io/javascript/nestjs-dematerializer-2/)에서는 동적 모듈과 프로바이더 스코프에 대해 알아보았다. 이번에는 NestJS의 실행 흐름을 제어하는 세 가지 핵심 구성 요소인 미들웨어(Middleware), 가드(Guard), **인터셉터(Interceptor)**를 살펴보려고 한다. Express를 써보셨다면 미들웨어라는 개념이 어색하지 않을 텐데, NestJS는 여기서 한 발 더 나아가 가드와 인터셉터라는 개념을 제공한다. 이들은 각각 다른 시점에서 요청/응답을 가로채고 처리할 수 있게 해주는데, 이런 구조는 관점 지향 프로그래밍(AOP, Aspect-Oriented Programming)을 가능하게 하여, 대규모 애플리케이션에서 중복 로직 최소화, 단일 책임 분리에 큰 도움을 준다.
