@@ -1,0 +1,66 @@
+---
+// Welcome to Astro Experimental Version
+const title = "인생은 B와 D사이 Code다 - Experimental";
+const description = "Tolerblanc의 기술 블로그 (Astro 실험 버전)";
+---
+
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main>
+      <h1>{title}</h1>
+      <p>{description}</p>
+      <div class="notice">
+        <p>🚧 이 페이지는 Jekyll에서 Astro로 마이그레이션 중인 실험 버전입니다.</p>
+        <p>메인 블로그는 <a href="https://tolerblanc.github.io">여기</a>에서 확인하세요.</p>
+      </div>
+      <section>
+        <h2>마이그레이션 진행 상황</h2>
+        <ul>
+          <li>✅ Astro 프로젝트 초기화</li>
+          <li>✅ TypeScript 설정</li>
+          <li>✅ 기본 구조 생성</li>
+          <li>⏳ 콘텐츠 마이그레이션</li>
+          <li>⏳ 디자인 시스템 구현</li>
+          <li>⏳ SEO 및 Analytics 통합</li>
+        </ul>
+      </section>
+    </main>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #2c3e50;
+      }
+      .notice {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        padding: 1rem;
+        margin: 2rem 0;
+      }
+      .notice p {
+        margin: 0.5rem 0;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      ul li {
+        padding: 0.5rem 0;
+        font-size: 1.1rem;
+      }
+    </style>
+  </body>
+</html>
