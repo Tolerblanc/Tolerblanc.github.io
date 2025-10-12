@@ -2,7 +2,8 @@
 
 > **최종 업데이트**: 2025-10-12
 > **현재 브랜치**: `astro-experimental`
-> **Phase**: 1 완료, Phase 2 준비 중
+> **Phase**: 1 완료 (Astro 5.14.4 업그레이드 포함), Phase 2 준비 중
+> **Astro 버전**: 5.14.4 (Content Layer, Vite 6 포함)
 
 ---
 
@@ -52,6 +53,12 @@
 - [x] TypeScript 및 린터 설정
 - [x] 디렉토리 구조 생성
 - [x] GitHub Actions 워크플로우 설정
+- [x] **Astro 5.14.4 업그레이드** (2025-10-12 추가)
+  - Astro 4.16.0 → 5.14.4
+  - @astrojs/mdx 3.0.0 → 4.3.7
+  - @astrojs/react 3.0.0 → 4.4.0
+  - Content Layer API 적용
+  - Vite 6.0 적용
 
 #### Phase 2: 콘텐츠 마이그레이션 도구 🔄 **다음 단계**
 - [ ] Jekyll → MDX 변환 스크립트 작성
@@ -1301,11 +1308,129 @@ chore: 빌드/설정 변경
 4. **독립적 커밋**: 각 기능은 별도 커밋으로 관리
 
 ### 측정 지표
-- 빌드 시간: 현재 미측정 (목표 <30s)
-- 포스트 수: 75개+
-- 커밋 수: 2개 완료 (Phase 1)
+- 빌드 시간: ~0.5초 (Astro 5.14.4)
+- 포스트 수: 75개+ (마이그레이션 대기 중)
+- 커밋 수: 4개 완료 (Phase 1)
 
 ---
 
-**마지막 커밋**: `311197f chore: Add GitHub Actions workflow for experimental deployment`
+## Astro 5.x 업그레이드 상세 정보
+
+### 업그레이드 날짜
+**2025-10-12** - Astro 4.16.0 → 5.14.4 (메이저 버전 업데이트)
+
+### 주요 변경사항
+
+#### 1. Content Layer API (새 기능)
+Astro 5.0의 가장 큰 변화는 Content Layer API 도입입니다. 이를 통해:
+- **5배 빠른 빌드 속도** (대규모 콘텐츠 컬렉션)
+- **다양한 소스 지원**: Markdown, API, CMS, 데이터베이스
+- **하위 호환성 유지**: 기존 Content Collections 코드 그대로 작동
+
+**적용 파일**: `src/content.config.ts` (신규 생성)
+
+```typescript
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    categories: z.array(z.string()),
+    tags: z.array(z.string()),
+  }),
+});
+
+export const collections = { blog };
+```
+
+**이점**:
+- 명시적 컬렉션 정의 (auto-generation 경고 제거)
+- glob loader로 빠른 파일 스캔
+- 타입 안정성 강화
+
+#### 2. Vite 6.0 업그레이드
+- 더 빠른 개발 서버
+- 개선된 HMR (Hot Module Replacement)
+- 최신 빌드 최적화
+
+#### 3. MDX 4.x 업그레이드
+**변경**: `@astrojs/mdx` 3.0.0 → 4.3.7
+
+**주요 개선사항**:
+- JSX/MDX 처리 성능 향상
+- 더 나은 에러 메시지
+- TypeScript 지원 개선
+
+**Breaking Changes (우리 프로젝트 영향 없음)**:
+- 구버전 MDX 통합 호환성 제거 (우리는 최신 버전 사용)
+
+#### 4. React 통합 업그레이드
+**변경**: `@astrojs/react` 3.0.0 → 4.4.0
+
+**개선사항**:
+- React 18.3.1 지원
+- 부분 hydration 최적화
+- 더 나은 클라이언트 디렉티브
+
+#### 5. TypeScript 설정 업데이트
+**변경**: `tsconfig.json` 업데이트
+
+```json
+{
+  "include": [".astro/types.d.ts", "src/**/*"]
+}
+```
+
+**이유**: Astro 5.x는 `.astro/types.d.ts`를 명시적으로 포함해야 함
+
+### Breaking Changes 영향 분석
+
+| 변경사항 | 우리 프로젝트 영향 | 조치 |
+|---------|------------------|------|
+| `<ViewTransitions />` → `<ClientRouter />` | 없음 | 사용 안함 |
+| `compiledContent()` 비동기화 | 없음 | 아직 사용 안함 |
+| Shiki 토큰 이름 변경 | 낮음 | 향후 커스텀 테마 적용 시 고려 |
+| `astro:content` 클라이언트 접근 제거 | 없음 | 서버 사이드만 사용 |
+| hybrid 렌더링 모드 제거 | 없음 | static 모드 사용 |
+| Script 태그 동작 변경 | 낮음 | 현재 스크립트 미사용 |
+
+### 테스트 결과
+
+**빌드 성공**: ✅
+```
+pnpm build
+✓ Completed in 599ms
+0 errors, 0 warnings, 0 hints
+```
+
+**파일 크기**:
+- 클라이언트 번들: 143.47 KB (gzip: 46.21 KB)
+- 정적 페이지: 1개
+
+### 다음 단계에서 활용할 Astro 5.x 기능
+
+1. **Content Layer Loaders**
+   - Jekyll 포스트를 효율적으로 로드
+   - 커스텀 loader 작성 가능 (필요 시)
+
+2. **개선된 이미지 처리**
+   - 크롭, 반응형 레이아웃
+   - 자동 srcset/sizes 생성
+
+3. **Environment Variables (astro:env)**
+   - 타입 안전 환경 변수
+   - Google Analytics ID, Giscus 설정 등
+
+### 참고 자료
+- [Astro 5.0 Upgrade Guide](https://docs.astro.build/en/guides/upgrade-to/v5/)
+- [Astro 5.0 Release Blog](https://astro.build/blog/astro-5/)
+- [Content Layer API Docs](https://docs.astro.build/en/guides/content-collections/)
+
+---
+
+**마지막 커밋**: `ccf021c docs: Add comprehensive migration progress documentation`
 **다음 목표**: Phase 2 - 콘텐츠 마이그레이션 도구 개발
