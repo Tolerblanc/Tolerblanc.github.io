@@ -1,9 +1,10 @@
 # Jekyll → Astro 마이그레이션 진행 상황
 
-> **최종 업데이트**: 2025-10-12
+> **최종 업데이트**: 2025-10-12 (Phase 2 완료)
 > **현재 브랜치**: `astro-experimental`
-> **Phase**: 1 완료 (Astro 5.14.4 업그레이드 포함), Phase 2 준비 중
+> **Phase**: Phase 1-2 완료, Phase 3 준비 중
 > **Astro 버전**: 5.14.4 (Content Layer, Vite 6 포함)
+> **변환된 포스트**: 5개 (샘플), 총 75개 예정
 
 ---
 
@@ -60,26 +61,46 @@
   - Content Layer API 적용
   - Vite 6.0 적용
 
-#### Phase 2: 콘텐츠 마이그레이션 도구 🔄 **다음 단계**
-- [ ] Jekyll → MDX 변환 스크립트 작성
-- [ ] frontmatter 매핑 유틸리티
-- [ ] 샘플 포스트 변환 및 검증
-- [ ] 이미지 경로 변환 로직
+#### Phase 2: 콘텐츠 마이그레이션 시스템 ✅ **완료**
+- [x] Jekyll → MDX 변환 스크립트 작성 (`src/utils/jekyll-to-mdx.ts`)
+- [x] frontmatter 매핑 유틸리티 (Jekyll → Astro schema)
+- [x] 샘플 포스트 5개 변환 및 검증
+- [x] Notice 컴포넌트 구현 (4 types)
+- [x] PostLayout 구현 (SEO, TOC, 메타데이터)
+- [x] 동적 라우팅 설정 (`/blog/[...slug]`)
+- [x] Tailwind CSS 통합 및 한국어 폰트 최적화
+- [x] 렌더링 검증 (0 errors, 0 warnings)
 
-#### Phase 3: 핵심 기능 구현
-- [ ] 레이아웃 컴포넌트 (BaseLayout, PostLayout)
-- [ ] SEO 메타데이터 시스템
+#### Phase 3: 핵심 기능 및 LaTeX 지원 🔄 **다음 단계**
+- [ ] **LaTeX 수식 렌더링 시스템**
+  - [ ] KaTeX 또는 MathJax 통합
+  - [ ] Inline 수식 지원 (`$...$` 또는 `\\(...\\)`)
+  - [ ] Block 수식 지원 (`$$...$$` 또는 `\\[...\\]`)
+  - [ ] 변환 스크립트에서 LaTeX 구문 보호
+  - [ ] 기존 포스트 수식 마이그레이션
 - [ ] Google Analytics 통합 (G-JWJT3DQR8G)
-- [ ] Giscus 댓글 통합
-- [ ] RSS/Sitemap 생성
+- [ ] Giscus 댓글 통합 (기존 설정 유지)
+- [ ] RSS 피드 생성 및 검증
+- [ ] Sitemap 최적화
+- [ ] 전체 75개 포스트 마이그레이션
 
-#### Phase 4: UI 컴포넌트 및 디자인
-- [ ] Notice 컴포넌트 (info, warning, danger)
-- [ ] 코드 하이라이팅 (Shiki/Prism)
-- [ ] TOC (목차) 컴포넌트
-- [ ] 카테고리/태그 네비게이션
-- [ ] 다크 테마 구현
+#### Phase 4: 네비게이션 및 고급 UI 컴포넌트
+- [ ] **좌측 사이드바 네비게이션**
+  - [ ] 카테고리 기반 트리 구조
+  - [ ] 라우팅 연동 (현재 위치 하이라이트)
+  - [ ] 커스텀 섹션 지원 (Featured, Recent 등)
+  - [ ] 접기/펼치기 기능
+  - [ ] 모바일 반응형 (햄버거 메뉴)
+- [ ] **상단 메뉴 (Header Navigation)**
+  - [ ] 주요 카테고리 링크
+  - [ ] 검색 바 통합
+  - [ ] 다크 모드 토글
+  - [ ] About/Tags 페이지 링크
+- [ ] 코드 하이라이팅 개선 (현재 Shiki 사용 중)
+- [ ] 카테고리/태그 아카이브 페이지
+- [ ] 다크 테마 완성도 향상
 - [ ] 검색 기능 (Algolia/Fuse.js)
+- [ ] 이미지 최적화 (@astrojs/image)
 
 #### Phase 5: 최적화 및 검증
 - [ ] 이미지 최적화 (@astrojs/image)
@@ -1274,43 +1295,336 @@ chore: 빌드/설정 변경
 
 ---
 
+## Phase 2 완료 내역 (2025-10-12)
+
+### 구축된 시스템
+
+#### 1. Jekyll → MDX 변환 파이프라인
+**파일**: `src/utils/jekyll-to-mdx.ts`
+
+**기능**:
+- 자동 frontmatter 매핑 (Jekyll → Astro schema)
+- Notice 블록 변환 (`<div class="notice--{type}">` → `<Notice type="{type}">`)
+- MDX 특수문자 이스케이프 (`<=`, `>=` → HTML 엔티티)
+- 날짜/슬러그 추출 (파일명 기반)
+- 카테고리 기반 디렉토리 구조 생성
+- 태그 평탄화 (중첩 배열 → flat array)
+- 시리즈 감지 (제목 패턴 매칭)
+
+**CLI 도구**: `scripts/convert-posts.ts`
+```bash
+pnpm run convert:posts          # 전체 변환
+pnpm run convert:posts:sample   # 샘플 5개
+pnpm run convert:posts:dry-run  # 미리보기
+```
+
+#### 2. 콘텐츠 스키마
+**파일**: `src/content.config.ts`
+
+**필드 구조**:
+- **필수**: title, excerpt, date, categories, tags
+- **SEO**: description (160자), ogImage, keywords
+- **품질**: draft, featured, readingTime
+- **TOC**: toc (boolean), tocDepth (1-6)
+- **다국어**: lang (ko/en)
+- **시리즈**: series (name, order)
+- **작성자**: author (기본값: Tolerblanc)
+
+#### 3. UI 컴포넌트
+
+**Notice 컴포넌트** (`src/components/Notice.astro`)
+- 4가지 타입: info (파랑), warning (노랑), danger (빨강), success (초록)
+- 다크 모드 지원 (Tailwind 유틸리티)
+- 접근성: ARIA live regions
+
+**PostLayout** (`src/layouts/PostLayout.astro`)
+- SEO 메타태그: Open Graph, Twitter Cards, Article metadata
+- 메타데이터 표시: 날짜 (한국어 포맷), 작성자, 카테고리, 태그
+- TOC: 데스크톱 사이드바 (sticky), 설정 가능한 depth
+- 시리즈 정보 배너
+- 다크 모드 지원
+- 한국어 폰트 스택
+
+#### 4. 라우팅 시스템
+**파일**: `src/pages/blog/[...slug].astro`
+
+- Astro 5.x Content Layer API 사용
+- 동적 정적 생성 (getStaticPaths)
+- Draft 필터링
+- URL 형식: `/experimental/blog/{category}-{slug}`
+
+#### 5. 스타일링
+- Tailwind CSS 3.4.18
+- @tailwindcss/typography (prose 스타일)
+- 커스텀 다크 모드 테마
+- 한국어 폰트 최적화
+
+### 검증 결과
+- ✅ 5개 샘플 포스트 변환 성공
+- ✅ 빌드: 0 errors, 0 warnings
+- ✅ 6 pages in 1.04s
+- ✅ 번들 크기: 143.47 KB
+- ✅ 렌더링 확인 완료
+
+### 알려진 이슈
+- LaTeX 수식 (`\(...\)`, `\[...\]`) 이스케이프 필요 → **Phase 3에서 해결**
+- 이미지 최적화 미완 (현재 GitHub raw URL) → Phase 4
+
+---
+
+## Phase 3 상세 계획: LaTeX 지원 및 핵심 기능
+
+### LaTeX 수식 렌더링 시스템
+
+#### 1. 라이브러리 선택
+**추천**: **KaTeX** (빠르고 가벼움, SSR 지원)
+- 대안: MathJax (더 많은 기능, 무거움)
+
+**의존성**:
+```bash
+pnpm add katex rehype-katex remark-math
+```
+
+#### 2. Astro 설정 업데이트
+**파일**: `astro.config.mjs`
+```javascript
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+export default defineConfig({
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
+});
+```
+
+#### 3. 스타일 추가
+**파일**: `src/styles/global.css`
+```css
+@import 'katex/dist/katex.min.css';
+```
+
+#### 4. 지원 구문
+- **Inline 수식**: `$E = mc^2$` 또는 `\(E = mc^2\)`
+- **Block 수식**: `$$\int_0^1 x^2 dx$$` 또는 `\[\int_0^1 x^2 dx\]`
+
+#### 5. 변환 스크립트 업데이트
+**파일**: `src/utils/jekyll-to-mdx.ts`
+
+LaTeX 구문 보호 로직 개선:
+```typescript
+export function protectLatexExpressions(content: string): string {
+  const protectedBlocks: string[] = [];
+
+  // Block math: \[...\] 또는 $$...$$
+  content = content.replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, (match) => {
+    const placeholder = `__LATEX_BLOCK_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
+    return placeholder;
+  });
+
+  // Inline math: \(...\) 또는 $...$
+  content = content.replace(/\\\([\s\S]*?\\\)|\$[^$\n]+\$/g, (match) => {
+    const placeholder = `__LATEX_INLINE_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
+    return placeholder;
+  });
+
+  return { content, protectedBlocks };
+}
+```
+
+#### 6. 기존 포스트 마이그레이션
+- Jekyll에서 `\\(...\\)` 형식 사용 확인
+- 변환 시 `\(...\)` 또는 `$...$`로 정규화
+- 75개 포스트 전체 스캔 및 변환
+
+### Google Analytics & Giscus 통합
+
+#### Google Analytics
+**파일**: `src/layouts/PostLayout.astro` 및 `src/pages/index.astro`
+
+```astro
+---
+const GA_ID = 'G-JWJT3DQR8G';
+---
+<head>
+  <!-- Google Analytics -->
+  <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{GA_ID}');
+  </script>
+</head>
+```
+
+#### Giscus 댓글
+**기존 설정 유지**:
+```javascript
+{
+  repo: "Tolerblanc/Tolerblanc.github.io",
+  repoId: "R_kgDOJ01EaQ",
+  category: "Announcements",
+  categoryId: "DIC_kwDOJ01Eac4Cerab",
+  theme: "dark_dimmed",
+  mapping: "pathname", // 중요: URL 기반 매핑
+}
+```
+
+**컴포넌트**: `src/components/GiscusComments.astro`
+
+---
+
+## Phase 4 상세 계획: 네비게이션 시스템
+
+### 좌측 사이드바 네비게이션
+
+#### 설계 구조
+```
+┌─────────────────────────┐
+│ 📚 Tolerblanc's Blog    │ ← 헤더
+├─────────────────────────┤
+│ 🔥 Featured             │ ← 커스텀 섹션
+│   • NestJS 해체분석기 1  │
+│   • 2025 회고           │
+├─────────────────────────┤
+│ 📝 Recent Posts         │ ← 최근 포스트
+│   • [최신 포스트 5개]    │
+├─────────────────────────┤
+│ 📂 Categories           │ ← 카테고리 트리
+│   ▼ Web                 │
+│     • NestJS            │
+│     • React             │
+│   ▼ Algorithm           │
+│     • DP                │
+│     • Graph             │
+│   ▶ DevOps              │
+│   ▶ CS                  │
+└─────────────────────────┘
+```
+
+#### 기술 스택
+- **컴포넌트**: `src/components/Sidebar.astro`
+- **상태 관리**: Astro Islands + React (접기/펼치기)
+- **라우팅 하이라이트**: Astro.url.pathname 활용
+- **반응형**:
+  - Desktop: 고정 좌측 사이드바 (width: 280px)
+  - Mobile: 햄버거 메뉴 → 슬라이드 오버레이
+
+#### 데이터 구조
+**파일**: `src/utils/navigation.ts`
+```typescript
+export interface NavCategory {
+  id: string;
+  name: string;
+  icon?: string;
+  children?: NavCategory[];
+  postCount?: number;
+}
+
+export const categories: NavCategory[] = [
+  {
+    id: 'web',
+    name: 'Web',
+    icon: '🌐',
+    children: [
+      { id: 'web/nestjs', name: 'NestJS', postCount: 5 },
+      { id: 'web/react', name: 'React', postCount: 8 },
+    ],
+  },
+  // ...
+];
+```
+
+### 상단 메뉴 (Header Navigation)
+
+#### 디자인
+```
+┌────────────────────────────────────────────────┐
+│ 🏠 Home  |  📝 Blog  |  🏷️ Tags  |  🔍 Search  │  🌙 │
+└────────────────────────────────────────────────┘
+```
+
+#### 기능
+1. **주요 링크**: Home, Blog, Tags, About
+2. **검색 바**:
+   - Algolia DocSearch 또는 Fuse.js
+   - 키보드 단축키 (Cmd+K)
+3. **다크 모드 토글**:
+   - localStorage 상태 저장
+   - 시스템 설정 감지
+4. **모바일 반응형**: 햄버거 메뉴로 변환
+
+---
+
 ## 다음 에이전트를 위한 컨텍스트 요약
 
-### 현재 상태
-1. **브랜치**: `astro-experimental` 생성 완료
-2. **설정**: Astro 프로젝트 초기화 완료 (package.json, tsconfig.json, astro.config.mjs)
-3. **인프라**: GitHub Actions 워크플로우 설정 완료
-4. **빌드**: 로컬 빌드 성공 확인 (0 errors)
+### 현재 상태 (Phase 2 완료)
+1. **브랜치**: `astro-experimental` (5 commits)
+2. **Phase 1**: ✅ 완료 (Astro 5.14.4, TypeScript, 빌드 환경)
+3. **Phase 2**: ✅ 완료 (변환 시스템, 컴포넌트, 라우팅, 렌더링 검증)
+4. **Phase 3**: 🔄 준비 완료 (LaTeX 지원 및 핵심 기능)
 
-### 즉시 진행 가능한 작업
-1. **콘텐츠 마이그레이션 스크립트** (Phase 2.1)
-   - `src/utils/jekyll-to-mdx.js` 작성
-   - frontmatter 파싱 및 변환 로직
-   - Liquid → MDX 변환
+### 완료된 파일 및 시스템
+**변환 시스템**:
+- `src/utils/jekyll-to-mdx.ts` - 자동 변환 유틸리티
+- `scripts/convert-posts.ts` - CLI 도구
+- `src/content.config.ts` - Astro 5.x Content Layer 스키마
 
-2. **Content Collections 설정** (Phase 2.2)
-   - `src/content/config.ts` 생성
-   - 블로그 스키마 정의
+**UI 컴포넌트**:
+- `src/components/Notice.astro` - 4가지 타입의 알림 컴포넌트
+- `src/layouts/PostLayout.astro` - SEO, TOC, 메타데이터 표시
+- `src/pages/blog/[...slug].astro` - 동적 라우팅
 
-3. **기본 레이아웃 구현** (Phase 3.1)
-   - `src/layouts/BaseLayout.astro`
-   - `src/layouts/PostLayout.astro`
+**스타일링**:
+- `tailwind.config.mjs` - Tailwind 설정 (typography 포함)
+- `src/styles/global.css` - 한국어 폰트, 다크 모드
 
-### 필요한 정보
-- 샘플 포스트 경로: `_posts/Web/NestJS/2025-03-15-nestjs-dematerializer-4.md`
-- 이미지 디렉토리: `assets/images/`
-- Jekyll 설정: `_config.yml`
+**변환된 샘플**:
+- `src/content/blog/9oormthon_challenge/*.mdx` - 5개 샘플 포스트
+
+### 즉시 진행 가능한 작업 (Phase 3)
+1. **LaTeX 수식 지원** (최우선)
+   - `pnpm add katex rehype-katex remark-math`
+   - `astro.config.mjs` 업데이트 (remarkPlugins, rehypePlugins)
+   - `src/utils/jekyll-to-mdx.ts`에 LaTeX 보호 로직 추가
+   - 기존 포스트에서 수식 패턴 스캔
+
+2. **Google Analytics 통합**
+   - `src/layouts/PostLayout.astro`에 GA 스크립트 추가
+   - `src/pages/index.astro`에도 적용
+
+3. **Giscus 댓글**
+   - `src/components/GiscusComments.astro` 생성
+   - PostLayout에 통합
+
+4. **전체 포스트 마이그레이션**
+   - `pnpm run convert:posts` 실행 (75개 포스트)
+   - 변환 결과 검증
+
+### 필요한 정보 (Phase 4 네비게이션)
+- **카테고리 구조**: `_posts/` 디렉토리 구조 분석 필요
+- **Featured 포스트**: 어떤 기준으로 선정할지 결정
+- **아이콘/이모지**: 각 카테고리에 사용할 아이콘
+- **디자인 선호도**: 사이드바 색상 스킴, 폰트 크기 등
 
 ### 주의사항
 1. **SEO 최우선**: URL 구조 절대 변경 금지
 2. **GA ID 유지**: `G-JWJT3DQR8G` 그대로 사용
-3. **Giscus 설정**: pathname 매핑 유지
+3. **Giscus pathname 매핑**: 기존 댓글 유지를 위해 URL 일치 필수
 4. **독립적 커밋**: 각 기능은 별도 커밋으로 관리
+5. **LaTeX 우선 처리**: 많은 포스트에 수식이 포함되어 있을 가능성
 
-### 측정 지표
-- 빌드 시간: ~0.5초 (Astro 5.14.4)
-- 포스트 수: 75개+ (마이그레이션 대기 중)
-- 커밋 수: 4개 완료 (Phase 1)
+### 측정 지표 (Phase 2 완료 시점)
+- 빌드 시간: 1.04s (6 pages)
+- 빌드 상태: 0 errors, 0 warnings
+- 번들 크기: 143.47 KB
+- 변환된 포스트: 5개 샘플 (75개 대기 중)
+- 커밋 수: 5개 (Phase 1-2 완료)
+- 성능: TypeScript 체크 164ms, 렌더링 정상
 
 ---
 
