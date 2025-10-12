@@ -1,0 +1,239 @@
+---
+/**
+ * Blog Post Layout
+ *
+ * 블로그 포스트를 위한 레이아웃 컴포넌트
+ *
+ * 기능:
+ * - SEO 메타데이터 (title, description, og:image)
+ * - 포스트 메타 정보 표시 (날짜, 카테고리, 태그)
+ * - TOC (Table of Contents) - 선택적
+ * - 읽기 시간 표시 (계산된 경우)
+ */
+
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  headings: MarkdownHeading[];
+}
+
+const { post, headings } = Astro.props;
+const { title, excerpt, date, updatedDate, categories, tags, description, toc, author, series } =
+  post.data;
+
+// 날짜 포맷팅
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date(date));
+};
+
+// TOC를 위한 필터링된 헤딩 (tocDepth에 따라)
+const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3));
+---
+
+<!doctype html>
+<html lang={post.data.lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO Meta Tags -->
+    <title>{title} | Tolerblanc's Blog</title>
+    <meta name="description" content={description || excerpt} />
+    <meta name="author" content={author} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || excerpt} />
+    {
+      post.data.ogImage && (
+        <>
+          <meta property="og:image" content={post.data.ogImage} />
+          <meta name="twitter:image" content={post.data.ogImage} />
+        </>
+      )
+    }
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description || excerpt} />
+
+    <!-- Article Meta -->
+    <meta property="article:published_time" content={new Date(date).toISOString()} />
+    {updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
+    <meta property="article:author" content={author} />
+    {categories.map((cat) => <meta property="article:section" content={cat} />)}
+    {tags.map((tag) => <meta property="article:tag" content={tag} />)}
+
+    <link rel="stylesheet" href="/experimental/styles/global.css" />
+  </head>
+
+  <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+      <!-- Header -->
+      <header class="mb-8">
+        <nav class="mb-8">
+          <a
+            href="/experimental"
+            class="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            ← Back to Home
+          </a>
+        </nav>
+
+        {
+          series && (
+            <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              <span class="font-semibold">{series.name}</span> 시리즈 · 제{series.order}편
+            </div>
+          )
+        }
+
+        <h1 class="text-4xl font-bold mb-4">{title}</h1>
+
+        <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <time datetime={new Date(date).toISOString()}>
+            {formatDate(date)}
+          </time>
+          {
+            updatedDate && (
+              <span>
+                (수정: <time datetime={new Date(updatedDate).toISOString()}>{formatDate(updatedDate)}</time>)
+              </span>
+            )
+          }
+          <span>by {author}</span>
+        </div>
+
+        {
+          excerpt && (
+            <p class="text-lg text-gray-700 dark:text-gray-300 mb-4">{excerpt}</p>
+          )
+        }
+
+        <!-- Categories and Tags -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          {
+            categories.map((cat) => (
+              <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                {cat}
+              </span>
+            ))
+          }
+        </div>
+        {
+          tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )
+        }
+      </header>
+
+      <div class="flex gap-8">
+        <!-- Main Content -->
+        <main class="flex-1 prose prose-lg dark:prose-invert max-w-none">
+          <slot />
+        </main>
+
+        <!-- TOC Sidebar (Desktop only) -->
+        {
+          toc && tocHeadings.length > 0 && (
+            <aside class="hidden lg:block w-64 sticky top-8 self-start">
+              <nav class="border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                <h2 class="text-sm font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                  목차
+                </h2>
+                <ul class="space-y-2 text-sm">
+                  {tocHeadings.map((heading) => (
+                    <li style={`padding-left: ${(heading.depth - 2) * 0.75}rem`}>
+                      <a
+                        href={`#${heading.slug}`}
+                        class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      >
+                        {heading.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </aside>
+          )
+        }
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+          © 2025 Tolerblanc. All rights reserved. |
+          <a
+            href="https://github.com/Tolerblanc/Tolerblanc.github.io"
+            class="text-blue-600 dark:text-blue-400 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /* Prose customization for Korean content */
+  .prose {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+    line-height: 1.8;
+  }
+
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    scroll-margin-top: 2rem;
+  }
+
+  .prose code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+
+  .dark .prose code {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .prose img {
+    border-radius: 0.5rem;
+    margin: 2rem auto;
+  }
+
+  .prose blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1rem;
+    font-style: italic;
+    color: #6b7280;
+  }
+
+  .dark .prose blockquote {
+    color: #9ca3af;
+  }
+</style>

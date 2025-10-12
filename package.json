@@ -28,7 +28,10 @@
     "astro": "astro",
     "type-check": "astro check",
     "jekyll:dev": "bundle exec jekyll serve",
-    "jekyll:build": "bundle exec jekyll build"
+    "jekyll:build": "bundle exec jekyll build",
+    "convert:posts": "tsx scripts/convert-posts.ts",
+    "convert:posts:sample": "tsx scripts/convert-posts.ts --sample 5",
+    "convert:posts:dry-run": "tsx scripts/convert-posts.ts --dry-run"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -36,14 +39,19 @@
     "@astrojs/react": "^4.4.0",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/tailwind": "^6.0.2",
     "astro": "^5.14.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
+    "gray-matter": "^4.0.3",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   }
 }
