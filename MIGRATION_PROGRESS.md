@@ -1,11 +1,12 @@
 # Jekyll → Astro 마이그레이션 진행 상황
 
-> **최종 업데이트**: 2025-10-26 (Phase 7 완료)
+> **최종 업데이트**: 2025-10-26 (Phase 8 완료)
 > **현재 브랜치**: `astro-experimental`
-> **진행 상태**: Phase 1-7 완료 ✅ | Phase 6, 8, 9 진행 예정
+> **진행 상태**: Phase 1-8 완료 ✅ | Phase 6, 9 진행 예정
 > **Astro 버전**: 5.14.4 (Content Layer API, Vite 6)
 > **변환 현황**: 56개 포스트 빌드 성공 / 17개 draft
-> **빌드 성능**: 124 pages in 3.21s | 번들 크기 143.47 KB
+> **빌드 성능**: 124 pages in 3.06s | 번들 크기 143.47 KB
+> **Jekyll 파일**: 완전 제거 (8.7MB, 317 files)
 
 ---
 
@@ -37,7 +38,7 @@
 
 ---
 
-## 완료된 작업 요약 (Phase 1-7)
+## 완료된 작업 요약 (Phase 1-8)
 
 ### Phase 1: 기초 인프라 구축 ✅
 **완료일**: 2025-10-12
@@ -122,7 +123,70 @@
 
 ---
 
-## 남은 작업 계획 (Phase 6, 8, 9)
+### Phase 8: 코드베이스 정리 및 코드 퀄리티 ✅
+**완료일**: 2025-10-26
+
+**1단계: Jekyll 파일 완전 제거** (8.7MB, 317 files)
+- 설정 파일: `_config.yml`, `Gemfile`, `Gemfile.lock`
+- 디렉토리: `_includes`, `_layouts`, `_posts`, `_pages`, `_data`, `_sass`
+- 빌드 아티팩트: `_site`, `_drafts`, `.jekyll-cache`
+- `.gitignore` 업데이트 (Jekyll 항목 제거)
+
+**2단계: 코드 정리 및 리팩토링**
+- **상수 파일 생성** (`src/constants.ts`):
+  - 사이트 설정 (URL, base path, author)
+  - Analytics 및 Giscus 설정
+  - 카테고리/그룹 레이블
+  - 네비게이션 메뉴
+  - 페이지 설정 (posts per page, TOC depth)
+- **유틸리티 함수 추가** (`src/utils/formatDate.ts`):
+  - 한국어 전체 형식 (`formatDateFull`)
+  - 짧은 형식 (`formatDateShort`)
+  - ISO 형식 (`formatDateISO`)
+  - 상대 시간 (`getRelativeTime`)
+- **navigation.ts 리팩토링**:
+  - 상수 분리 (constants.ts로 이동)
+  - JSDoc 주석 추가
+  - 타입 안정성 개선
+- **jekyll-to-mdx.ts 제거**: 마이그레이션 완료로 불필요
+
+**3단계: 문서화 완성**
+- **POST_GUIDE.md**: 새 포스트 작성 가이드
+  - 빠른 시작 템플릿
+  - Frontmatter 레퍼런스
+  - MDX 작성 팁
+  - 컴포넌트 사용법
+  - 카테고리 가이드
+  - 코드 블록 및 LaTeX
+  - 문제 해결 체크리스트
+- **COMPONENT_GUIDE.md**: 컴포넌트 사용 및 개발 가이드
+  - 컴포넌트 개요 및 구조
+  - 레이아웃 컴포넌트
+  - UI 컴포넌트 (Notice, Header, Sidebar 등)
+  - 유틸리티 함수
+  - 새 컴포넌트 만들기
+  - 스타일링 가이드 (design tokens)
+  - 베스트 프랙티스
+- **ARCHITECTURE.md**: 시스템 아키텍처 문서
+  - 프로젝트 개요 및 원칙
+  - 디렉토리 구조
+  - 기술 스택
+  - 핵심 개념 (Content Collections, routing)
+  - 데이터 흐름 및 빌드 프로세스
+  - SEO 전략
+  - 성능 최적화
+  - 확장 가이드
+  - 테스트 및 배포 전략
+
+**효과**:
+- 저장소 크기: 8.7MB 감소
+- 코드 가독성: 상수 중앙화, JSDoc 추가
+- 유지보수성: 명확한 문서화
+- 개발자 경험: FE 초보자도 쉽게 이해 가능
+
+---
+
+## 남은 작업 계획 (Phase 6, 9)
 
 ### Phase 6: 최종 최적화 및 배포 준비
 **우선순위**: 중 | **예상 시간**: 8-12시간
@@ -140,35 +204,6 @@
 - [ ] 접근성 테스트 (WCAG AA)
 - [ ] 검색 기능 구현 (Algolia 또는 Fuse.js)
 - [ ] 프로덕션 배포 및 A/B 테스트
-
----
-
-### Phase 8: 코드베이스 정리 및 코드 퀄리티
-**우선순위**: 높음 | **예상 시간**: 6-8시간
-
-**주요 작업:**
-- [ ] **Jekyll 파일 완전 제거** (15MB+ 예상)
-  - [ ] 설정: `_config.yml`, `Gemfile`, `Gemfile.lock`
-  - [ ] 디렉토리: `_includes`, `_layouts`, `_posts`, `_drafts`, `_sass`, `_site`, `.jekyll-cache`
-  - [ ] `.gitignore` 업데이트
-- [ ] **사용하지 않는 코드 제거**
-  - [ ] 미사용 import, 함수, 변수, CSS 클래스
-  - [ ] 중복 코드 통합
-- [ ] **코드 가독성 개선**
-  - [ ] 네이밍 컨벤션 (한글 주석, 영어 변수)
-  - [ ] 함수 분리 (단일 책임)
-  - [ ] 매직 넘버/문자열 상수화
-  - [ ] 주석 개선
-- [ ] **확장성 고려 리팩토링**
-  - [ ] 컴포넌트 props 타입 명확화
-  - [ ] 유틸리티 함수 분리
-  - [ ] 설정값 중앙화 (`constants.ts`)
-  - [ ] 디렉토리 구조 개선
-- [ ] **문서화**
-  - [ ] `POST_GUIDE.md` (새 포스트 작성법)
-  - [ ] `COMPONENT_GUIDE.md` (컴포넌트 가이드)
-  - [ ] `ARCHITECTURE.md` (구조 설명)
-  - [ ] JSDoc 주석 추가
 
 ---
 
@@ -192,30 +227,19 @@
 
 ## 우선순위 제안
 
-### 1️⃣ 즉시 진행: Phase 8 (코드베이스 정리)
-**이유**:
-- Jekyll 파일 혼재로 혼란 가능성
-- 15MB+ 불필요한 파일 제거
-- 향후 작업의 깔끔한 기반
+### ✅ 완료: Phase 8 (코드베이스 정리)
+**완료일**: 2025-10-26
 
-**작업 순서**:
-1. **Jekyll 완전 제거** (1-2시간)
-   - 설정 및 디렉토리 삭제
-   - `.gitignore` 업데이트
-   - 커밋: "chore: Remove Jekyll legacy files"
-
-2. **코드 정리** (2-3시간)
-   - 미사용 코드 제거
-   - 네이밍 통일
-   - 상수화 및 함수 분리
-
-3. **문서화** (2-3시간)
-   - `POST_GUIDE.md`, `COMPONENT_GUIDE.md`, `ARCHITECTURE.md`
-   - JSDoc 주석
+**성과**:
+- Jekyll 파일 완전 제거 (8.7MB, 317 files)
+- 상수 중앙화 (`constants.ts`)
+- 유틸리티 함수 추가 (`formatDate.ts`)
+- 코드 리팩토링 (navigation.ts)
+- 완전한 문서화 (POST_GUIDE, COMPONENT_GUIDE, ARCHITECTURE)
 
 ---
 
-### 2️⃣ 중기 진행: Phase 6 (최적화 및 배포 준비)
+### 1️⃣ 다음 진행: Phase 6 (최적화 및 배포 준비)
 **이유**:
 - SEO 및 성능 최적화 필수
 - Draft 포스트 수정으로 콘텐츠 완성도 향상
@@ -311,3 +335,38 @@ astro-experimental 브랜치
 - **마이그레이션 가이드**: https://docs.astro.build/en/guides/migrate-to-astro/from-jekyll/
 - **MDX**: https://mdxjs.com/
 - **Giscus**: https://giscus.app/
+
+---
+
+## 프로젝트 현황 요약
+
+### 완료된 Phase
+- ✅ Phase 1: 기초 인프라 구축
+- ✅ Phase 2: 콘텐츠 마이그레이션 시스템
+- ✅ Phase 3: 핵심 기능 및 LaTeX 지원
+- ✅ Phase 4: 네비게이션 및 UI 컴포넌트
+- ✅ Phase 5: 최적화 및 검증
+- ✅ Phase 7: UI/UX 개선 및 고도화
+- ✅ Phase 8: 코드베이스 정리 및 문서화
+
+### 남은 Phase
+- ⏳ Phase 6: 최종 최적화 및 배포 준비 (중요도: 중)
+- ⏳ Phase 9: 성능 최적화 및 모니터링 (중요도: 낮음)
+
+### 주요 지표
+- **빌드 성능**: 124 pages in 3.06s
+- **번들 크기**: 143.47 KB (gzip: 46.21 kB)
+- **타입 체크**: 0 errors, 0 warnings
+- **테스트**: 8개 스위트 통과 (Playwright)
+- **Jekyll 제거**: 8.7MB, 317 files 완전 제거
+- **문서**: 3개 완전 가이드 (POST, COMPONENT, ARCHITECTURE)
+
+### 다음 단계
+1. Draft 포스트 수정 (17개)
+   - Hongong-SQL (6개): 간단 수정
+   - LaTeX/템플릿 (3개): 수동 검토
+   - LeetCode/Programmers (6개): HTML 재구성
+   - 회고록 (2개): 특수 문자 처리
+2. 이미지/폰트 최적화
+3. Lighthouse 성능 테스트
+4. 프로덕션 배포
