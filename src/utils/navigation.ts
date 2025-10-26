@@ -1,4 +1,18 @@
+/**
+ * 네비게이션 유틸리티
+ *
+ * 사이드바 및 카테고리 네비게이션을 위한 데이터를 제공합니다.
+ * 카테고리 그룹화, 포스트 개수 계산, 최근 포스트 조회 등을 지원합니다.
+ */
+
 import { getCollection } from 'astro:content';
+import {
+  CATEGORY_LABELS,
+  CATEGORY_GROUPS,
+  GROUP_LABELS,
+  SITE_CONFIG,
+  PAGE_CONFIG,
+} from '../constants';
 
 export interface NavCategory {
   id: string;
@@ -15,48 +29,17 @@ export interface NavCategoryGroup {
   totalPosts: number;
 }
 
-// 카테고리별 한글 이름 매핑 (이모지 제거)
-const categoryLabels: Record<string, string> = {
-  '9oormthon_challenge': '9oormthon',
-  'algorithm': 'Algorithm',
-  'boj': 'BOJ',
-  'cpp': 'C++',
-  'dl': 'Deep Learning',
-  'docker': 'Docker',
-  'graphics': 'Graphics',
-  'javascript': 'JavaScript',
-  'leetcode': 'LeetCode',
-  'os': 'OS',
-  'programmers': 'Programmers',
-  'python': 'Python',
-  'retrospective': 'Retrospective',
-  'review': 'Review',
-  'unix': 'Unix',
-  'web_fundamentals': 'Web Fundamentals',
-  '혼공학습단': '혼공학습단',
-};
-
-// 카테고리 그룹 정의 (토스페이먼츠 스타일)
-const categoryGroups: Record<string, string[]> = {
-  'programming': ['cpp', 'python', 'javascript'],
-  'algorithm': ['algorithm', 'boj', 'leetcode', 'programmers'],
-  'web': ['web_fundamentals', 'graphics'],
-  'learning': ['9oormthon_challenge', '혼공학습단', 'retrospective', 'review'],
-  'ai': ['dl'],
-  'system': ['os', 'unix', 'docker'],
-};
-
-const groupLabels: Record<string, string> = {
-  'programming': 'Programming',
-  'algorithm': 'Algorithm',
-  'web': 'Web',
-  'learning': 'Learning',
-  'ai': 'AI & ML',
-  'system': 'System',
-};
+export interface RecentPost {
+  title: string;
+  slug: string;
+  date: Date;
+  category: string;
+}
 
 /**
  * 모든 카테고리 정보를 포스트 개수와 함께 반환
+ *
+ * @returns 포스트 개수순으로 정렬된 카테고리 배열
  */
 export async function getNavigationCategories(): Promise<NavCategory[]> {
   const allPosts = await getCollection('blog', ({ data }) => {
@@ -75,11 +58,11 @@ export async function getNavigationCategories(): Promise<NavCategory[]> {
   // NavCategory 객체 생성
   const categories: NavCategory[] = Array.from(categoryCounts.entries())
     .map(([id, count]) => {
-      const name = categoryLabels[id] || id;
+      const name = CATEGORY_LABELS[id] || id;
       return {
         id,
         name,
-        path: `/experimental/blog/category/${id}`,
+        path: `${SITE_CONFIG.BASE_PATH}/blog/category/${id}`,
         postCount: count,
       };
     })
@@ -90,6 +73,8 @@ export async function getNavigationCategories(): Promise<NavCategory[]> {
 
 /**
  * 그룹화된 카테고리 정보를 반환 (2-depth 구조)
+ *
+ * @returns 포스트 개수순으로 정렬된 카테고리 그룹 배열
  */
 export async function getNavigationCategoryGroups(): Promise<NavCategoryGroup[]> {
   const allCategories = await getNavigationCategories();
@@ -97,7 +82,7 @@ export async function getNavigationCategoryGroups(): Promise<NavCategoryGroup[]>
 
   const groups: NavCategoryGroup[] = [];
 
-  for (const [groupId, categoryIds] of Object.entries(categoryGroups)) {
+  for (const [groupId, categoryIds] of Object.entries(CATEGORY_GROUPS)) {
     const children = categoryIds
       .map(id => categoryMap.get(id))
       .filter((cat): cat is NavCategory => cat !== undefined);
@@ -106,7 +91,7 @@ export async function getNavigationCategoryGroups(): Promise<NavCategoryGroup[]>
       const totalPosts = children.reduce((sum, cat) => sum + cat.postCount, 0);
       groups.push({
         id: groupId,
-        name: groupLabels[groupId] || groupId,
+        name: GROUP_LABELS[groupId] || groupId,
         children,
         totalPosts,
       });
@@ -118,16 +103,21 @@ export async function getNavigationCategoryGroups(): Promise<NavCategoryGroup[]>
 }
 
 /**
- * 최근 포스트 5개 반환
+ * 최근 포스트를 날짜순으로 반환
+ *
+ * @param count 반환할 포스트 개수 (기본값: PAGE_CONFIG.RECENT_POSTS_COUNT)
+ * @returns 최근 포스트 배열
  */
-export async function getRecentPosts() {
+export async function getRecentPosts(
+  count: number = PAGE_CONFIG.RECENT_POSTS_COUNT
+): Promise<RecentPost[]> {
   const allPosts = await getCollection('blog', ({ data }) => {
     return data.draft !== true;
   });
 
   return allPosts
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-    .slice(0, 5)
+    .slice(0, count)
     .map(post => ({
       title: post.data.title,
       slug: post.id,
