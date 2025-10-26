@@ -1,0 +1,218 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+  // 카테고리별로 그룹화
+  const categoryMap = new Map<string, any[]>();
+
+  allPosts.forEach(post => {
+    const category = post.id.split('/')[0];
+    if (!categoryMap.has(category)) {
+      categoryMap.set(category, []);
+    }
+    categoryMap.get(category)!.push(post);
+  });
+
+  // 각 카테고리에 대한 경로 생성
+  return Array.from(categoryMap.entries()).map(([category, posts]) => ({
+    params: { category },
+    props: {
+      category,
+      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+    },
+  }));
+}
+
+const { category, posts } = Astro.props;
+
+// 카테고리 레이블 매핑
+const categoryLabels: Record<string, { name: string; icon: string }> = {
+  '9oormthon_challenge': { name: '9oormthon', icon: '🚀' },
+  'algorithm': { name: 'Algorithm', icon: '🧮' },
+  'boj': { name: 'BOJ', icon: '💻' },
+  'cpp': { name: 'C++', icon: '⚙️' },
+  'dl': { name: 'Deep Learning', icon: '🤖' },
+  'docker': { name: 'Docker', icon: '🐳' },
+  'graphics': { name: 'Graphics', icon: '🎨' },
+  'javascript': { name: 'JavaScript', icon: '📜' },
+  'leetcode': { name: 'LeetCode', icon: '🔢' },
+  'os': { name: 'OS', icon: '🖥️' },
+  'programmers': { name: 'Programmers', icon: '👨‍💻' },
+  'python': { name: 'Python', icon: '🐍' },
+  'retrospective': { name: 'Retrospective', icon: '📝' },
+  'review': { name: 'Review', icon: '📖' },
+  'unix': { name: 'Unix', icon: '🐧' },
+  'web_fundamentals': { name: 'Web Fundamentals', icon: '🌐' },
+  '혼공학습단': { name: '혼공학습단', icon: '📚' },
+};
+
+const label = categoryLabels[category] || { name: category, icon: '📁' };
+---
+
+<BaseLayout
+  title={`${label.name} - Tolerblanc's Blog`}
+  description={`${label.name} 카테고리의 모든 포스트 (${posts.length}개)`}
+  currentPath={Astro.url.pathname}
+>
+  <div class="category-page">
+    <header class="category-header">
+      <div class="category-icon">{label.icon}</div>
+      <h1 class="category-title">{label.name}</h1>
+      <p class="category-count">{posts.length}개의 포스트</p>
+    </header>
+
+    <div class="posts-grid">
+      {posts.map((post) => (
+        <article class="post-card">
+          <a href={`/experimental/blog/${post.id}`}>
+            <div class="post-card-header">
+              <h2 class="post-card-title">{post.data.title}</h2>
+              <time class="post-card-date" datetime={post.data.date.toISOString()}>
+                {post.data.date.toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </time>
+            </div>
+
+            {post.data.excerpt && (
+              <p class="post-card-excerpt">{post.data.excerpt}</p>
+            )}
+
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="post-card-tags">
+                {post.data.tags.slice(0, 5).map((tag: string) => (
+                  <span class="tag">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .category-page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .category-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #333;
+  }
+
+  .category-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .category-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .category-count {
+    font-size: 1.125rem;
+    color: #9ca3af;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .post-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.2s;
+    height: 100%;
+  }
+
+  .post-card:hover {
+    border-color: #60a5fa;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .post-card-header {
+    margin-bottom: 1rem;
+  }
+
+  .post-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-card-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .post-card-excerpt {
+    flex: 1;
+    color: #9ca3af;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .tag {
+    padding: 0.125rem 0.5rem;
+    background: #374151;
+    color: #9ca3af;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+  }
+</style>

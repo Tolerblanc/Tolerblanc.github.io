@@ -1,7 +1,3 @@
-# Jekyll
-_site
-.jekyll-cache
-
 # Astro
 dist/
 .astro/

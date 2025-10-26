@@ -163,19 +163,43 @@ export function optimizeImagePaths(content: string, _slug: string): string {
 export function escapeMDXCharacters(content: string): string {
   // 코드 블록 내부는 제외하고 처리
   const codeBlockPattern = /(```[\s\S]*?```|`[^`]+`)/g;
-  const codeBlocks: string[] = [];
+  const protectedBlocks: string[] = [];
 
   // 코드 블록을 임시로 저장
   let processedContent = content.replace(codeBlockPattern, (match) => {
-    const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
-    codeBlocks.push(match);
+    const placeholder = `__CODE_BLOCK_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
     return placeholder;
   });
 
-  // LaTeX 수식도 보호 (\\( ... \\) 형식)
-  processedContent = processedContent.replace(/\\\\\([^)]*\\\\\)/g, (match) => {
-    const placeholder = `__LATEX_${codeBlocks.length}__`;
-    codeBlocks.push(match);
+  // 자동 링크 <URL>을 마크다운 링크 [URL](URL)로 변환
+  processedContent = processedContent.replace(/<(https?:\/\/[^\s>]+)>/g, '[$1]($1)');
+
+  // LaTeX 수식 보호 (다양한 형식 지원)
+  // Block math: $$...$$ 또는 \\[...\\]
+  processedContent = processedContent.replace(/\$\$[\s\S]*?\$\$/g, (match) => {
+    const placeholder = `__LATEX_BLOCK_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
+    return placeholder;
+  });
+
+  processedContent = processedContent.replace(/\\\\\[[\s\S]*?\\\\\]/g, (match) => {
+    const placeholder = `__LATEX_BLOCK_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
+    return placeholder;
+  });
+
+  // Inline math: \\(...\\) 먼저 처리 (LaTeX 우선)
+  processedContent = processedContent.replace(/\\\\\([^)]*?\\\\\)/g, (match) => {
+    const placeholder = `__LATEX_INLINE_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
+    return placeholder;
+  });
+
+  // Inline math: $...$ 형식 (단, 줄바꿈이 없고 연속된 두 개의 $ 사이)
+  processedContent = processedContent.replace(/\$([^$\n]+?)\$/g, (match) => {
+    const placeholder = `__LATEX_INLINE_${protectedBlocks.length}__`;
+    protectedBlocks.push(match);
     return placeholder;
   });
 
@@ -185,9 +209,9 @@ export function escapeMDXCharacters(content: string): string {
     .replace(/>=(?![^<]*?>)/g, '&gt;=');
 
   // 코드 블록 및 LaTeX 복원
-  codeBlocks.forEach((block, index) => {
+  protectedBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(
-      new RegExp(`__(?:CODE_BLOCK|LATEX)_${index}__`, 'g'),
+      new RegExp(`__(?:CODE_BLOCK|LATEX_BLOCK|LATEX_INLINE)_${index}__`, 'g'),
       block
     );
   });

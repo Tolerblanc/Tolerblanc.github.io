@@ -1,0 +1,48 @@
+---
+/**
+ * Giscus Comments Component
+ *
+ * GitHub Discussions 기반 댓글 시스템
+ *
+ * 설정 정보:
+ * - repo: Tolerblanc/Tolerblanc.github.io
+ * - repoId: R_kgDOJ01EaQ
+ * - category: Announcements
+ * - categoryId: DIC_kwDOJ01Eac4Cerab
+ * - mapping: pathname (URL 기반 매핑으로 기존 댓글 유지)
+ * - theme: dark_dimmed (다크 테마)
+ * - lang: ko (한국어)
+ */
+---
+
+<div class="giscus-wrapper my-8">
+  <script
+    is:inline
+    src="https://giscus.app/client.js"
+    data-repo="Tolerblanc/Tolerblanc.github.io"
+    data-repo-id="R_kgDOJ01EaQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOJ01Eac4Cerab"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="dark_dimmed"
+    data-lang="ko"
+    crossorigin="anonymous"
+    async
+  ></script>
+</div>
+
+<style>
+  .giscus-wrapper {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .dark .giscus-wrapper {
+    border-top-color: #374151;
+  }
+</style>

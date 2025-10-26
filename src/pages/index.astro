@@ -1,66 +1,251 @@
 ---
-// Welcome to Astro Experimental Version
-const title = "인생은 B와 D사이 Code다 - Experimental";
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const title = "인생은 B와 D사이 Code다";
 const description = "Tolerblanc의 기술 블로그 (Astro 실험 버전)";
+
+// Get all published blog posts, sorted by date
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 10); // 최근 10개만 표시
 ---
 
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>{description}</p>
-      <div class="notice">
-        <p>🚧 이 페이지는 Jekyll에서 Astro로 마이그레이션 중인 실험 버전입니다.</p>
-        <p>메인 블로그는 <a href="https://tolerblanc.github.io">여기</a>에서 확인하세요.</p>
+<BaseLayout title={title} description={description}>
+  <div class="home-container">
+    <section class="hero">
+      <h1 class="hero-title">인생은 B와 D사이 Code다</h1>
+      <p class="hero-subtitle">Tolerblanc의 기술 블로그</p>
+      <div class="hero-notice">
+        <p>🚧 Jekyll → Astro 마이그레이션 실험 버전</p>
+        <p>메인 블로그: <a href="https://tolerblanc.github.io" target="_blank">tolerblanc.github.io</a></p>
       </div>
-      <section>
-        <h2>마이그레이션 진행 상황</h2>
-        <ul>
-          <li>✅ Astro 프로젝트 초기화</li>
-          <li>✅ TypeScript 설정</li>
-          <li>✅ 기본 구조 생성</li>
-          <li>⏳ 콘텐츠 마이그레이션</li>
-          <li>⏳ 디자인 시스템 구현</li>
-          <li>⏳ SEO 및 Analytics 통합</li>
-        </ul>
-      </section>
-    </main>
-    <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-        line-height: 1.6;
-      }
-      h1 {
-        color: #2c3e50;
-      }
-      .notice {
-        background-color: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 4px;
-        padding: 1rem;
-        margin: 2rem 0;
-      }
-      .notice p {
-        margin: 0.5rem 0;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      ul li {
-        padding: 0.5rem 0;
-        font-size: 1.1rem;
-      }
-    </style>
-  </body>
-</html>
+    </section>
+
+    <section class="progress">
+      <h2>마이그레이션 진행 상황</h2>
+      <ul class="progress-list">
+        <li>✅ Phase 1: Astro 프로젝트 초기화</li>
+        <li>✅ Phase 2: 콘텐츠 마이그레이션 시스템</li>
+        <li>✅ Phase 3: LaTeX, Analytics, 댓글, RSS</li>
+        <li>✅ 56개 포스트 빌드 성공</li>
+        <li>🔄 Phase 4: 네비게이션 UI (진행 중)</li>
+      </ul>
+    </section>
+
+    <section class="recent-posts">
+      <h2>📚 최근 포스트</h2>
+      <div class="post-grid">
+        {posts.map((post) => (
+          <article class="post-card">
+            <a href={`/experimental/blog/${post.id}`}>
+              <div class="post-card-header">
+                <h3 class="post-card-title">{post.data.title}</h3>
+                {post.data.categories && post.data.categories.length > 0 && (
+                  <span class="post-card-category">{post.data.categories[0]}</span>
+                )}
+              </div>
+              <p class="post-card-excerpt">{post.data.excerpt}</p>
+              <div class="post-card-meta">
+                <time datetime={post.data.date.toISOString()}>
+                  {post.data.date.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="post-card-tags">
+                    {post.data.tags.slice(0, 3).map(tag => (
+                      <span class="tag">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 2rem 0;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    margin-bottom: 2rem;
+  }
+
+  .hero-notice {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .hero-notice p {
+    margin: 0.5rem 0;
+    color: #d1d5db;
+  }
+
+  .hero-notice a {
+    color: #60a5fa;
+    text-decoration: underline;
+  }
+
+  .hero-notice a:hover {
+    color: #93c5fd;
+  }
+
+  .progress {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .progress h2 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  .progress-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .progress-list li {
+    padding: 0.5rem 0;
+    font-size: 1.0625rem;
+    color: #d1d5db;
+  }
+
+  .recent-posts {
+    margin-bottom: 4rem;
+  }
+
+  .recent-posts h2 {
+    font-size: 1.875rem;
+    color: #fff;
+    margin-bottom: 2rem;
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .post-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.2s;
+  }
+
+  .post-card:hover {
+    border-color: #60a5fa;
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
+  }
+
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .post-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .post-card-category {
+    flex-shrink: 0;
+    padding: 0.25rem 0.75rem;
+    background: #1e40af;
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .post-card-excerpt {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .post-card-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    padding: 0.125rem 0.5rem;
+    background: #374151;
+    color: #9ca3af;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 3rem;
+    }
+
+    .post-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

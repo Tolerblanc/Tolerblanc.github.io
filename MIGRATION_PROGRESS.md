@@ -1,23 +1,22 @@
 # Jekyll → Astro 마이그레이션 진행 상황
 
-> **최종 업데이트**: 2025-10-12 (Phase 2 완료)
+> **최종 업데이트**: 2025-10-26 (Phase 7 완료)
 > **현재 브랜치**: `astro-experimental`
-> **Phase**: Phase 1-2 완료, Phase 3 준비 중
-> **Astro 버전**: 5.14.4 (Content Layer, Vite 6 포함)
-> **변환된 포스트**: 5개 (샘플), 총 75개 예정
+> **진행 상태**: Phase 1-7 완료 ✅ | Phase 6, 8, 9 진행 예정
+> **Astro 버전**: 5.14.4 (Content Layer API, Vite 6)
+> **변환 현황**: 56개 포스트 빌드 성공 / 17개 draft
+> **빌드 성능**: 124 pages in 3.21s | 번들 크기 143.47 KB
 
 ---
 
 ## 📋 목차
 
 1. [프로젝트 개요](#프로젝트-개요)
-2. [마이그레이션 전략](#마이그레이션-전략)
-3. [완료된 작업 (Phase 1)](#완료된-작업-phase-1)
-4. [다음 작업 계획 (Phase 2-5)](#다음-작업-계획-phase-2-5)
+2. [완료된 작업 요약](#완료된-작업-요약-phase-1-7)
+3. [남은 작업 계획](#남은-작업-계획-phase-6-8-9)
+4. [우선순위 제안](#우선순위-제안)
 5. [기술 스택 비교](#기술-스택-비교)
-6. [핵심 요구사항](#핵심-요구사항)
-7. [파일 구조 매핑](#파일-구조-매핑)
-8. [배포 전략](#배포-전략)
+6. [배포 전략](#배포-전략)
 
 ---
 
@@ -27,1724 +26,288 @@
 - **사이트**: https://tolerblanc.github.io
 - **포스트 수**: 75개 이상의 한국어 기술 문서
 - **테마**: minimal-mistakes-jekyll v4.24.0
-- **빌드 도구**: Jekyll (Ruby 기반)
 - **트래픽**: 상당량의 유기적 트래픽 (SEO 유지 필수)
 
 ### 마이그레이션 목표
-1. **Ruby 의존성 제거** - JavaScript/TypeScript 생태계로 전환
-2. **개발 경험 개선** - 더 빠른 빌드, 핫 리로드, 타입 안정성
-3. **확장성 강화** - MDX로 커스텀 컴포넌트 구현
-4. **SEO 100% 보존** - URL, 메타데이터, Analytics 유지
-5. **실험적 접근** - 별도 브랜치에서 검증 후 점진적 전환
+1. **Ruby 의존성 제거** → JavaScript/TypeScript 생태계
+2. **개발 경험 개선** → 빠른 빌드, 핫 리로드, 타입 안정성
+3. **확장성 강화** → MDX 기반 커스텀 컴포넌트
+4. **SEO 100% 보존** → URL, 메타데이터, Analytics 유지
+5. **실험적 접근** → `/experimental` 배포 후 점진적 전환
 
 ---
 
-## 마이그레이션 전략
+## 완료된 작업 요약 (Phase 1-7)
 
-### 원칙
-- **안전성 우선**: 메인 사이트는 계속 운영하며 실험 브랜치에서 작업
-- **SEO 보존**: 모든 URL, 메타데이터, Analytics 설정 유지
-- **점진적 전환**: `/experimental` 경로로 배포하여 A/B 테스트
-- **독립적 커밋**: 각 기능은 별도 커밋으로 관리하여 롤백 가능
+### Phase 1: 기초 인프라 구축 ✅
+**완료일**: 2025-10-12
 
-### 단계별 계획
+- Astro 5.14.4 프로젝트 초기화 (Content Layer API, Vite 6)
+- TypeScript 설정 및 path aliases
+- GitHub Actions 워크플로우 (pnpm, 자동 배포)
+- 디렉토리 구조 생성
 
-#### Phase 1: 기초 인프라 구축 ✅ **완료**
-- [x] Astro 프로젝트 초기화
-- [x] TypeScript 및 린터 설정
-- [x] 디렉토리 구조 생성
-- [x] GitHub Actions 워크플로우 설정
-- [x] **Astro 5.14.4 업그레이드** (2025-10-12 추가)
-  - Astro 4.16.0 → 5.14.4
-  - @astrojs/mdx 3.0.0 → 4.3.7
-  - @astrojs/react 3.0.0 → 4.4.0
-  - Content Layer API 적용
-  - Vite 6.0 적용
+**생성 파일**: `package.json`, `tsconfig.json`, `astro.config.mjs`, `.github/workflows/deploy-experimental.yml`
 
-#### Phase 2: 콘텐츠 마이그레이션 시스템 ✅ **완료**
-- [x] Jekyll → MDX 변환 스크립트 작성 (`src/utils/jekyll-to-mdx.ts`)
-- [x] frontmatter 매핑 유틸리티 (Jekyll → Astro schema)
-- [x] 샘플 포스트 5개 변환 및 검증
-- [x] Notice 컴포넌트 구현 (4 types)
-- [x] PostLayout 구현 (SEO, TOC, 메타데이터)
-- [x] 동적 라우팅 설정 (`/blog/[...slug]`)
-- [x] Tailwind CSS 통합 및 한국어 폰트 최적화
-- [x] 렌더링 검증 (0 errors, 0 warnings)
+---
 
-#### Phase 3: 핵심 기능 및 LaTeX 지원 🔄 **다음 단계**
-- [ ] **LaTeX 수식 렌더링 시스템**
-  - [ ] KaTeX 또는 MathJax 통합
-  - [ ] Inline 수식 지원 (`$...$` 또는 `\\(...\\)`)
-  - [ ] Block 수식 지원 (`$$...$$` 또는 `\\[...\\]`)
-  - [ ] 변환 스크립트에서 LaTeX 구문 보호
-  - [ ] 기존 포스트 수식 마이그레이션
-- [ ] Google Analytics 통합 (G-JWJT3DQR8G)
-- [ ] Giscus 댓글 통합 (기존 설정 유지)
-- [ ] RSS 피드 생성 및 검증
-- [ ] Sitemap 최적화
-- [ ] 전체 75개 포스트 마이그레이션
+### Phase 2: 콘텐츠 마이그레이션 시스템 ✅
+**완료일**: 2025-10-12
 
-#### Phase 4: 네비게이션 및 고급 UI 컴포넌트
-- [ ] **좌측 사이드바 네비게이션**
-  - [ ] 카테고리 기반 트리 구조
-  - [ ] 라우팅 연동 (현재 위치 하이라이트)
-  - [ ] 커스텀 섹션 지원 (Featured, Recent 등)
-  - [ ] 접기/펼치기 기능
-  - [ ] 모바일 반응형 (햄버거 메뉴)
-- [ ] **상단 메뉴 (Header Navigation)**
-  - [ ] 주요 카테고리 링크
-  - [ ] 검색 바 통합
-  - [ ] 다크 모드 토글
-  - [ ] About/Tags 페이지 링크
-- [ ] 코드 하이라이팅 개선 (현재 Shiki 사용 중)
-- [ ] 카테고리/태그 아카이브 페이지
-- [ ] 다크 테마 완성도 향상
-- [ ] 검색 기능 (Algolia/Fuse.js)
-- [ ] 이미지 최적화 (@astrojs/image)
+- Jekyll → MDX 자동 변환 시스템 (`jekyll-to-mdx.ts`)
+- Content Collections 스키마 (`content.config.ts`)
+- Notice 컴포넌트 (info, warning, danger, success)
+- PostLayout (SEO, TOC, 메타데이터)
+- Tailwind CSS + 한국어 폰트
+- 샘플 5개 포스트 변환 및 검증
 
-#### Phase 5: 최적화 및 검증
-- [ ] 이미지 최적화 (@astrojs/image)
+**빌드 성능**: 1.04s (6 pages), 143.47 KB
+
+---
+
+### Phase 3: 핵심 기능 및 LaTeX 지원 ✅
+**완료일**: 2025-10-14
+
+- **LaTeX 렌더링**: KaTeX + remark-math + rehype-katex
+- **Google Analytics**: G-JWJT3DQR8G (기존 유지)
+- **Giscus 댓글**: pathname 매핑 유지
+- **RSS 피드**: `/rss.xml`
+- **Sitemap**: @astrojs/sitemap
+- **전체 포스트 마이그레이션**: 56개 성공 / 17개 draft
+
+**Draft 현황** (17개):
+- LeetCode/Programmers: 복잡한 HTML (6개)
+- Hongong-SQL: Unclosed `<img>` (6개)
+- LaTeX 복잡도: 수식 충돌 (3개)
+- 작성 중: 2개
+
+**빌드 성능**: 2.94s (57 pages), 143.47 KB (gzip 46.21 kB)
+
+---
+
+### Phase 4: 네비게이션 및 UI 컴포넌트 ✅
+**완료일**: 2025-10-20
+
+- **사이드바**: 카테고리 리스트 (14개), Recent Posts, 포스트 카운트
+- **헤더**: Home, Blog, Tags, About, 다크 모드 토글
+- **카테고리/태그**: `/blog/category/[category]`, `/tags`, `/tags/[tag]`
+- **About 페이지**: `/about`
+- **코드 하이라이팅**: Shiki dark-plus
+
+---
+
+### Phase 5: 최적화 및 검증 ✅
+**완료일**: 2025-10-22
+
+- **프로덕션 빌드**: 124 pages in 3.21s
+- **TypeScript**: 0 errors
+- **번들 크기**: 143.47 KB
+- **SEO 검증**: Sitemap, robots.txt, Meta 태그, GA, Giscus, RSS
+- **Playwright 테스트**: 8개 스위트 통과
+
+---
+
+### Phase 7: UI/UX 개선 및 고도화 ✅
+**완료일**: 2025-10-26
+
+- **디자인 시스템**: `design-tokens.css` (CSS 변수)
+- **다크/라이트 모드**: 전체 컴포넌트 일관성
+- **사이드바**: 2-depth 확장/축소, 자동 확장
+- **코드 블록**: CodeCopyButton (복사 + 피드백)
+- **Scroll to Top**: IntersectionObserver
+- **Reading Progress**: 스크롤 진행률
+- **TOC**: 활성 섹션 하이라이팅
+
+**생성 컴포넌트**: `CodeCopyButton.astro`, `ScrollToTop.astro`, `ReadingProgress.astro`, `GiscusComments.astro`
+
+---
+
+## 남은 작업 계획 (Phase 6, 8, 9)
+
+### Phase 6: 최종 최적화 및 배포 준비
+**우선순위**: 중 | **예상 시간**: 8-12시간
+
+**주요 작업:**
+- [ ] Draft 포스트 수정 (17개)
+  - **우선순위 1**: Hongong-SQL (6개) - `<img>` → `<img />`
+  - **우선순위 2**: LaTeX/템플릿 (3개) - 수동 검토
+  - **우선순위 3**: LeetCode/Programmers (6개) - HTML 재구성
+  - **우선순위 4**: 회고록 (2개) - 특수 문자 이스케이프
+- [ ] 이미지 최적화 (@astrojs/image 또는 Sharp)
 - [ ] 한글 폰트 최적화 (subset, preload)
-- [ ] 성능 테스트 및 벤치마크
-- [ ] SEO 검증 (Lighthouse, 메타태그)
-- [ ] 링크 무결성 검사
-- [ ] 접근성 테스트 (WCAG)
+- [ ] Lighthouse 성능 테스트 (목표: 95+)
+- [ ] 링크 무결성 검사 (linkinator)
+- [ ] 접근성 테스트 (WCAG AA)
+- [ ] 검색 기능 구현 (Algolia 또는 Fuse.js)
+- [ ] 프로덕션 배포 및 A/B 테스트
 
 ---
 
-## 완료된 작업 (Phase 1)
+### Phase 8: 코드베이스 정리 및 코드 퀄리티
+**우선순위**: 높음 | **예상 시간**: 6-8시간
 
-### 1. 브랜치 및 프로젝트 초기화
-
-**생성된 브랜치**: `astro-experimental`
-
-```bash
-git checkout -b astro-experimental
-```
-
-### 2. 패키지 관리 및 의존성
-
-**파일**: `package.json`
-
-```json
-{
-  "name": "tolerblanc-blog",
-  "type": "module",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "type-check": "astro check",
-    "jekyll:dev": "bundle exec jekyll serve",
-    "jekyll:build": "bundle exec jekyll build"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.0",
-    "@astrojs/mdx": "^3.0.0",
-    "@astrojs/react": "^3.0.0",
-    "@astrojs/rss": "^4.0.0",
-    "@astrojs/sitemap": "^3.0.0",
-    "astro": "^4.16.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "sharp": "^0.33.0"
-  }
-}
-```
-
-**주요 특징**:
-- pnpm 사용 (더 빠른 의존성 관리)
-- Jekyll 명령어 보존 (하위 호환성)
-- ESM 모듈 시스템 사용
-
-### 3. TypeScript 설정
-
-**파일**: `tsconfig.json`
-
-```json
-{
-  "extends": "astro/tsconfigs/strict",
-  "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".astro",
-    "_site",
-    "_posts",
-    "assets",
-    "banner.js"
-  ],
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@utils/*": ["src/utils/*"],
-      "@content/*": ["src/content/*"]
-    }
-  }
-}
-```
-
-**주요 특징**:
-- Strict 모드 활성화
-- Path aliases 설정 (import 경로 단축)
-- Jekyll 파일 제외 (타입 체크 충돌 방지)
-
-### 4. Astro 설정
-
-**파일**: `astro.config.mjs`
-
-```javascript
-import { defineConfig } from 'astro/config';
-import mdx from '@astrojs/mdx';
-import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
-
-export default defineConfig({
-  site: 'https://tolerblanc.github.io',
-  base: '/experimental',
-  integrations: [
-    mdx(),
-    react(),
-    sitemap()
-  ],
-  markdown: {
-    shikiConfig: {
-      theme: 'dark-plus',
-      wrap: true
-    }
-  },
-  vite: {
-    optimizeDeps: {
-      exclude: ['sharp']
-    }
-  }
-});
-```
-
-**주요 특징**:
-- `/experimental` base path (메인 사이트와 격리)
-- MDX, React, Sitemap 통합
-- Shiki 코드 하이라이팅 (dark-plus 테마)
-
-### 5. 디렉토리 구조
-
-```
-src/
-├── components/       # 재사용 가능한 React/Astro 컴포넌트
-├── layouts/          # 페이지 레이아웃 템플릿
-├── pages/            # 파일 기반 라우팅
-│   └── index.astro   # 랜딩 페이지
-├── content/
-│   └── blog/         # 블로그 포스트 (MDX)
-├── styles/           # 글로벌 스타일
-└── utils/            # 유틸리티 함수
-```
-
-### 6. GitHub Actions 워크플로우
-
-**파일**: `.github/workflows/deploy-experimental.yml`
-
-```yaml
-name: Deploy Experimental Astro Site
-
-on:
-  push:
-    branches: [astro-experimental]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: astro-dist
-          path: dist/
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - uses: actions/download-artifact@v4
-        with:
-          name: astro-dist
-          path: experimental/
-      - uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./experimental
-          destination_dir: experimental
-```
-
-**주요 특징**:
-- 자동 배포 (`astro-experimental` 브랜치 푸시 시)
-- pnpm 캐싱으로 빌드 속도 향상
-- Artifact 기반 빌드/배포 분리
-- `/experimental` 경로로 격리 배포
-
-### 7. 초기 랜딩 페이지
-
-**파일**: `src/pages/index.astro`
-
-마이그레이션 진행 상황을 보여주는 간단한 페이지:
-- 프로젝트 소개
-- 진행 상황 체크리스트
-- 메인 사이트 링크
-
-### 8. 커밋 히스토리
-
-```
-311197f chore: Add GitHub Actions workflow for experimental deployment
-527cfdb feat: Initialize Astro project for experimental migration
-```
+**주요 작업:**
+- [ ] **Jekyll 파일 완전 제거** (15MB+ 예상)
+  - [ ] 설정: `_config.yml`, `Gemfile`, `Gemfile.lock`
+  - [ ] 디렉토리: `_includes`, `_layouts`, `_posts`, `_drafts`, `_sass`, `_site`, `.jekyll-cache`
+  - [ ] `.gitignore` 업데이트
+- [ ] **사용하지 않는 코드 제거**
+  - [ ] 미사용 import, 함수, 변수, CSS 클래스
+  - [ ] 중복 코드 통합
+- [ ] **코드 가독성 개선**
+  - [ ] 네이밍 컨벤션 (한글 주석, 영어 변수)
+  - [ ] 함수 분리 (단일 책임)
+  - [ ] 매직 넘버/문자열 상수화
+  - [ ] 주석 개선
+- [ ] **확장성 고려 리팩토링**
+  - [ ] 컴포넌트 props 타입 명확화
+  - [ ] 유틸리티 함수 분리
+  - [ ] 설정값 중앙화 (`constants.ts`)
+  - [ ] 디렉토리 구조 개선
+- [ ] **문서화**
+  - [ ] `POST_GUIDE.md` (새 포스트 작성법)
+  - [ ] `COMPONENT_GUIDE.md` (컴포넌트 가이드)
+  - [ ] `ARCHITECTURE.md` (구조 설명)
+  - [ ] JSDoc 주석 추가
 
 ---
 
-## 다음 작업 계획 (Phase 2-5)
+### Phase 9: 성능 최적화 및 모니터링
+**우선순위**: 낮음 | **예상 시간**: 4-6시간
 
-### Phase 2: 콘텐츠 마이그레이션 도구 (우선순위 높음)
-
-#### 2.1 Jekyll → MDX 변환 스크립트
-
-**목적**: 75개 이상의 포스트를 자동 변환
-
-**변환 로직**:
-```javascript
-// src/utils/jekyll-to-mdx.js (예정)
-// 1. frontmatter 파싱 및 변환
-//    - date, title, categories, tags, excerpt 추출
-//    - Astro Content Collection 형식으로 변환
-// 2. 본문 변환
-//    - Liquid 구문 제거/변환
-//    - 이미지 경로 수정
-//    - Notice 블록 → MDX 컴포넌트
-// 3. 파일명 변환
-//    - YYYY-MM-DD-title.md → title.mdx
-//    - 카테고리 기반 디렉토리 구조 유지
-```
-
-**입력 예시** (`_posts/Web/NestJS/2025-03-15-nestjs-dematerializer-4.md`):
-```markdown
----
-title: "NestJS 해체분석기 4편"
-excerpt: "NestJS 실행 파이프라인 심층 분석"
-categories:
-  - Web
-  - NestJS
-tags:
-  - TypeScript
-  - Backend
----
-
-<div class="notice--info" markdown="1">
-👨‍💻 개인 공부 기록용 블로그입니다.
-</div>
-
-## 개요
-NestJS의 실행 파이프라인을 분석합니다...
-```
-
-**출력 예시** (`src/content/blog/web/nestjs/nestjs-dematerializer-4.mdx`):
-```mdx
----
-title: "NestJS 해체분석기 4편"
-description: "NestJS 실행 파이프라인 심층 분석"
-pubDate: 2025-03-15
-categories: ["Web", "NestJS"]
-tags: ["TypeScript", "Backend"]
----
-
-import Notice from '@components/Notice.astro';
-
-<Notice type="info">
-👨‍💻 개인 공부 기록용 블로그입니다.
-</Notice>
-
-## 개요
-NestJS의 실행 파이프라인을 분석합니다...
-```
-
-#### 2.2 Content Collections 설정
-
-**파일**: `src/content/config.ts` (생성 예정)
-
-```typescript
-import { defineCollection, z } from 'astro:content';
-
-const blog = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    pubDate: z.date(),
-    updatedDate: z.date().optional(),
-    categories: z.array(z.string()),
-    tags: z.array(z.string()),
-    draft: z.boolean().default(false),
-  }),
-});
-
-export const collections = { blog };
-```
-
-#### 2.3 샘플 변환 및 검증
-
-1. 대표 포스트 3-5개 수동 변환
-2. 변환 스크립트 실행 및 결과 비교
-3. 렌더링 테스트 (이미지, 코드블록, 링크)
-4. 전체 포스트 배치 변환
+**주요 작업:**
+- [ ] **이미지 최적화**
+  - [ ] WebP, AVIF 포맷
+  - [ ] 반응형 이미지
+  - [ ] 지연 로딩
+- [ ] **폰트 최적화**
+  - [ ] Pretendard Variable
+  - [ ] FOUT 방지
+- [ ] **성능 모니터링**
+  - [ ] Lighthouse CI
+  - [ ] Core Web Vitals
+  - [ ] 빌드 벤치마크
 
 ---
 
-### Phase 3: 핵심 기능 구현
+## 우선순위 제안
 
-#### 3.1 레이아웃 시스템
+### 1️⃣ 즉시 진행: Phase 8 (코드베이스 정리)
+**이유**:
+- Jekyll 파일 혼재로 혼란 가능성
+- 15MB+ 불필요한 파일 제거
+- 향후 작업의 깔끔한 기반
 
-**BaseLayout.astro** (기본 레이아웃):
-```astro
----
-interface Props {
-  title: string;
-  description: string;
-}
+**작업 순서**:
+1. **Jekyll 완전 제거** (1-2시간)
+   - 설정 및 디렉토리 삭제
+   - `.gitignore` 업데이트
+   - 커밋: "chore: Remove Jekyll legacy files"
 
-const { title, description } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
----
+2. **코드 정리** (2-3시간)
+   - 미사용 코드 제거
+   - 네이밍 통일
+   - 상수화 및 함수 분리
 
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWJT3DQR8G"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-JWJT3DQR8G');
-    </script>
-  </head>
-  <body>
-    <slot />
-  </body>
-</html>
-```
-
-**PostLayout.astro** (포스트 레이아웃):
-```astro
----
-import BaseLayout from './BaseLayout.astro';
-import Giscus from '@components/Giscus.astro';
-
-interface Props {
-  frontmatter: {
-    title: string;
-    description: string;
-    pubDate: Date;
-    categories: string[];
-    tags: string[];
-  }
-}
-
-const { frontmatter } = Astro.props;
----
-
-<BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <article>
-    <header>
-      <h1>{frontmatter.title}</h1>
-      <time datetime={frontmatter.pubDate.toISOString()}>
-        {frontmatter.pubDate.toLocaleDateString('ko-KR')}
-      </time>
-    </header>
-
-    <div class="content">
-      <slot />
-    </div>
-
-    <Giscus />
-  </article>
-</BaseLayout>
-```
-
-#### 3.2 Google Analytics 통합
-
-**현재 설정 (유지 필수)**:
-- Tracking ID: `G-JWJT3DQR8G`
-- 페이지뷰 자동 추적
-- 이벤트 추적 (선택적)
-
-**구현 방법**:
-1. BaseLayout에 스크립트 추가 (위 예시 참조)
-2. 환경 변수로 ID 관리 (`PUBLIC_GA_ID`)
-3. 개발 환경에서는 비활성화
-
-#### 3.3 Giscus 댓글 시스템
-
-**현재 설정 (유지 필수)**:
-```javascript
-{
-  repo: "Tolerblanc/Tolerblanc.github.io",
-  repoId: "R_kgDOJ01EaQ",
-  category: "Announcements",
-  categoryId: "DIC_kwDOJ01Eac4Cerab",
-  theme: "dark_dimmed",
-  lang: "ko"
-}
-```
-
-**컴포넌트**: `src/components/Giscus.astro` (생성 예정)
-
-```astro
----
-// Giscus 설정은 환경 변수나 config에서 가져오기
----
-
-<div class="giscus-wrapper">
-  <script
-    src="https://giscus.app/client.js"
-    data-repo="Tolerblanc/Tolerblanc.github.io"
-    data-repo-id="R_kgDOJ01EaQ"
-    data-category="Announcements"
-    data-category-id="DIC_kwDOJ01Eac4Cerab"
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="bottom"
-    data-theme="dark_dimmed"
-    data-lang="ko"
-    crossorigin="anonymous"
-    async>
-  </script>
-</div>
-```
-
-#### 3.4 RSS 및 Sitemap
-
-**RSS 피드** (`src/pages/rss.xml.ts` 생성 예정):
-```typescript
-import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
-
-export async function GET(context) {
-  const posts = await getCollection('blog');
-  return rss({
-    title: "인생은 B와 D사이 Code다",
-    description: "Tolerblanc의 기술 블로그",
-    site: context.site,
-    items: posts.map((post) => ({
-      title: post.data.title,
-      pubDate: post.data.pubDate,
-      description: post.data.description,
-      link: `/blog/${post.slug}/`,
-    })),
-  });
-}
-```
-
-**Sitemap**: `@astrojs/sitemap` 통합으로 자동 생성됨 ✅
+3. **문서화** (2-3시간)
+   - `POST_GUIDE.md`, `COMPONENT_GUIDE.md`, `ARCHITECTURE.md`
+   - JSDoc 주석
 
 ---
 
-### Phase 4: UI 컴포넌트 및 디자인
+### 2️⃣ 중기 진행: Phase 6 (최적화 및 배포 준비)
+**이유**:
+- SEO 및 성능 최적화 필수
+- Draft 포스트 수정으로 콘텐츠 완성도 향상
 
-#### 4.1 Notice 컴포넌트
-
-**현재 Jekyll 구문**:
-```html
-<div class="notice--info" markdown="1">
-👨‍💻 개인 공부 기록용 블로그입니다.
-</div>
-```
-
-**목표 MDX 구문**:
-```mdx
-<Notice type="info">
-👨‍💻 개인 공부 기록용 블로그입니다.
-</Notice>
-```
-
-**컴포넌트**: `src/components/Notice.astro` (생성 예정)
-
-```astro
----
-interface Props {
-  type?: 'info' | 'warning' | 'danger' | 'success';
-}
-
-const { type = 'info' } = Astro.props;
----
-
-<div class={`notice notice--${type}`}>
-  <slot />
-</div>
-
-<style>
-  .notice {
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 4px;
-    border-left: 4px solid;
-  }
-
-  .notice--info {
-    background-color: #e7f3ff;
-    border-color: #2196f3;
-  }
-
-  .notice--warning {
-    background-color: #fff3cd;
-    border-color: #ffc107;
-  }
-
-  .notice--danger {
-    background-color: #f8d7da;
-    border-color: #dc3545;
-  }
-
-  .notice--success {
-    background-color: #d4edda;
-    border-color: #28a745;
-  }
-</style>
-```
-
-#### 4.2 코드 하이라이팅
-
-**현재**: Rouge (Ruby 기반)
-**목표**: Shiki (이미 설정됨 ✅)
-
-**추가 설정** (astro.config.mjs):
-```javascript
-markdown: {
-  shikiConfig: {
-    theme: 'dark-plus',
-    wrap: true,
-    langs: [
-      'javascript', 'typescript', 'python', 'go',
-      'rust', 'java', 'bash', 'json', 'yaml'
-    ]
-  }
-}
-```
-
-#### 4.3 목차 (TOC) 컴포넌트
-
-**컴포넌트**: `src/components/TableOfContents.astro` (생성 예정)
-
-```astro
----
-interface Props {
-  headings: Array<{
-    depth: number;
-    slug: string;
-    text: string;
-  }>;
-}
-
-const { headings } = Astro.props;
----
-
-<nav class="toc">
-  <h2>목차</h2>
-  <ul>
-    {headings.map(heading => (
-      <li class={`toc-level-${heading.depth}`}>
-        <a href={`#${heading.slug}`}>{heading.text}</a>
-      </li>
-    ))}
-  </ul>
-</nav>
-
-<style>
-  .toc {
-    position: sticky;
-    top: 2rem;
-    max-width: 250px;
-  }
-
-  .toc-level-2 { margin-left: 0; }
-  .toc-level-3 { margin-left: 1rem; }
-  .toc-level-4 { margin-left: 2rem; }
-</style>
-```
-
-**사용 예시** (PostLayout.astro):
-```astro
----
-const { headings } = await Astro.props.frontmatter;
----
-
-<div class="post-container">
-  <TableOfContents headings={headings} />
-  <article>
-    <slot />
-  </article>
-</div>
-```
-
-#### 4.4 카테고리/태그 시스템
-
-**페이지 생성**: `src/pages/categories/[category].astro` (예정)
-
-```astro
----
-import { getCollection } from 'astro:content';
-
-export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  const categories = [...new Set(posts.flatMap(post => post.data.categories))];
-
-  return categories.map(category => ({
-    params: { category },
-    props: {
-      posts: posts.filter(post =>
-        post.data.categories.includes(category)
-      )
-    }
-  }));
-}
-
-const { category } = Astro.params;
-const { posts } = Astro.props;
----
-
-<BaseLayout title={`카테고리: ${category}`}>
-  <h1>{category}</h1>
-  <ul>
-    {posts.map(post => (
-      <li>
-        <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
-      </li>
-    ))}
-  </ul>
-</BaseLayout>
-```
-
-#### 4.5 검색 기능
-
-**현재**: Lunr.js (Jekyll 플러그인)
-**목표**: Algolia 또는 Fuse.js
-
-**Option 1 - Algolia** (추천):
-- 빠른 검색 속도
-- 한글 형태소 분석 지원
-- 무료 플랜 (10K requests/month)
-
-**Option 2 - Fuse.js** (대안):
-- 클라이언트 사이드 검색
-- 외부 서비스 불필요
-- 포스트 수가 많을 경우 성능 저하 가능
+**우선순위**:
+1. Draft 포스트 수정 (17개)
+2. Lighthouse 성능 테스트
+3. 링크 무결성 검사
+4. 이미지 최적화
+5. 검색 기능 구현
 
 ---
 
-### Phase 5: 최적화 및 검증
-
-#### 5.1 이미지 최적화
-
-**설치**: `@astrojs/image` 또는 `astro-imagetools`
-
-```bash
-pnpm add @astrojs/image
-```
-
-**astro.config.mjs 업데이트**:
-```javascript
-import image from '@astrojs/image';
-
-export default defineConfig({
-  integrations: [
-    image({
-      serviceEntryPoint: '@astrojs/image/sharp'
-    })
-  ]
-});
-```
-
-**사용 예시**:
-```astro
----
-import { Image } from '@astrojs/image/components';
----
-
-<Image
-  src="/assets/images/hero.png"
-  alt="Hero image"
-  width={1200}
-  height={600}
-  format="webp"
-  quality={80}
-/>
-```
-
-#### 5.2 한글 폰트 최적화
-
-**전략**:
-1. **Subset 생성**: 사용 빈도 높은 한글 2,350자만 포함
-2. **Preload**: 중요 폰트는 `<link rel="preload">`
-3. **Font Display**: `font-display: swap` 사용
-4. **Variable Fonts**: 가능한 경우 가변 폰트 사용
-
-**구현 예시** (BaseLayout.astro):
-```astro
-<head>
-  <!-- 한글 폰트 preload -->
-  <link
-    rel="preload"
-    href="/fonts/PretendardVariable.subset.woff2"
-    as="font"
-    type="font/woff2"
-    crossorigin
-  />
-</head>
-
-<style is:global>
-  @font-face {
-    font-family: 'Pretendard';
-    src: url('/fonts/PretendardVariable.subset.woff2') format('woff2-variations');
-    font-display: swap;
-    font-weight: 100 900;
-  }
-
-  body {
-    font-family: 'Pretendard', -apple-system, sans-serif;
-  }
-</style>
-```
-
-#### 5.3 성능 목표 및 벤치마크
-
-**목표 메트릭**:
-- **빌드 시간**: <30초 (75개 포스트)
-- **핫 리로드**: <3초
-- **Lighthouse 점수**: 95+ (모든 카테고리)
-- **번들 크기**: <500KB (초기 로드)
-- **FCP**: <1.5s
-- **LCP**: <2.5s
-- **CLS**: <0.1
-
-**측정 도구**:
-- Lighthouse CI
-- WebPageTest
-- Chrome DevTools Performance
-
-#### 5.4 SEO 검증 체크리스트
-
-**URL 구조** (필수):
-- [ ] 모든 기존 URL이 동일한 패턴 유지
-- [ ] `/:categories/:title/` 형식 보존
-- [ ] 리다이렉트 없이 직접 접근 가능
-
-**메타데이터**:
-- [ ] `<title>` 태그 (각 페이지 고유)
-- [ ] `<meta name="description">`
-- [ ] Open Graph 태그 (`og:title`, `og:description`, `og:image`)
-- [ ] Twitter Card 태그
-- [ ] Canonical URL (`<link rel="canonical">`)
-
-**구조화된 데이터**:
-- [ ] BlogPosting Schema.org 마크업
-- [ ] BreadcrumbList
-- [ ] Article 메타데이터
-
-**기술적 SEO**:
-- [ ] Sitemap 생성 및 검증
-- [ ] robots.txt 설정
-- [ ] RSS 피드 생성
-- [ ] 404 페이지
-
-#### 5.5 링크 무결성 검사
-
-**도구**: `linkinator` 또는 `broken-link-checker`
-
-```bash
-pnpm add -D linkinator
-
-# package.json
-{
-  "scripts": {
-    "check-links": "linkinator dist/ --recurse --silent --skip '^https?://localhost'"
-  }
-}
-```
-
-**자동화**: GitHub Actions에 추가
-
-```yaml
-- name: Check for broken links
-  run: |
-    pnpm build
-    pnpm check-links
-```
-
-#### 5.6 접근성 테스트
-
-**도구**:
-- axe DevTools
-- Lighthouse Accessibility
-- WAVE
-
-**체크리스트**:
-- [ ] 시맨틱 HTML 사용
-- [ ] ARIA 레이블 적절히 사용
-- [ ] 키보드 네비게이션 가능
-- [ ] 색상 대비 충분 (WCAG AA 이상)
-- [ ] 이미지 alt 텍스트
-- [ ] 폼 레이블 연결
+### 3️⃣ 장기 진행: Phase 9 (성능 모니터링)
+**이유**:
+- 배포 후 실제 사용자 데이터 기반 최적화
+- 지속적 개선 가능
 
 ---
 
 ## 기술 스택 비교
 
-| 항목 | Jekyll (현재) | Astro (목표) |
-|------|--------------|-------------|
+| 항목 | Jekyll | Astro |
+|------|--------|-------|
 | **언어** | Ruby | JavaScript/TypeScript |
 | **템플릿** | Liquid | Astro + JSX |
-| **콘텐츠** | Markdown | MDX (Markdown + Components) |
-| **스타일** | Sass | CSS + Sass (선택적) |
-| **빌드 도구** | Jekyll | Vite |
-| **패키지 관리** | Bundler (Gemfile) | pnpm (package.json) |
-| **핫 리로드** | 느림 (~10s) | 빠름 (<3s) |
-| **타입 안정성** | 없음 | TypeScript |
-| **컴포넌트 재사용** | Includes (제한적) | React/Astro 컴포넌트 |
-| **코드 하이라이팅** | Rouge | Shiki |
+| **콘텐츠** | Markdown | MDX |
+| **빌드** | Jekyll | Vite |
+| **패키지 관리** | Bundler | pnpm |
+| **핫 리로드** | ~10s | <3s |
+| **타입 안정성** | ❌ | ✅ TypeScript |
+| **컴포넌트** | Includes (제한적) | React/Astro |
+| **하이라이팅** | Rouge | Shiki |
 | **검색** | Lunr.js | Algolia/Fuse.js (예정) |
-
----
-
-## 핵심 요구사항
-
-### 1. SEO 보존 (최우선)
-
-#### URL 구조 유지
-```
-현재: https://tolerblanc.github.io/web/nestjs/nestjs-dematerializer-4/
-유지: https://tolerblanc.github.io/web/nestjs/nestjs-dematerializer-4/
-```
-
-**구현 방법**:
-- Content Collections의 slug 활용
-- 카테고리 기반 디렉토리 구조 유지
-- `[...slug].astro` 동적 라우팅
-
-**파일 매핑 예시**:
-```
-Jekyll: _posts/Web/NestJS/2025-03-15-nestjs-dematerializer-4.md
-Astro:  src/content/blog/web/nestjs/nestjs-dematerializer-4.mdx
-URL:    /web/nestjs/nestjs-dematerializer-4/
-```
-
-#### Google Analytics 연속성
-- Tracking ID 동일: `G-JWJT3DQR8G`
-- 페이지뷰 추적 형식 동일
-- 이벤트 추적 구조 유지 (있는 경우)
-
-#### Giscus 댓글 연속성
-- pathname 기반 매핑 사용 중 (변경 불필요)
-- 기존 댓글 자동 유지됨
-
-### 2. 콘텐츠 무결성
-
-#### 포스트 메타데이터 보존
-- 발행일 (pubDate)
-- 카테고리 (계층 구조 유지)
-- 태그
-- 제목 및 발췌문
-
-#### 이미지 및 미디어
-- 경로 변환 (Jekyll → Astro)
-- 최적화 적용 (WebP 변환)
-- Alt 텍스트 보존
-
-#### 내부 링크
-- 상대 경로 → 절대 경로 변환
-- 링크 검증 필수
-
-### 3. 성능 개선
-
-**목표**:
-- 빌드 시간: 현재 대비 50% 단축
-- 페이지 로드: 현재 대비 30% 개선
-- Lighthouse 점수: 95+ (현재: 측정 필요)
-
-### 4. 개발자 경험
-
-**개선 사항**:
-- 타입 안정성 (TypeScript)
-- 빠른 핫 리로드 (<3s)
-- 컴포넌트 재사용
-- 모던 개발 도구 (ESLint, Prettier)
-
----
-
-## 파일 구조 매핑
-
-### Jekyll 구조 (현재)
-```
-.
-├── _config.yml                 # 사이트 설정
-├── _data/                      # 데이터 파일
-├── _includes/                  # 재사용 컴포넌트
-├── _layouts/                   # 페이지 템플릿
-│   ├── default.html
-│   ├── single.html
-│   └── archive.html
-├── _posts/                     # 블로그 포스트
-│   ├── Personal/
-│   ├── PL/
-│   ├── Web/
-│   │   └── NestJS/
-│   │       └── 2025-03-15-nestjs-dematerializer-4.md
-│   ├── DevOps/
-│   ├── CS/
-│   └── Algorithm/
-├── _sass/                      # 스타일시트
-├── assets/                     # 정적 파일
-│   ├── images/
-│   └── js/
-├── Gemfile                     # Ruby 의존성
-└── _site/                      # 빌드 출력 (무시)
-```
-
-### Astro 구조 (목표)
-```
-.
-├── astro.config.mjs            # Astro 설정
-├── tsconfig.json               # TypeScript 설정
-├── package.json                # npm 의존성
-├── src/
-│   ├── components/             # 재사용 컴포넌트
-│   │   ├── Notice.astro
-│   │   ├── Giscus.astro
-│   │   ├── TableOfContents.astro
-│   │   └── PostCard.astro
-│   ├── layouts/                # 페이지 레이아웃
-│   │   ├── BaseLayout.astro
-│   │   ├── PostLayout.astro
-│   │   └── ArchiveLayout.astro
-│   ├── pages/                  # 라우팅
-│   │   ├── index.astro
-│   │   ├── blog/
-│   │   │   └── [...slug].astro # 동적 라우팅
-│   │   ├── categories/
-│   │   │   └── [category].astro
-│   │   ├── tags/
-│   │   │   └── [tag].astro
-│   │   ├── rss.xml.ts
-│   │   └── 404.astro
-│   ├── content/                # 콘텐츠 컬렉션
-│   │   ├── config.ts
-│   │   └── blog/
-│   │       ├── personal/
-│   │       ├── pl/
-│   │       ├── web/
-│   │       │   └── nestjs/
-│   │       │       └── nestjs-dematerializer-4.mdx
-│   │       ├── devops/
-│   │       ├── cs/
-│   │       └── algorithm/
-│   ├── styles/                 # 글로벌 스타일
-│   │   ├── global.css
-│   │   └── markdown.css
-│   └── utils/                  # 유틸리티 함수
-│       ├── jekyll-to-mdx.js
-│       ├── formatDate.ts
-│       └── sortPosts.ts
-├── public/                     # 정적 파일 (복사됨)
-│   ├── images/
-│   ├── fonts/
-│   └── favicon.ico
-├── .github/
-│   └── workflows/
-│       └── deploy-experimental.yml
-└── dist/                       # 빌드 출력 (무시)
-```
-
-### 파일 변환 매핑
-
-| Jekyll | Astro | 변환 작업 |
-|--------|-------|----------|
-| `_posts/Web/NestJS/YYYY-MM-DD-title.md` | `src/content/blog/web/nestjs/title.mdx` | frontmatter 변환, Liquid → MDX |
-| `_layouts/single.html` | `src/layouts/PostLayout.astro` | Liquid → Astro 구문 |
-| `_includes/notice` | `src/components/Notice.astro` | 컴포넌트화 |
-| `assets/images/*` | `public/images/*` | 경로 수정, 최적화 |
-| `_config.yml` | `astro.config.mjs` | 설정 이전 |
 
 ---
 
 ## 배포 전략
 
-### 현재 배포 (Jekyll)
+### 현재 (Jekyll)
 ```
-main 브랜치 → GitHub Pages 자동 배포 → https://tolerblanc.github.io
+main 브랜치 → GitHub Pages → https://tolerblanc.github.io
 ```
 
-### 실험 배포 (Astro)
+### 실험 (Astro)
 ```
 astro-experimental 브랜치
   → GitHub Actions 빌드
-  → gh-pages 브랜치의 /experimental 디렉토리에 배포
+  → gh-pages /experimental
   → https://tolerblanc.github.io/experimental
 ```
 
 ### 최종 전환 시나리오
 
 **옵션 1: 점진적 전환 (권장)**
-```
-1. /experimental에서 충분히 테스트
-2. 메인 사이트에 "새 버전 체험하기" 링크 추가
+1. `/experimental` 충분히 테스트
+2. 메인 사이트에 "새 버전" 링크
 3. 사용자 피드백 수집 (2-4주)
-4. 문제 없으면 main 브랜치에 머지
-5. Jekyll 파일 아카이브 브랜치로 이동
-```
+4. main 브랜치 머지
+5. Jekyll 파일 아카이브
 
 **옵션 2: 일시 전환**
-```
-1. /experimental 완성도 100% 확인
-2. 유지보수 공지 게시
-3. astro-experimental → main 병합
+1. `/experimental` 완성도 100% 확인
+2. 유지보수 공지
+3. main 머지
 4. 즉시 전환
-```
-
-### 롤백 계획
-- Jekyll 설정 백업 보관
-- Gemfile 및 _config.yml 보존
-- 문제 발생 시 이전 커밋으로 revert
 
 ---
 
-## 환경 변수 관리
+## 핵심 요구사항 (반드시 유지)
 
-### 필요한 환경 변수
+### 1. SEO 보존
+- **URL 구조**: `/:categories/:title/` 동일
+- **Google Analytics**: G-JWJT3DQR8G
+- **Giscus 댓글**: pathname 매핑
+- **Sitemap/RSS**: 동일 구조
 
-**개발 환경** (`.env`):
-```env
-# Google Analytics (개발 시 비활성화)
-PUBLIC_GA_ID=G-JWJT3DQR8G
-PUBLIC_GA_ENABLED=false
+### 2. 콘텐츠 무결성
+- 메타데이터: pubDate, categories, tags, title, excerpt
+- 이미지: 경로 변환 + WebP 최적화
+- 내부 링크: 검증 필수
 
-# Giscus
-PUBLIC_GISCUS_REPO=Tolerblanc/Tolerblanc.github.io
-PUBLIC_GISCUS_REPO_ID=R_kgDOJ01EaQ
-PUBLIC_GISCUS_CATEGORY=Announcements
-PUBLIC_GISCUS_CATEGORY_ID=DIC_kwDOJ01Eac4Cerab
-
-# Site
-PUBLIC_SITE_URL=https://tolerblanc.github.io
-PUBLIC_BASE_PATH=/experimental
-```
-
-**프로덕션 환경** (GitHub Secrets):
-```
-GA_ID=G-JWJT3DQR8G
-ALGOLIA_API_KEY=... (선택적)
-```
-
----
-
-## 테스트 전략
-
-### 단위 테스트
-- 유틸리티 함수 (formatDate, sortPosts)
-- 변환 스크립트 (jekyll-to-mdx)
-
-### 통합 테스트
-- 페이지 렌더링
-- 라우팅 동작
-- Content Collections 쿼리
-
-### E2E 테스트
-- 주요 사용자 플로우
-- 검색 기능
-- 댓글 로딩
-
-### 성능 테스트
-- Lighthouse CI
-- 빌드 시간 측정
-- 번들 크기 분석
-
-### SEO 테스트
-- 메타태그 검증
-- 구조화된 데이터 검증
-- 링크 무결성 검사
-
----
-
-## 리스크 및 대응 방안
-
-### 리스크 1: SEO 영향
-**리스크**: URL 구조 변경으로 인한 검색 순위 하락
-**대응**:
-- URL 구조 완벽히 보존
-- 301 리다이렉트 설정 (필요 시)
-- Google Search Console 모니터링
-
-### 리스크 2: 댓글 유실
-**리스크**: Giscus pathname 매핑 불일치
-**대응**:
-- pathname 기반 매핑 유지
-- 마이그레이션 전 테스트 페이지로 검증
-
-### 리스크 3: 이미지 누락
-**리스크**: 이미지 경로 변환 오류
-**대응**:
-- 자동 변환 스크립트 + 수동 검증
-- 깨진 이미지 자동 감지 스크립트
-
-### 리스크 4: 성능 저하
-**리스크**: JavaScript 번들 크기 증가
-**대응**:
-- Astro Islands (부분 hydration)
-- 코드 스플리팅
-- 번들 분석 및 최적화
-
-### 리스크 5: 빌드 실패
-**리스크**: GitHub Actions에서 빌드 실패
-**대응**:
-- 로컬에서 충분한 테스트
-- 의존성 버전 고정
-- 빌드 캐싱 전략
-
----
-
-## 개발 워크플로우
-
-### 로컬 개발
-```bash
-# Astro 개발 서버 시작
-pnpm dev
-
-# Jekyll 개발 서버 (비교용)
-pnpm jekyll:dev
-
-# 타입 체크
-pnpm type-check
-
-# 빌드
-pnpm build
-
-# 빌드 미리보기
-pnpm preview
-```
-
-### 브랜치 전략
-```
-main                    # 프로덕션 (Jekyll)
-  └── astro-experimental # 실험 (Astro)
-        └── feature/*    # 기능 브랜치
-```
-
-### 커밋 컨벤션
-```
-feat: 새로운 기능 추가
-fix: 버그 수정
-docs: 문서 수정
-style: 코드 포맷팅
-refactor: 리팩토링
-test: 테스트 추가
-chore: 빌드/설정 변경
-```
+### 3. 성능 목표
+- 빌드: 현재 대비 50% 단축
+- 페이지 로드: 30% 개선
+- Lighthouse: 95+
 
 ---
 
 ## 참고 자료
 
-### Astro 공식 문서
-- https://docs.astro.build/
-- https://docs.astro.build/en/guides/content-collections/
-- https://docs.astro.build/en/guides/migrate-to-astro/
-
-### 마이그레이션 가이드
-- Jekyll to Astro: https://docs.astro.build/en/guides/migrate-to-astro/from-jekyll/
-
-### 도구 및 라이브러리
-- MDX: https://mdxjs.com/
-- Shiki: https://shiki.matsu.io/
-- Giscus: https://giscus.app/
-
----
-
-## Phase 2 완료 내역 (2025-10-12)
-
-### 구축된 시스템
-
-#### 1. Jekyll → MDX 변환 파이프라인
-**파일**: `src/utils/jekyll-to-mdx.ts`
-
-**기능**:
-- 자동 frontmatter 매핑 (Jekyll → Astro schema)
-- Notice 블록 변환 (`<div class="notice--{type}">` → `<Notice type="{type}">`)
-- MDX 특수문자 이스케이프 (`<=`, `>=` → HTML 엔티티)
-- 날짜/슬러그 추출 (파일명 기반)
-- 카테고리 기반 디렉토리 구조 생성
-- 태그 평탄화 (중첩 배열 → flat array)
-- 시리즈 감지 (제목 패턴 매칭)
-
-**CLI 도구**: `scripts/convert-posts.ts`
-```bash
-pnpm run convert:posts          # 전체 변환
-pnpm run convert:posts:sample   # 샘플 5개
-pnpm run convert:posts:dry-run  # 미리보기
-```
-
-#### 2. 콘텐츠 스키마
-**파일**: `src/content.config.ts`
-
-**필드 구조**:
-- **필수**: title, excerpt, date, categories, tags
-- **SEO**: description (160자), ogImage, keywords
-- **품질**: draft, featured, readingTime
-- **TOC**: toc (boolean), tocDepth (1-6)
-- **다국어**: lang (ko/en)
-- **시리즈**: series (name, order)
-- **작성자**: author (기본값: Tolerblanc)
-
-#### 3. UI 컴포넌트
-
-**Notice 컴포넌트** (`src/components/Notice.astro`)
-- 4가지 타입: info (파랑), warning (노랑), danger (빨강), success (초록)
-- 다크 모드 지원 (Tailwind 유틸리티)
-- 접근성: ARIA live regions
-
-**PostLayout** (`src/layouts/PostLayout.astro`)
-- SEO 메타태그: Open Graph, Twitter Cards, Article metadata
-- 메타데이터 표시: 날짜 (한국어 포맷), 작성자, 카테고리, 태그
-- TOC: 데스크톱 사이드바 (sticky), 설정 가능한 depth
-- 시리즈 정보 배너
-- 다크 모드 지원
-- 한국어 폰트 스택
-
-#### 4. 라우팅 시스템
-**파일**: `src/pages/blog/[...slug].astro`
-
-- Astro 5.x Content Layer API 사용
-- 동적 정적 생성 (getStaticPaths)
-- Draft 필터링
-- URL 형식: `/experimental/blog/{category}-{slug}`
-
-#### 5. 스타일링
-- Tailwind CSS 3.4.18
-- @tailwindcss/typography (prose 스타일)
-- 커스텀 다크 모드 테마
-- 한국어 폰트 최적화
-
-### 검증 결과
-- ✅ 5개 샘플 포스트 변환 성공
-- ✅ 빌드: 0 errors, 0 warnings
-- ✅ 6 pages in 1.04s
-- ✅ 번들 크기: 143.47 KB
-- ✅ 렌더링 확인 완료
-
-### 알려진 이슈
-- LaTeX 수식 (`\(...\)`, `\[...\]`) 이스케이프 필요 → **Phase 3에서 해결**
-- 이미지 최적화 미완 (현재 GitHub raw URL) → Phase 4
-
----
-
-## Phase 3 상세 계획: LaTeX 지원 및 핵심 기능
-
-### LaTeX 수식 렌더링 시스템
-
-#### 1. 라이브러리 선택
-**추천**: **KaTeX** (빠르고 가벼움, SSR 지원)
-- 대안: MathJax (더 많은 기능, 무거움)
-
-**의존성**:
-```bash
-pnpm add katex rehype-katex remark-math
-```
-
-#### 2. Astro 설정 업데이트
-**파일**: `astro.config.mjs`
-```javascript
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-
-export default defineConfig({
-  markdown: {
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
-  },
-});
-```
-
-#### 3. 스타일 추가
-**파일**: `src/styles/global.css`
-```css
-@import 'katex/dist/katex.min.css';
-```
-
-#### 4. 지원 구문
-- **Inline 수식**: `$E = mc^2$` 또는 `\(E = mc^2\)`
-- **Block 수식**: `$$\int_0^1 x^2 dx$$` 또는 `\[\int_0^1 x^2 dx\]`
-
-#### 5. 변환 스크립트 업데이트
-**파일**: `src/utils/jekyll-to-mdx.ts`
-
-LaTeX 구문 보호 로직 개선:
-```typescript
-export function protectLatexExpressions(content: string): string {
-  const protectedBlocks: string[] = [];
-
-  // Block math: \[...\] 또는 $$...$$
-  content = content.replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, (match) => {
-    const placeholder = `__LATEX_BLOCK_${protectedBlocks.length}__`;
-    protectedBlocks.push(match);
-    return placeholder;
-  });
-
-  // Inline math: \(...\) 또는 $...$
-  content = content.replace(/\\\([\s\S]*?\\\)|\$[^$\n]+\$/g, (match) => {
-    const placeholder = `__LATEX_INLINE_${protectedBlocks.length}__`;
-    protectedBlocks.push(match);
-    return placeholder;
-  });
-
-  return { content, protectedBlocks };
-}
-```
-
-#### 6. 기존 포스트 마이그레이션
-- Jekyll에서 `\\(...\\)` 형식 사용 확인
-- 변환 시 `\(...\)` 또는 `$...$`로 정규화
-- 75개 포스트 전체 스캔 및 변환
-
-### Google Analytics & Giscus 통합
-
-#### Google Analytics
-**파일**: `src/layouts/PostLayout.astro` 및 `src/pages/index.astro`
-
-```astro
----
-const GA_ID = 'G-JWJT3DQR8G';
----
-<head>
-  <!-- Google Analytics -->
-  <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{GA_ID}');
-  </script>
-</head>
-```
-
-#### Giscus 댓글
-**기존 설정 유지**:
-```javascript
-{
-  repo: "Tolerblanc/Tolerblanc.github.io",
-  repoId: "R_kgDOJ01EaQ",
-  category: "Announcements",
-  categoryId: "DIC_kwDOJ01Eac4Cerab",
-  theme: "dark_dimmed",
-  mapping: "pathname", // 중요: URL 기반 매핑
-}
-```
-
-**컴포넌트**: `src/components/GiscusComments.astro`
-
----
-
-## Phase 4 상세 계획: 네비게이션 시스템
-
-### 좌측 사이드바 네비게이션
-
-#### 설계 구조
-```
-┌─────────────────────────┐
-│ 📚 Tolerblanc's Blog    │ ← 헤더
-├─────────────────────────┤
-│ 🔥 Featured             │ ← 커스텀 섹션
-│   • NestJS 해체분석기 1  │
-│   • 2025 회고           │
-├─────────────────────────┤
-│ 📝 Recent Posts         │ ← 최근 포스트
-│   • [최신 포스트 5개]    │
-├─────────────────────────┤
-│ 📂 Categories           │ ← 카테고리 트리
-│   ▼ Web                 │
-│     • NestJS            │
-│     • React             │
-│   ▼ Algorithm           │
-│     • DP                │
-│     • Graph             │
-│   ▶ DevOps              │
-│   ▶ CS                  │
-└─────────────────────────┘
-```
-
-#### 기술 스택
-- **컴포넌트**: `src/components/Sidebar.astro`
-- **상태 관리**: Astro Islands + React (접기/펼치기)
-- **라우팅 하이라이트**: Astro.url.pathname 활용
-- **반응형**:
-  - Desktop: 고정 좌측 사이드바 (width: 280px)
-  - Mobile: 햄버거 메뉴 → 슬라이드 오버레이
-
-#### 데이터 구조
-**파일**: `src/utils/navigation.ts`
-```typescript
-export interface NavCategory {
-  id: string;
-  name: string;
-  icon?: string;
-  children?: NavCategory[];
-  postCount?: number;
-}
-
-export const categories: NavCategory[] = [
-  {
-    id: 'web',
-    name: 'Web',
-    icon: '🌐',
-    children: [
-      { id: 'web/nestjs', name: 'NestJS', postCount: 5 },
-      { id: 'web/react', name: 'React', postCount: 8 },
-    ],
-  },
-  // ...
-];
-```
-
-### 상단 메뉴 (Header Navigation)
-
-#### 디자인
-```
-┌────────────────────────────────────────────────┐
-│ 🏠 Home  |  📝 Blog  |  🏷️ Tags  |  🔍 Search  │  🌙 │
-└────────────────────────────────────────────────┘
-```
-
-#### 기능
-1. **주요 링크**: Home, Blog, Tags, About
-2. **검색 바**:
-   - Algolia DocSearch 또는 Fuse.js
-   - 키보드 단축키 (Cmd+K)
-3. **다크 모드 토글**:
-   - localStorage 상태 저장
-   - 시스템 설정 감지
-4. **모바일 반응형**: 햄버거 메뉴로 변환
-
----
-
-## 다음 에이전트를 위한 컨텍스트 요약
-
-### 현재 상태 (Phase 2 완료)
-1. **브랜치**: `astro-experimental` (5 commits)
-2. **Phase 1**: ✅ 완료 (Astro 5.14.4, TypeScript, 빌드 환경)
-3. **Phase 2**: ✅ 완료 (변환 시스템, 컴포넌트, 라우팅, 렌더링 검증)
-4. **Phase 3**: 🔄 준비 완료 (LaTeX 지원 및 핵심 기능)
-
-### 완료된 파일 및 시스템
-**변환 시스템**:
-- `src/utils/jekyll-to-mdx.ts` - 자동 변환 유틸리티
-- `scripts/convert-posts.ts` - CLI 도구
-- `src/content.config.ts` - Astro 5.x Content Layer 스키마
-
-**UI 컴포넌트**:
-- `src/components/Notice.astro` - 4가지 타입의 알림 컴포넌트
-- `src/layouts/PostLayout.astro` - SEO, TOC, 메타데이터 표시
-- `src/pages/blog/[...slug].astro` - 동적 라우팅
-
-**스타일링**:
-- `tailwind.config.mjs` - Tailwind 설정 (typography 포함)
-- `src/styles/global.css` - 한국어 폰트, 다크 모드
-
-**변환된 샘플**:
-- `src/content/blog/9oormthon_challenge/*.mdx` - 5개 샘플 포스트
-
-### 즉시 진행 가능한 작업 (Phase 3)
-1. **LaTeX 수식 지원** (최우선)
-   - `pnpm add katex rehype-katex remark-math`
-   - `astro.config.mjs` 업데이트 (remarkPlugins, rehypePlugins)
-   - `src/utils/jekyll-to-mdx.ts`에 LaTeX 보호 로직 추가
-   - 기존 포스트에서 수식 패턴 스캔
-
-2. **Google Analytics 통합**
-   - `src/layouts/PostLayout.astro`에 GA 스크립트 추가
-   - `src/pages/index.astro`에도 적용
-
-3. **Giscus 댓글**
-   - `src/components/GiscusComments.astro` 생성
-   - PostLayout에 통합
-
-4. **전체 포스트 마이그레이션**
-   - `pnpm run convert:posts` 실행 (75개 포스트)
-   - 변환 결과 검증
-
-### 필요한 정보 (Phase 4 네비게이션)
-- **카테고리 구조**: `_posts/` 디렉토리 구조 분석 필요
-- **Featured 포스트**: 어떤 기준으로 선정할지 결정
-- **아이콘/이모지**: 각 카테고리에 사용할 아이콘
-- **디자인 선호도**: 사이드바 색상 스킴, 폰트 크기 등
-
-### 주의사항
-1. **SEO 최우선**: URL 구조 절대 변경 금지
-2. **GA ID 유지**: `G-JWJT3DQR8G` 그대로 사용
-3. **Giscus pathname 매핑**: 기존 댓글 유지를 위해 URL 일치 필수
-4. **독립적 커밋**: 각 기능은 별도 커밋으로 관리
-5. **LaTeX 우선 처리**: 많은 포스트에 수식이 포함되어 있을 가능성
-
-### 측정 지표 (Phase 2 완료 시점)
-- 빌드 시간: 1.04s (6 pages)
-- 빌드 상태: 0 errors, 0 warnings
-- 번들 크기: 143.47 KB
-- 변환된 포스트: 5개 샘플 (75개 대기 중)
-- 커밋 수: 5개 (Phase 1-2 완료)
-- 성능: TypeScript 체크 164ms, 렌더링 정상
-
----
-
-## Astro 5.x 업그레이드 상세 정보
-
-### 업그레이드 날짜
-**2025-10-12** - Astro 4.16.0 → 5.14.4 (메이저 버전 업데이트)
-
-### 주요 변경사항
-
-#### 1. Content Layer API (새 기능)
-Astro 5.0의 가장 큰 변화는 Content Layer API 도입입니다. 이를 통해:
-- **5배 빠른 빌드 속도** (대규모 콘텐츠 컬렉션)
-- **다양한 소스 지원**: Markdown, API, CMS, 데이터베이스
-- **하위 호환성 유지**: 기존 Content Collections 코드 그대로 작동
-
-**적용 파일**: `src/content.config.ts` (신규 생성)
-
-```typescript
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
-
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    pubDate: z.coerce.date(),
-    categories: z.array(z.string()),
-    tags: z.array(z.string()),
-  }),
-});
-
-export const collections = { blog };
-```
-
-**이점**:
-- 명시적 컬렉션 정의 (auto-generation 경고 제거)
-- glob loader로 빠른 파일 스캔
-- 타입 안정성 강화
-
-#### 2. Vite 6.0 업그레이드
-- 더 빠른 개발 서버
-- 개선된 HMR (Hot Module Replacement)
-- 최신 빌드 최적화
-
-#### 3. MDX 4.x 업그레이드
-**변경**: `@astrojs/mdx` 3.0.0 → 4.3.7
-
-**주요 개선사항**:
-- JSX/MDX 처리 성능 향상
-- 더 나은 에러 메시지
-- TypeScript 지원 개선
-
-**Breaking Changes (우리 프로젝트 영향 없음)**:
-- 구버전 MDX 통합 호환성 제거 (우리는 최신 버전 사용)
-
-#### 4. React 통합 업그레이드
-**변경**: `@astrojs/react` 3.0.0 → 4.4.0
-
-**개선사항**:
-- React 18.3.1 지원
-- 부분 hydration 최적화
-- 더 나은 클라이언트 디렉티브
-
-#### 5. TypeScript 설정 업데이트
-**변경**: `tsconfig.json` 업데이트
-
-```json
-{
-  "include": [".astro/types.d.ts", "src/**/*"]
-}
-```
-
-**이유**: Astro 5.x는 `.astro/types.d.ts`를 명시적으로 포함해야 함
-
-### Breaking Changes 영향 분석
-
-| 변경사항 | 우리 프로젝트 영향 | 조치 |
-|---------|------------------|------|
-| `<ViewTransitions />` → `<ClientRouter />` | 없음 | 사용 안함 |
-| `compiledContent()` 비동기화 | 없음 | 아직 사용 안함 |
-| Shiki 토큰 이름 변경 | 낮음 | 향후 커스텀 테마 적용 시 고려 |
-| `astro:content` 클라이언트 접근 제거 | 없음 | 서버 사이드만 사용 |
-| hybrid 렌더링 모드 제거 | 없음 | static 모드 사용 |
-| Script 태그 동작 변경 | 낮음 | 현재 스크립트 미사용 |
-
-### 테스트 결과
-
-**빌드 성공**: ✅
-```
-pnpm build
-✓ Completed in 599ms
-0 errors, 0 warnings, 0 hints
-```
-
-**파일 크기**:
-- 클라이언트 번들: 143.47 KB (gzip: 46.21 KB)
-- 정적 페이지: 1개
-
-### 다음 단계에서 활용할 Astro 5.x 기능
-
-1. **Content Layer Loaders**
-   - Jekyll 포스트를 효율적으로 로드
-   - 커스텀 loader 작성 가능 (필요 시)
-
-2. **개선된 이미지 처리**
-   - 크롭, 반응형 레이아웃
-   - 자동 srcset/sizes 생성
-
-3. **Environment Variables (astro:env)**
-   - 타입 안전 환경 변수
-   - Google Analytics ID, Giscus 설정 등
-
-### 참고 자료
-- [Astro 5.0 Upgrade Guide](https://docs.astro.build/en/guides/upgrade-to/v5/)
-- [Astro 5.0 Release Blog](https://astro.build/blog/astro-5/)
-- [Content Layer API Docs](https://docs.astro.build/en/guides/content-collections/)
-
----
-
-**마지막 커밋**: `ccf021c docs: Add comprehensive migration progress documentation`
-**다음 목표**: Phase 2 - 콘텐츠 마이그레이션 도구 개발
+- **Astro 문서**: https://docs.astro.build/
+- **마이그레이션 가이드**: https://docs.astro.build/en/guides/migrate-to-astro/from-jekyll/
+- **MDX**: https://mdxjs.com/
+- **Giscus**: https://giscus.app/

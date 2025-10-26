@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// 태그별로 포스트 수 계산
+const tagCounts = new Map<string, number>();
+
+allPosts.forEach(post => {
+  post.data.tags.forEach(tag => {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  });
+});
+
+// 태그를 포스트 개수 순으로 정렬
+const sortedTags = Array.from(tagCounts.entries())
+  .sort((a, b) => b[1] - a[1])
+  .map(([tag, count]) => ({ tag, count }));
+---
+
+<BaseLayout
+  title="Tags - Tolerblanc's Blog"
+  description="블로그의 모든 태그 목록"
+  currentPath={Astro.url.pathname}
+>
+  <div class="tags-page">
+    <header class="tags-header">
+      <h1 class="tags-title">🏷️ Tags</h1>
+      <p class="tags-count">{sortedTags.length}개의 태그</p>
+    </header>
+
+    <div class="tags-cloud">
+      {sortedTags.map(({ tag, count }) => {
+        // 태그 크기를 포스트 수에 따라 조정 (최소 0.875rem, 최대 1.5rem)
+        const maxCount = sortedTags[0].count;
+        const minSize = 0.875;
+        const maxSize = 1.5;
+        const size = minSize + (count / maxCount) * (maxSize - minSize);
+
+        return (
+          <a
+            href={`/experimental/tags/${tag}`}
+            class="tag-item"
+            style={`font-size: ${size}rem;`}
+          >
+            <span class="tag-name">#{tag}</span>
+            <span class="tag-count">{count}</span>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tags-page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .tags-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #333;
+  }
+
+  .tags-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .tags-count {
+    font-size: 1.125rem;
+    color: #9ca3af;
+  }
+
+  .tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 9999px;
+    text-decoration: none;
+    color: #d1d5db;
+    transition: all 0.2s;
+  }
+
+  .tag-item:hover {
+    background: #2a2a2a;
+    border-color: #60a5fa;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
+  }
+
+  .tag-name {
+    font-weight: 600;
+  }
+
+  .tag-count {
+    font-size: 0.75em;
+    color: #9ca3af;
+    background: #374151;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .tag-item:hover .tag-count {
+    background: #1e40af;
+    color: #fff;
+  }
+</style>
