@@ -6,10 +6,10 @@ const recentPosts = await getRecentPosts();
 const currentPath = Astro.url.pathname;
 
 // 현재 카테고리 확인
-const currentCategory = currentPath.includes('/blog/category/')
-  ? currentPath.split('/blog/category/')[1]?.replace('/', '')
-  : currentPath.includes('/blog/')
-  ? currentPath.split('/blog/')[1]?.split('/')[0]
+const currentCategory = currentPath.includes('/category/')
+  ? currentPath.split('/category/')[1]?.replace('/', '')
+  : currentPath !== '/' && currentPath !== '/posts' && !currentPath.startsWith('/posts/') && !currentPath.startsWith('/tags')
+  ? currentPath.split('/')[1]?.split('/')[0]
   : null;
 ---
 
@@ -45,7 +45,7 @@ const currentCategory = currentPath.includes('/blog/category/')
         {recentPosts.map(post => (
           <li>
             <a
-              href={`/blog/${post.slug}`}
+              href={`/${post.slug}`}
               class="recent-post-link"
             >
               <span class="post-title">{post.title}</span>

@@ -34,7 +34,7 @@ const recentPosts = allPosts
             홈으로 돌아가기
           </Button>
         </a>
-        <a href="/blog">
+        <a href="/posts">
           <Button variant="outline" size="lg" className="blog-button">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="mr-2">
               <path d="M4 4H16V6H4V4ZM4 8H16V10H4V8ZM4 12H12V14H4V12Z" fill="currentColor"/>
@@ -51,7 +51,7 @@ const recentPosts = allPosts
           <ul class="recent-posts-list">
             {recentPosts.map((post) => (
               <li class="recent-post-item">
-                <a href={`/blog/${post.id}`} class="recent-post-link">
+                <a href={`/${post.id}`} class="recent-post-link">
                   {post.data.categories && post.data.categories.length > 0 && (
                     <div class="post-category">
                       {post.data.categories[0]}

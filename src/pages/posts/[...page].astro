@@ -3,9 +3,9 @@
  * Blog List with Pagination
  *
  * URL 구조:
- * - /blog → 첫 페이지
- * - /blog/2 → 두 번째 페이지
- * - /blog/3 → 세 번째 페이지
+ * - /posts → 첫 페이지
+ * - /posts/2 → 두 번째 페이지
+ * - /posts/3 → 세 번째 페이지
  */
 
 import { getCollection } from 'astro:content';
@@ -72,7 +72,7 @@ const description = "Tolerblanc의 기술 블로그 포스트 목록";
     <BlogPagination
       currentPage={currentPage}
       totalPages={lastPage}
-      baseUrl="/blog"
+      baseUrl="/posts"
       client:load
     />
   </div>

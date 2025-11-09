@@ -32,7 +32,7 @@ export async function GET(context: APIContext) {
       title: post.data.title,
       pubDate: new Date(post.data.date),
       description: post.data.description || post.data.excerpt,
-      link: `/blog/${post.data.categories.map(c => c.toLowerCase()).join('-')}-${post.id.split('/').pop()?.replace('.mdx', '')}/`,
+      link: `/${post.id}`,
       categories: post.data.categories,
     })),
     customData: `<language>ko</language>`,

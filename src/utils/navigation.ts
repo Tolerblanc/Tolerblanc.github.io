@@ -62,7 +62,7 @@ export async function getNavigationCategories(): Promise<NavCategory[]> {
       return {
         id,
         name,
-        path: `${SITE_CONFIG.BASE_PATH}/blog/category/${id}`,
+        path: `${SITE_CONFIG.BASE_PATH}/category/${id}`,
         postCount: count,
       };
     })
