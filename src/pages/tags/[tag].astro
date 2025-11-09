@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { BlogPostCard } from '@/components/ui/blog-post-card';
 import { calculateReadingTime } from '@/utils/readingTime';
-import { Tag } from 'lucide-react';
+import { Tag as TagIcon } from 'lucide-react';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -48,7 +48,7 @@ const postsWithReadingTime = posts.map(post => ({
     <!-- Tag Header -->
     <header class="text-center mb-12 pb-8 border-b border-border">
       <h1 class="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
-        <Tag size={32} />
+        <TagIcon width={32} height={32} />
         #{tag}
       </h1>
       <p class="text-lg text-muted-foreground">
