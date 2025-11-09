@@ -24,10 +24,15 @@ export async function getStaticPaths() {
     params: { category },
     props: {
       category,
-      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).map(post => ({
-        ...post,
-        readingTime: post.body ? calculateReadingTime(post.body) : '1분'
-      })),
+      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).map(post => {
+        const readingTime = post.body ? calculateReadingTime(post.body) : '1분';
+        return {
+          id: post.id,
+          slug: post.slug,
+          data: post.data,
+          readingTime,
+        };
+      }),
     },
   }));
 }
