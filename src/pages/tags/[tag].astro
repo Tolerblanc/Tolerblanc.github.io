@@ -1,6 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { BlogPostCard } from '@/components/ui/blog-post-card';
+import { calculateReadingTime } from '@/utils/readingTime';
+import { Tag } from 'lucide-react';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -28,6 +31,12 @@ export async function getStaticPaths() {
 }
 
 const { tag, posts } = Astro.props;
+
+// Add reading time to posts
+const postsWithReadingTime = posts.map(post => ({
+  ...post,
+  readingTime: post.body ? calculateReadingTime(post.body) : '1분'
+}));
 ---
 
 <BaseLayout
@@ -35,151 +44,32 @@ const { tag, posts } = Astro.props;
   description={`${tag} 태그가 있는 모든 포스트 (${posts.length}개)`}
   currentPath={Astro.url.pathname}
 >
-  <div class="tag-page">
-    <header class="tag-header">
-      <h1 class="tag-title">#{tag}</h1>
-      <p class="tag-count">{posts.length}개의 포스트</p>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Tag Header -->
+    <header class="text-center mb-12 pb-8 border-b border-border">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+        <Tag size={32} />
+        #{tag}
+      </h1>
+      <p class="text-lg text-muted-foreground">
+        {posts.length}개의 포스트
+      </p>
     </header>
 
-    <div class="posts-list">
-      {posts.map((post) => (
-        <article class="post-item">
-          <a href={`/blog/${post.id}`}>
-            <div class="post-main">
-              <h2 class="post-title">{post.data.title}</h2>
-              {post.data.excerpt && (
-                <p class="post-excerpt">{post.data.excerpt}</p>
-              )}
-            </div>
-
-            <div class="post-meta">
-              <time datetime={post.data.date.toISOString()}>
-                {post.data.date.toLocaleDateString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </time>
-              {post.data.categories && post.data.categories.length > 0 && (
-                <span class="post-category">{post.data.categories[0]}</span>
-              )}
-            </div>
-          </a>
-        </article>
+    <!-- Posts Grid -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {postsWithReadingTime.map((post) => (
+        <BlogPostCard
+          title={post.data.title}
+          excerpt={post.data.excerpt}
+          date={post.data.date}
+          slug={post.id}
+          categories={post.data.categories}
+          tags={post.data.tags}
+          readingTime={post.readingTime}
+          client:load
+        />
       ))}
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .tag-page {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .tag-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #333;
-  }
-
-  .tag-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #60a5fa;
-    margin-bottom: 0.5rem;
-  }
-
-  .tag-count {
-    font-size: 1.125rem;
-    color: #9ca3af;
-  }
-
-  .posts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .post-item {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    transition: all 0.2s;
-  }
-
-  .post-item:hover {
-    border-color: #60a5fa;
-    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
-  }
-
-  .post-item a {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    gap: 2rem;
-  }
-
-  .post-main {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .post-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-  }
-
-  .post-excerpt {
-    color: #9ca3af;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .post-meta {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-  }
-
-  .post-meta time {
-    color: #6b7280;
-    white-space: nowrap;
-  }
-
-  .post-category {
-    padding: 0.25rem 0.75rem;
-    background: #1e40af;
-    color: #fff;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  @media (max-width: 768px) {
-    .post-item a {
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .post-meta {
-      flex-direction: row;
-      align-items: center;
-      width: 100%;
-      justify-content: space-between;
-    }
-  }
-</style>
