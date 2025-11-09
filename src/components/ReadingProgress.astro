@@ -9,28 +9,41 @@
 
 <script is:inline>
   (function() {
+    console.log('[ReadingProgress] Script loaded');
+
     // Store cleanup function to prevent memory leaks
     let cleanupReadingProgress = null;
 
     function initReadingProgress() {
+      console.log('[ReadingProgress] Initializing...');
+
       // Cleanup previous instance
       if (cleanupReadingProgress) {
+        console.log('[ReadingProgress] Cleaning up previous instance');
         cleanupReadingProgress();
       }
 
       const progressBar = document.querySelector('.reading-progress-bar');
       const progressContainer = document.querySelector('.reading-progress');
 
+      console.log('[ReadingProgress] Elements found:', {
+        progressBar: !!progressBar,
+        progressContainer: !!progressContainer
+      });
+
       if (!progressBar || !progressContainer) {
+        console.warn('[ReadingProgress] Elements not found!');
         return;
       }
 
       // Check if sidebar exists in the DOM
       const hasSidebar = document.querySelector('.sidebar') !== null;
+      console.log('[ReadingProgress] Has sidebar:', hasSidebar);
 
       // Adjust position based on sidebar presence
       if (hasSidebar) {
         const sidebarWidth = getComputedStyle(document.documentElement).getPropertyValue('--layout-sidebar-width');
+        console.log('[ReadingProgress] Sidebar width:', sidebarWidth);
         progressContainer.style.left = sidebarWidth;
       } else {
         progressContainer.style.left = '0';
@@ -52,6 +65,12 @@
         const finalProgress = Math.min(Math.max(progress, 0), 100);
 
         progressBar.style.width = finalProgress + '%';
+
+        console.log('[ReadingProgress] Update:', {
+          scrollTop,
+          scrollableHeight,
+          progress: finalProgress.toFixed(2) + '%'
+        });
       }
 
       // Event listeners with throttling for better performance
@@ -70,6 +89,8 @@
       window.addEventListener('scroll', scrollHandler, { passive: true });
       window.addEventListener('resize', updateProgress, { passive: true });
 
+      console.log('[ReadingProgress] Event listeners attached');
+
       // Initial update
       updateProgress();
 
@@ -77,21 +98,28 @@
       cleanupReadingProgress = function() {
         window.removeEventListener('scroll', scrollHandler);
         window.removeEventListener('resize', updateProgress);
+        console.log('[ReadingProgress] Cleaned up');
       };
     }
 
     // Initialize on load
     if (document.readyState === 'loading') {
+      console.log('[ReadingProgress] Waiting for DOMContentLoaded');
       document.addEventListener('DOMContentLoaded', initReadingProgress);
     } else {
+      console.log('[ReadingProgress] DOM already loaded, initializing immediately');
       initReadingProgress();
     }
 
     // Re-initialize on navigation (for View Transitions)
-    document.addEventListener('astro:page-load', initReadingProgress);
+    document.addEventListener('astro:page-load', function() {
+      console.log('[ReadingProgress] astro:page-load event');
+      initReadingProgress();
+    });
 
     // Cleanup on before swap (for View Transitions)
     document.addEventListener('astro:before-swap', function() {
+      console.log('[ReadingProgress] astro:before-swap event');
       if (cleanupReadingProgress) {
         cleanupReadingProgress();
       }
