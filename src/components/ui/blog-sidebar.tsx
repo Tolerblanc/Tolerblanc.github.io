@@ -197,7 +197,7 @@ export function BlogSidebar({ recentPosts, categoryGroups, currentCategory }: Bl
                     {recentPosts.map((post) => (
                       <a
                         key={post.slug}
-                        href={`/blog/${post.slug}`}
+                        href={`/${post.slug}`}
                         className="block p-2 rounded-md hover:bg-accent transition-colors"
                       >
                         <div className="text-sm font-medium line-clamp-2 mb-1">
