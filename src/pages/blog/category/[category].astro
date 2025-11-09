@@ -1,0 +1,256 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { Layers, Clock, Monitor, Code, Brain, Box, Palette, DollarSign, HardDrive, Terminal, FileCode, BookOpen, Globe, Folder } from 'lucide-react';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+  // 카테고리별로 그룹화
+  const categoryMap = new Map<string, any[]>();
+
+  allPosts.forEach(post => {
+    const category = post.id.split('/')[0];
+    if (!categoryMap.has(category)) {
+      categoryMap.set(category, []);
+    }
+    categoryMap.get(category)!.push(post);
+  });
+
+  // 각 카테고리에 대한 경로 생성
+  return Array.from(categoryMap.entries()).map(([category, posts]) => ({
+    params: { category },
+    props: {
+      category,
+      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+    },
+  }));
+}
+
+const { category, posts } = Astro.props;
+
+// 카테고리 레이블 및 Lucide 아이콘 매핑
+const categoryIcons: Record<string, any> = {
+  '9oormthon_challenge': Layers,
+  'algorithm': Clock,
+  'boj': Monitor,
+  'cpp': Code,
+  'dl': Brain,
+  'docker': Box,
+  'graphics': Palette,
+  'javascript': Code,
+  'leetcode': DollarSign,
+  'os': HardDrive,
+  'programmers': Terminal,
+  'python': FileCode,
+  'retrospective': Clock,
+  'review': BookOpen,
+  'unix': Terminal,
+  'web_fundamentals': Globe,
+  '혼공학습단': BookOpen,
+};
+
+const categoryLabels: Record<string, string> = {
+  '9oormthon_challenge': '9oormthon',
+  'algorithm': 'Algorithm',
+  'boj': 'BOJ',
+  'cpp': 'C++',
+  'dl': 'Deep Learning',
+  'docker': 'Docker',
+  'graphics': 'Graphics',
+  'javascript': 'JavaScript',
+  'leetcode': 'LeetCode',
+  'os': 'OS',
+  'programmers': 'Programmers',
+  'python': 'Python',
+  'retrospective': 'Retrospective',
+  'review': 'Review',
+  'unix': 'Unix',
+  'web_fundamentals': 'Web Fundamentals',
+  '혼공학습단': '혼공학습단',
+};
+
+const Icon = categoryIcons[category] || Folder;
+const label = categoryLabels[category] || category;
+---
+
+<BaseLayout
+  title={`${label} - Tolerblanc's Blog`}
+  description={`${label} 카테고리의 모든 포스트 (${posts.length}개)`}
+  currentPath={Astro.url.pathname}
+>
+  <div class="category-page">
+    <header class="category-header">
+      <div class="category-icon">
+        <Icon size={48} />
+      </div>
+      <h1 class="category-title">{label}</h1>
+      <p class="category-count">{posts.length}개의 포스트</p>
+    </header>
+
+    <div class="posts-grid">
+      {posts.map((post) => (
+        <article class="post-card">
+          <a href={`/experimental/blog/${post.id}`}>
+            <div class="post-card-header">
+              <h2 class="post-card-title">{post.data.title}</h2>
+              <time class="post-card-date" datetime={post.data.date.toISOString()}>
+                {post.data.date.toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </time>
+            </div>
+
+            {post.data.excerpt && (
+              <p class="post-card-excerpt">{post.data.excerpt}</p>
+            )}
+
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="post-card-tags">
+                {post.data.tags.slice(0, 5).map((tag: string) => (
+                  <span class="tag">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .category-page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* ===== 카테고리 헤더 ===== */
+  .category-header {
+    text-align: center;
+    margin-bottom: var(--spacing-12);
+    padding-bottom: var(--spacing-8);
+    border-bottom: 2px solid var(--color-border-primary);
+  }
+
+  .category-icon {
+    font-size: var(--font-size-5xl);
+    margin-bottom: var(--spacing-4);
+  }
+
+  .category-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.02em;
+  }
+
+  .category-count {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* ===== 게시글 그리드 ===== */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-6);
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* ===== 게시글 카드 ===== */
+  .post-card {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-6);
+    transition: all var(--transition-base);
+    height: 100%;
+    box-shadow: var(--shadow-card);
+  }
+
+  .post-card:hover {
+    border-color: var(--color-accent-primary);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .post-card-header {
+    margin-bottom: var(--spacing-4);
+  }
+
+  .post-card-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+    line-height: var(--line-height-tight);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: keep-all;
+  }
+
+  .post-card-date {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .post-card-excerpt {
+    flex: 1;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--spacing-4);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin-top: auto;
+  }
+
+  .tag {
+    padding: var(--spacing-1) var(--spacing-3);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    border: 1px solid var(--color-border-primary);
+    transition: all var(--transition-fast);
+  }
+
+  .tag:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-accent-primary);
+  }
+</style>

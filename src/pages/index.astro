@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlogPostCard } from '@/components/ui/blog-post-card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { calculateReadingTime } from '@/utils/readingTime';
+import { Book, FileCode } from 'lucide-react';
+
+const title = "인생은 B와 D사이 Code다";
+const description = "Tolerblanc의 기술 블로그 (Astro 실험 버전)";
+
+// Get all published blog posts with body content for reading time calculation
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 6) // 최근 6개만 표시
+  .map(post => ({
+    ...post,
+    readingTime: post.body ? calculateReadingTime(post.body) : '1분'
+  }));
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Hero Section -->
+    <section class="text-center mb-16 py-12">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+        인생은 B와 D사이 Code다
+      </h1>
+      <p class="text-xl text-muted-foreground mb-8">
+        Tolerblanc의 기술 블로그
+      </p>
+
+      <Card className="max-w-2xl mx-auto bg-card/50 backdrop-blur border-border/50" client:load>
+        <CardHeader client:load>
+          <CardTitle className="flex items-center gap-2 justify-center" client:load>
+            <FileCode size={20} />
+            Jekyll → Astro 마이그레이션 실험 버전
+          </CardTitle>
+        </CardHeader>
+        <CardContent client:load>
+          <p class="text-muted-foreground">
+            메인 블로그: <a
+              href="https://tolerblanc.github.io"
+              target="_blank"
+              class="text-primary hover:underline"
+            >
+              tolerblanc.github.io
+            </a>
+          </p>
+        </CardContent>
+      </Card>
+    </section>
+
+    <Separator className="mb-12" client:load />
+
+    <!-- Migration Progress -->
+    <section class="mb-16">
+      <Card client:load>
+        <CardHeader client:load>
+          <CardTitle className="text-2xl" client:load>마이그레이션 진행 상황</CardTitle>
+        </CardHeader>
+        <CardContent client:load>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 1: Astro 프로젝트 초기화</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 2: 콘텐츠 마이그레이션 시스템</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 3: LaTeX, Analytics, 댓글, RSS</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>56개 포스트 빌드 성공</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="secondary" client:load>🔄</Badge>
+              <span>Phase 4: shadcn/ui 적용 (진행 중)</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </section>
+
+    <Separator className="mb-12" client:load />
+
+    <!-- Recent Posts -->
+    <section class="mb-16">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-bold flex items-center gap-3">
+          <Book size={28} />
+          최근 포스트
+        </h2>
+        <Button variant="outline" asChild client:load>
+          <a href="/experimental/blog">
+            전체 보기 →
+          </a>
+        </Button>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            excerpt={post.data.excerpt}
+            date={post.data.date}
+            slug={post.id}
+            categories={post.data.categories}
+            tags={post.data.tags}
+            readingTime={post.readingTime}
+            client:load
+          />
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

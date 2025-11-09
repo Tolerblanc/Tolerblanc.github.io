@@ -1,0 +1,40 @@
+---
+/**
+ * Dynamic Blog Post Route
+ *
+ * URL 구조: /experimental/blog/{category}/{slug}
+ * 예: /experimental/blog/javascript/nestjs-dematerializer-1
+ *
+ * Jekyll 호환 URL 패턴 유지:
+ * - Jekyll: /{category}/{slug}/
+ * - Astro: /experimental/blog/{category}/{slug}
+ */
+
+import { getCollection, type CollectionEntry, render } from 'astro:content';
+import PostLayout from '@layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => {
+    // draft가 아닌 포스트만 빌드
+    return !data.draft;
+  });
+
+  return posts.map((post) => ({
+    // post.id는 "javascript/nestjs-dematerializer-4" 형식
+    // [...slug]로 받아서 "javascript/nestjs-dematerializer-4"로 매칭
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: CollectionEntry<'blog'>;
+};
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<PostLayout post={post} headings={headings}>
+  <Content components={{ Notice: (await import('@components/Notice.astro')).default }} />
+</PostLayout>

@@ -1,0 +1,82 @@
+---
+// Reading progress indicator
+// Shows a progress bar at the top of the page indicating reading progress
+---
+
+<div class="reading-progress">
+  <div class="reading-progress-bar"></div>
+</div>
+
+<script>
+  function initReadingProgress() {
+    const progressBar = document.querySelector('.reading-progress-bar') as HTMLElement;
+    if (!progressBar) return;
+
+    function updateProgress() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+
+      const scrollableHeight = documentHeight - windowHeight;
+      const progress = (scrollTop / scrollableHeight) * 100;
+
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
+    }
+
+    // Event listener
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress, { passive: true });
+
+    // Initial update
+    updateProgress();
+  }
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReadingProgress);
+  } else {
+    initReadingProgress();
+  }
+
+  // Re-initialize on navigation
+  document.addEventListener('astro:page-load', initReadingProgress);
+</script>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    top: var(--layout-header-height);
+    left: var(--layout-sidebar-width);
+    right: 0;
+    height: 3px;
+    background-color: var(--color-border-primary);
+    z-index: calc(var(--z-fixed) + 1);
+    overflow: hidden;
+    transition: left var(--transition-base);
+  }
+
+  .reading-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent-primary) 0%,
+      var(--color-accent-hover) 100%
+    );
+    transition: width 0.1s ease-out;
+  }
+
+  /* Hide on very short pages */
+  @media (max-height: 600px) {
+    .reading-progress {
+      display: none;
+    }
+  }
+
+  /* Mobile: 전체 너비 */
+  @media (max-width: 768px) {
+    .reading-progress {
+      left: 0;
+    }
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+// Code block copy button component
+// Inspired by Toss Payments documentation
+---
+
+<script>
+  function initCodeCopyButtons() {
+    // Find all code blocks
+    const codeBlocks = document.querySelectorAll('pre > code');
+
+    codeBlocks.forEach((codeBlock) => {
+      const pre = codeBlock.parentElement;
+      if (!pre) return;
+
+      // Skip if button already exists
+      if (pre.querySelector('.copy-button')) return;
+
+      // Create wrapper if doesn't exist
+      if (!pre.parentElement?.classList.contains('code-block-wrapper')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+      }
+
+      // Create copy button
+      const button = document.createElement('button');
+      button.className = 'copy-button';
+      button.setAttribute('aria-label', 'Copy code');
+      button.innerHTML = `
+        <svg class="copy-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3 10.5V3.5C3 2.67157 3.67157 2 4.5 2H9.5" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <svg class="check-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L6 11L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+
+      // Add click handler
+      button.addEventListener('click', async () => {
+        const code = codeBlock.textContent || '';
+
+        try {
+          await navigator.clipboard.writeText(code);
+          button.classList.add('copied');
+
+          setTimeout(() => {
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code:', err);
+        }
+      });
+
+      pre.parentElement?.appendChild(button);
+    });
+  }
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCodeCopyButtons);
+  } else {
+    initCodeCopyButtons();
+  }
+
+  // Re-initialize on navigation (for SPA-like behavior)
+  document.addEventListener('astro:page-load', initCodeCopyButtons);
+</script>
+
+<style>
+  :global(.code-block-wrapper) {
+    position: relative;
+    margin: var(--spacing-4) 0;
+  }
+
+  :global(.copy-button) {
+    position: absolute;
+    top: var(--spacing-2);
+    right: var(--spacing-2);
+    padding: var(--spacing-2);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+
+  :global(.copy-button:hover) {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-border-hover);
+  }
+
+  :global(.copy-button:active) {
+    transform: scale(0.95);
+  }
+
+  :global(.copy-button .copy-icon) {
+    display: block;
+    color: var(--color-text-secondary);
+  }
+
+  :global(.copy-button .check-icon) {
+    display: none;
+    color: var(--color-accent-primary);
+  }
+
+  :global(.copy-button.copied .copy-icon) {
+    display: none;
+  }
+
+  :global(.copy-button.copied .check-icon) {
+    display: block;
+  }
+
+  :global(.copy-button.copied) {
+    background-color: var(--color-accent-bg);
+    border-color: var(--color-accent-primary);
+  }
+</style>

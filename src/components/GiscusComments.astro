@@ -1,0 +1,52 @@
+---
+/**
+ * Giscus Comments Component
+ *
+ * GitHub Discussions 기반 댓글 시스템
+ *
+ * 설정 정보:
+ * - repo: Tolerblanc/Tolerblanc.github.io
+ * - repoId: R_kgDOJ01EaQ
+ * - category: Announcements
+ * - categoryId: DIC_kwDOJ01Eac4Cerab
+ * - mapping: pathname (URL 기반 매핑으로 기존 댓글 유지)
+ * - theme: dark_dimmed (다크 테마)
+ * - lang: ko (한국어)
+ */
+---
+
+<div class="giscus-wrapper" id="giscus-container"></div>
+
+<script is:inline>
+  // Giscus 스크립트 동적 로드
+  (function() {
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', 'Tolerblanc/Tolerblanc.github.io');
+    script.setAttribute('data-repo-id', 'R_kgDOJ01EaQ');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOJ01Eac4Cerab');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'bottom');
+    script.setAttribute('data-theme', 'dark_dimmed');
+    script.setAttribute('data-lang', 'ko');
+    script.setAttribute('crossorigin', 'anonymous');
+    script.async = true;
+
+    const container = document.getElementById('giscus-container');
+    if (container) {
+      container.appendChild(script);
+    }
+  })();
+</script>
+
+<style>
+  .giscus-wrapper {
+    margin-top: var(--spacing-12);
+    padding-top: var(--spacing-8);
+    border-top: 1px solid var(--color-border-primary);
+  }
+</style>
