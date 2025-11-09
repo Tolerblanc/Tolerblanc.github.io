@@ -6,6 +6,21 @@ interface PagefindUI {
     element: HTMLElement;
     showSubResults?: boolean;
     bundlePath?: string;
+    placeholder?: string;
+    autofocus?: boolean;
+    translations?: {
+      placeholder?: string;
+      clear_search?: string;
+      load_more?: string;
+      search_label?: string;
+      filters_label?: string;
+      zero_results?: string;
+      many_results?: string;
+      one_result?: string;
+      alt_search?: string;
+      search_suggestion?: string;
+      searching?: string;
+    };
   }): void;
 }
 
@@ -71,6 +86,17 @@ export const Search = () => {
             new window.PagefindUI({
               element: currentRef,
               showSubResults: true,
+              autofocus: true,
+              translations: {
+                placeholder: '검색어를 입력하세요...',
+                clear_search: '검색 지우기',
+                load_more: '더 보기',
+                search_label: '검색',
+                zero_results: '검색 결과가 없습니다.',
+                many_results: '개의 결과',
+                one_result: '1개의 결과',
+                searching: '검색 중...',
+              },
             });
           }
         };
@@ -87,6 +113,17 @@ export const Search = () => {
         new window.PagefindUI({
           element: currentRef,
           showSubResults: true,
+          autofocus: true,
+          translations: {
+            placeholder: '검색어를 입력하세요...',
+            clear_search: '검색 지우기',
+            load_more: '더 보기',
+            search_label: '검색',
+            zero_results: '검색 결과가 없습니다.',
+            many_results: '개의 결과',
+            one_result: '1개의 결과',
+            searching: '검색 중...',
+          },
         });
       }
     };
