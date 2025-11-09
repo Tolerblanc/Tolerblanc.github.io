@@ -95,14 +95,15 @@ document.addEventListener('astro:before-swap', () => {
 <style>
   .reading-progress {
     position: fixed;
-    top: var(--layout-header-height);
+    top: 64px; /* Fixed header height */
     left: 0;
     right: 0;
     height: 4px;
-    background-color: transparent;
-    z-index: calc(var(--z-fixed) + 1);
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 9999;
     overflow: hidden;
-    transition: left var(--transition-base);
+    transition: left 0.3s ease;
+    pointer-events: none;
   }
 
   .reading-progress-bar {
@@ -110,12 +111,17 @@ document.addEventListener('astro:before-swap', () => {
     width: 0%;
     background: linear-gradient(
       90deg,
-      var(--color-accent-primary) 0%,
-      var(--color-accent-hover) 100%
+      #3b82f6 0%,
+      #2563eb 100%
     );
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     transition: width 0.15s ease-out;
     transform-origin: left;
+  }
+
+  /* Dark mode support */
+  :global(.dark) .reading-progress {
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   /* Hide on very short pages */
@@ -129,6 +135,7 @@ document.addEventListener('astro:before-swap', () => {
   @media (max-width: 768px) {
     .reading-progress {
       left: 0 !important; /* Override JavaScript adjustment on mobile */
+      top: 56px; /* Mobile header height */
     }
   }
 </style>
