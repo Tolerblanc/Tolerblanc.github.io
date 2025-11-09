@@ -8,41 +8,26 @@
 </div>
 
 <script>
-console.log('[ReadingProgress] Script loaded');
-
 // Store cleanup function to prevent memory leaks
 let cleanupReadingProgress: (() => void) | null = null;
 
 function initReadingProgress() {
-  console.log('[ReadingProgress] Initializing...');
-
   // Cleanup previous instance
   if (cleanupReadingProgress) {
-    console.log('[ReadingProgress] Cleaning up previous instance');
     cleanupReadingProgress();
   }
 
   const progressBar = document.querySelector('.reading-progress-bar') as HTMLElement;
   const progressContainer = document.querySelector('.reading-progress') as HTMLElement;
 
-  console.log('[ReadingProgress] Elements found:', {
-    progressBar: !!progressBar,
-    progressContainer: !!progressContainer
-  });
-
   if (!progressBar || !progressContainer) {
-    console.warn('[ReadingProgress] Elements not found!');
     return;
   }
 
-  // Check if sidebar exists in the DOM
+  // Check if sidebar exists in the DOM and adjust position
   const hasSidebar = document.querySelector('.sidebar') !== null;
-  console.log('[ReadingProgress] Has sidebar:', hasSidebar);
-
-  // Adjust position based on sidebar presence
   if (hasSidebar) {
     const sidebarWidth = getComputedStyle(document.documentElement).getPropertyValue('--layout-sidebar-width');
-    console.log('[ReadingProgress] Sidebar width:', sidebarWidth);
     progressContainer.style.left = sidebarWidth;
   } else {
     progressContainer.style.left = '0';
@@ -52,7 +37,6 @@ function initReadingProgress() {
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     const scrollTop = window.scrollY || window.pageYOffset;
-
     const scrollableHeight = documentHeight - windowHeight;
 
     if (scrollableHeight <= 0) {
@@ -62,19 +46,11 @@ function initReadingProgress() {
 
     const progress = (scrollTop / scrollableHeight) * 100;
     const finalProgress = Math.min(Math.max(progress, 0), 100);
-
     progressBar.style.width = `${finalProgress}%`;
-
-    console.log('[ReadingProgress] Update:', {
-      scrollTop,
-      scrollableHeight,
-      progress: finalProgress.toFixed(2) + '%'
-    });
   }
 
-  // Event listeners with throttling for better performance
+  // Event listeners with requestAnimationFrame throttling
   let ticking = false;
-
   const scrollHandler = () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
@@ -88,8 +64,6 @@ function initReadingProgress() {
   window.addEventListener('scroll', scrollHandler, { passive: true });
   window.addEventListener('resize', updateProgress, { passive: true });
 
-  console.log('[ReadingProgress] Event listeners attached');
-
   // Initial update
   updateProgress();
 
@@ -97,28 +71,21 @@ function initReadingProgress() {
   cleanupReadingProgress = () => {
     window.removeEventListener('scroll', scrollHandler);
     window.removeEventListener('resize', updateProgress);
-    console.log('[ReadingProgress] Cleaned up');
   };
 }
 
 // Initialize on load
 if (document.readyState === 'loading') {
-  console.log('[ReadingProgress] Waiting for DOMContentLoaded');
   document.addEventListener('DOMContentLoaded', initReadingProgress);
 } else {
-  console.log('[ReadingProgress] DOM already loaded, initializing immediately');
   initReadingProgress();
 }
 
 // Re-initialize on navigation (for View Transitions)
-document.addEventListener('astro:page-load', () => {
-  console.log('[ReadingProgress] astro:page-load event');
-  initReadingProgress();
-});
+document.addEventListener('astro:page-load', initReadingProgress);
 
 // Cleanup on before swap (for View Transitions)
 document.addEventListener('astro:before-swap', () => {
-  console.log('[ReadingProgress] astro:before-swap event');
   if (cleanupReadingProgress) {
     cleanupReadingProgress();
   }
@@ -131,8 +98,8 @@ document.addEventListener('astro:before-swap', () => {
     top: var(--layout-header-height);
     left: 0;
     right: 0;
-    height: 3px;
-    background-color: var(--color-border-primary);
+    height: 4px;
+    background-color: transparent;
     z-index: calc(var(--z-fixed) + 1);
     overflow: hidden;
     transition: left var(--transition-base);
@@ -146,7 +113,9 @@ document.addEventListener('astro:before-swap', () => {
       var(--color-accent-primary) 0%,
       var(--color-accent-hover) 100%
     );
-    transition: width 0.1s ease-out;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    transition: width 0.15s ease-out;
+    transform-origin: left;
   }
 
   /* Hide on very short pages */
