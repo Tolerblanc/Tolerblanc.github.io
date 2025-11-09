@@ -6,6 +6,21 @@ interface PagefindUI {
     element: HTMLElement;
     showSubResults?: boolean;
     bundlePath?: string;
+    placeholder?: string;
+    autofocus?: boolean;
+    translations?: {
+      placeholder?: string;
+      clear_search?: string;
+      load_more?: string;
+      search_label?: string;
+      filters_label?: string;
+      zero_results?: string;
+      many_results?: string;
+      one_result?: string;
+      alt_search?: string;
+      search_suggestion?: string;
+      searching?: string;
+    };
   }): void;
 }
 
@@ -26,6 +41,10 @@ export const Search = () => {
       if (isOpen) {
         dialogRef.current.close();
         setIsOpen(false);
+        // 모달을 닫을 때 Pagefind UI 정리 (중첩 방지)
+        if (searchRef.current) {
+          searchRef.current.innerHTML = '';
+        }
       } else {
         dialogRef.current.showModal();
         setIsOpen(true);
@@ -67,6 +86,17 @@ export const Search = () => {
             new window.PagefindUI({
               element: currentRef,
               showSubResults: true,
+              autofocus: true,
+              translations: {
+                placeholder: '검색어를 입력하세요...',
+                clear_search: '검색 지우기',
+                load_more: '더 보기',
+                search_label: '검색',
+                zero_results: '검색 결과가 없습니다.',
+                many_results: '개의 결과',
+                one_result: '1개의 결과',
+                searching: '검색 중...',
+              },
             });
           }
         };
@@ -83,6 +113,17 @@ export const Search = () => {
         new window.PagefindUI({
           element: currentRef,
           showSubResults: true,
+          autofocus: true,
+          translations: {
+            placeholder: '검색어를 입력하세요...',
+            clear_search: '검색 지우기',
+            load_more: '더 보기',
+            search_label: '검색',
+            zero_results: '검색 결과가 없습니다.',
+            many_results: '개의 결과',
+            one_result: '1개의 결과',
+            searching: '검색 중...',
+          },
         });
       }
     };
@@ -117,7 +158,7 @@ export const Search = () => {
       {/* 검색 다이얼로그 */}
       <dialog
         ref={dialogRef}
-        className="backdrop:bg-black/50 bg-transparent border-0 p-0 m-0 max-w-2xl w-full rounded-lg shadow-2xl"
+        className="backdrop:bg-black/50 bg-transparent border-0 p-4 inset-0 m-auto max-w-2xl w-full max-h-[80vh] rounded-lg shadow-2xl overflow-visible"
         onClick={(e) => {
           // 배경 클릭 시 닫기
           if (e.target === dialogRef.current) {
@@ -125,7 +166,7 @@ export const Search = () => {
           }
         }}
       >
-        <div className="bg-background rounded-lg p-6 shadow-2xl">
+        <div className="bg-background rounded-lg p-6 shadow-2xl max-h-full overflow-auto">
           <div ref={searchRef} className="pagefind-search" />
         </div>
       </dialog>
