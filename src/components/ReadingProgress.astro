@@ -46,12 +46,13 @@
   .reading-progress {
     position: fixed;
     top: var(--layout-header-height);
-    left: 0;
+    left: var(--layout-sidebar-width);
     right: 0;
     height: 3px;
     background-color: var(--color-border-primary);
     z-index: calc(var(--z-fixed) + 1);
     overflow: hidden;
+    transition: left var(--transition-base);
   }
 
   .reading-progress-bar {
@@ -69,6 +70,13 @@
   @media (max-height: 600px) {
     .reading-progress {
       display: none;
+    }
+  }
+
+  /* Mobile: 전체 너비 */
+  @media (max-width: 768px) {
+    .reading-progress {
+      left: 0;
     }
   }
 </style>

@@ -1,251 +1,126 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlogPostCard } from '@/components/ui/blog-post-card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { calculateReadingTime } from '@/utils/readingTime';
+import { Book, FileCode } from 'lucide-react';
 
 const title = "인생은 B와 D사이 Code다";
 const description = "Tolerblanc의 기술 블로그 (Astro 실험 버전)";
 
-// Get all published blog posts, sorted by date
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
+// Get all published blog posts with body content for reading time calculation
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 10); // 최근 10개만 표시
+  .slice(0, 6) // 최근 6개만 표시
+  .map(post => ({
+    ...post,
+    readingTime: post.body ? calculateReadingTime(post.body) : '1분'
+  }));
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="home-container">
-    <section class="hero">
-      <h1 class="hero-title">인생은 B와 D사이 Code다</h1>
-      <p class="hero-subtitle">Tolerblanc의 기술 블로그</p>
-      <div class="hero-notice">
-        <p>🚧 Jekyll → Astro 마이그레이션 실험 버전</p>
-        <p>메인 블로그: <a href="https://tolerblanc.github.io" target="_blank">tolerblanc.github.io</a></p>
-      </div>
-    </section>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Hero Section -->
+    <section class="text-center mb-16 py-12">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+        인생은 B와 D사이 Code다
+      </h1>
+      <p class="text-xl text-muted-foreground mb-8">
+        Tolerblanc의 기술 블로그
+      </p>
 
-    <section class="progress">
-      <h2>마이그레이션 진행 상황</h2>
-      <ul class="progress-list">
-        <li>✅ Phase 1: Astro 프로젝트 초기화</li>
-        <li>✅ Phase 2: 콘텐츠 마이그레이션 시스템</li>
-        <li>✅ Phase 3: LaTeX, Analytics, 댓글, RSS</li>
-        <li>✅ 56개 포스트 빌드 성공</li>
-        <li>🔄 Phase 4: 네비게이션 UI (진행 중)</li>
-      </ul>
-    </section>
-
-    <section class="recent-posts">
-      <h2>📚 최근 포스트</h2>
-      <div class="post-grid">
-        {posts.map((post) => (
-          <article class="post-card">
-            <a href={`/experimental/blog/${post.id}`}>
-              <div class="post-card-header">
-                <h3 class="post-card-title">{post.data.title}</h3>
-                {post.data.categories && post.data.categories.length > 0 && (
-                  <span class="post-card-category">{post.data.categories[0]}</span>
-                )}
-              </div>
-              <p class="post-card-excerpt">{post.data.excerpt}</p>
-              <div class="post-card-meta">
-                <time datetime={post.data.date.toISOString()}>
-                  {post.data.date.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </time>
-                {post.data.tags && post.data.tags.length > 0 && (
-                  <div class="post-card-tags">
-                    {post.data.tags.slice(0, 3).map(tag => (
-                      <span class="tag">#{tag}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
+      <Card className="max-w-2xl mx-auto bg-card/50 backdrop-blur border-border/50" client:load>
+        <CardHeader client:load>
+          <CardTitle className="flex items-center gap-2 justify-center" client:load>
+            <FileCode size={20} />
+            Jekyll → Astro 마이그레이션 실험 버전
+          </CardTitle>
+        </CardHeader>
+        <CardContent client:load>
+          <p class="text-muted-foreground">
+            메인 블로그: <a
+              href="https://tolerblanc.github.io"
+              target="_blank"
+              class="text-primary hover:underline"
+            >
+              tolerblanc.github.io
             </a>
-          </article>
+          </p>
+        </CardContent>
+      </Card>
+    </section>
+
+    <Separator className="mb-12" client:load />
+
+    <!-- Migration Progress -->
+    <section class="mb-16">
+      <Card client:load>
+        <CardHeader client:load>
+          <CardTitle className="text-2xl" client:load>마이그레이션 진행 상황</CardTitle>
+        </CardHeader>
+        <CardContent client:load>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 1: Astro 프로젝트 초기화</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 2: 콘텐츠 마이그레이션 시스템</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>Phase 3: LaTeX, Analytics, 댓글, RSS</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="default" client:load>✅</Badge>
+              <span>56개 포스트 빌드 성공</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <Badge variant="secondary" client:load>🔄</Badge>
+              <span>Phase 4: shadcn/ui 적용 (진행 중)</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </section>
+
+    <Separator className="mb-12" client:load />
+
+    <!-- Recent Posts -->
+    <section class="mb-16">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-bold flex items-center gap-3">
+          <Book size={28} />
+          최근 포스트
+        </h2>
+        <Button variant="outline" asChild client:load>
+          <a href="/experimental/blog">
+            전체 보기 →
+          </a>
+        </Button>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            excerpt={post.data.excerpt}
+            date={post.data.date}
+            slug={post.id}
+            categories={post.data.categories}
+            tags={post.data.tags}
+            readingTime={post.readingTime}
+            client:load
+          />
         ))}
       </div>
     </section>
   </div>
 </BaseLayout>
 
-<style>
-  .home-container {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .hero {
-    text-align: center;
-    margin-bottom: 4rem;
-    padding: 2rem 0;
-  }
-
-  .hero-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1.25rem;
-    color: #9ca3af;
-    margin-bottom: 2rem;
-  }
-
-  .hero-notice {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .hero-notice p {
-    margin: 0.5rem 0;
-    color: #d1d5db;
-  }
-
-  .hero-notice a {
-    color: #60a5fa;
-    text-decoration: underline;
-  }
-
-  .hero-notice a:hover {
-    color: #93c5fd;
-  }
-
-  .progress {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
-    padding: 2rem;
-    margin-bottom: 3rem;
-  }
-
-  .progress h2 {
-    font-size: 1.5rem;
-    color: #fff;
-    margin-bottom: 1rem;
-  }
-
-  .progress-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .progress-list li {
-    padding: 0.5rem 0;
-    font-size: 1.0625rem;
-    color: #d1d5db;
-  }
-
-  .recent-posts {
-    margin-bottom: 4rem;
-  }
-
-  .recent-posts h2 {
-    font-size: 1.875rem;
-    color: #fff;
-    margin-bottom: 2rem;
-  }
-
-  .post-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .post-card {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    transition: all 0.2s;
-  }
-
-  .post-card:hover {
-    border-color: #60a5fa;
-    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
-  }
-
-  .post-card a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-
-  .post-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .post-card-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-    flex: 1;
-    line-height: 1.4;
-  }
-
-  .post-card-category {
-    flex-shrink: 0;
-    padding: 0.25rem 0.75rem;
-    background: #1e40af;
-    color: #fff;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .post-card-excerpt {
-    color: #9ca3af;
-    margin-bottom: 1rem;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .post-card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-
-  .post-card-tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    padding: 0.125rem 0.5rem;
-    background: #374151;
-    color: #9ca3af;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-  }
-
-  @media (min-width: 768px) {
-    .hero-title {
-      font-size: 3rem;
-    }
-
-    .post-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-</style>

@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import Sidebar from '@/components/Sidebar.astro';
 import Header from '@/components/Header.astro';
 import '@/styles/global.css';
@@ -14,13 +15,27 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
-<html lang="ko" class="dark">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+
+    <!-- FOUC 방지: 테마 초기화 스크립트 -->
+    <script is:inline>
+      // 페이지 로드 전에 테마 적용 (FOUC 방지)
+      (function() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <!-- View Transitions for smooth page navigation -->
+    <ViewTransitions />
 
     <!-- Google Analytics -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-JWJT3DQR8G"></script>
@@ -35,6 +50,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <slot name="head" />
   </head>
   <body>
+    <!-- 사이드바 열기 버튼 (사이드바가 닫혔을 때만 표시) -->
+    <button class="sidebar-open-btn" aria-label="사이드바 열기" title="사이드바 열기">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
     <div class="layout">
       <Sidebar currentPath={currentPath || Astro.url.pathname} />
       <div class="main-wrapper">
@@ -55,25 +77,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   }
 
   html {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background: #0f0f0f;
-    color: #e0e0e0;
-  }
-
-  html.dark {
-    background: #0f0f0f;
-    color: #e0e0e0;
-  }
-
-  html:not(.dark) {
-    background: #ffffff;
-    color: #1a1a1a;
+    font-family: var(--font-family-base);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    transition: background-color var(--transition-base), color var(--transition-base);
   }
 
   body {
-    line-height: 1.6;
+    line-height: var(--line-height-normal);
   }
 
   .layout {
@@ -83,19 +94,64 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
   .main-wrapper {
     flex: 1;
-    margin-left: 280px; /* 사이드바 너비 */
+    margin-left: var(--layout-sidebar-width);
     display: flex;
     flex-direction: column;
+    transition: margin-left var(--transition-base);
   }
 
   .content {
     flex: 1;
-    margin-top: 64px; /* 헤더 높이 */
-    padding: 2rem;
-    max-width: 1200px;
+    margin-top: var(--layout-header-height);
+    padding: var(--layout-container-padding);
+    max-width: var(--layout-max-content-width);
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  /* 테마 전환 시 부드러운 애니메이션 (성능 최적화) */
+  html.theme-transitioning,
+  html.theme-transitioning * {
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease !important;
+  }
+
+  /* 사이드바 열기 버튼 (왼쪽 상단 고정) */
+  .sidebar-open-btn {
+    position: fixed;
+    top: var(--spacing-4);
+    left: var(--spacing-4);
+    z-index: calc(var(--z-modal) + 1);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: all var(--transition-fast);
+    border: 1px solid var(--color-border-primary);
+  }
+
+  .sidebar-open-btn:hover {
+    background-color: var(--color-bg-secondary);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .sidebar-open-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* 사이드바가 collapsed일 때만 표시 */
+  .sidebar-open-btn.visible {
+    display: flex;
   }
 
   /* Mobile Responsive */

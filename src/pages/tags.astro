@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Tag } from 'lucide-react';
 
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
 
@@ -26,7 +27,10 @@ const sortedTags = Array.from(tagCounts.entries())
 >
   <div class="tags-page">
     <header class="tags-header">
-      <h1 class="tags-title">🏷️ Tags</h1>
+      <h1 class="tags-title flex items-center justify-center gap-3">
+        <Tag size={32} />
+        Tags
+      </h1>
       <p class="tags-count">{sortedTags.length}개의 태그</p>
     </header>
 
@@ -59,70 +63,78 @@ const sortedTags = Array.from(tagCounts.entries())
     margin: 0 auto;
   }
 
+  /* ===== 태그 헤더 ===== */
   .tags-header {
     text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #333;
+    margin-bottom: var(--spacing-12);
+    padding-bottom: var(--spacing-8);
+    border-bottom: 2px solid var(--color-border-primary);
   }
 
   .tags-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.02em;
   }
 
   .tags-count {
-    font-size: 1.125rem;
-    color: #9ca3af;
+    font-size: var(--font-size-lg);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
   }
 
+  /* ===== 태그 클라우드 ===== */
   .tags-cloud {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--spacing-4);
     justify-content: center;
     align-items: center;
-    padding: 2rem;
+    padding: var(--spacing-8);
   }
 
   .tag-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 9999px;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-full);
     text-decoration: none;
-    color: #d1d5db;
-    transition: all 0.2s;
+    color: var(--color-text-secondary);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-card);
   }
 
   .tag-item:hover {
-    background: #2a2a2a;
-    border-color: #60a5fa;
-    color: #fff;
+    background: var(--color-bg-secondary);
+    border-color: var(--color-accent-primary);
+    color: var(--color-text-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
+    box-shadow: var(--shadow-card-hover);
   }
 
   .tag-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .tag-count {
     font-size: 0.75em;
-    color: #9ca3af;
-    background: #374151;
-    padding: 0.125rem 0.5rem;
-    border-radius: 999px;
-    font-weight: 600;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-secondary);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-semibold);
+    border: 1px solid var(--color-border-primary);
+    transition: all var(--transition-fast);
   }
 
   .tag-item:hover .tag-count {
-    background: #1e40af;
-    color: #fff;
+    background: var(--color-accent-primary);
+    color: var(--color-bg-primary);
+    border-color: var(--color-accent-primary);
   }
 </style>

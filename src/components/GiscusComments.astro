@@ -15,34 +15,38 @@
  */
 ---
 
-<div class="giscus-wrapper my-8">
-  <script
-    is:inline
-    src="https://giscus.app/client.js"
-    data-repo="Tolerblanc/Tolerblanc.github.io"
-    data-repo-id="R_kgDOJ01EaQ"
-    data-category="Announcements"
-    data-category-id="DIC_kwDOJ01Eac4Cerab"
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="bottom"
-    data-theme="dark_dimmed"
-    data-lang="ko"
-    crossorigin="anonymous"
-    async
-  ></script>
-</div>
+<div class="giscus-wrapper" id="giscus-container"></div>
+
+<script is:inline>
+  // Giscus 스크립트 동적 로드
+  (function() {
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', 'Tolerblanc/Tolerblanc.github.io');
+    script.setAttribute('data-repo-id', 'R_kgDOJ01EaQ');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOJ01Eac4Cerab');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'bottom');
+    script.setAttribute('data-theme', 'dark_dimmed');
+    script.setAttribute('data-lang', 'ko');
+    script.setAttribute('crossorigin', 'anonymous');
+    script.async = true;
+
+    const container = document.getElementById('giscus-container');
+    if (container) {
+      container.appendChild(script);
+    }
+  })();
+</script>
 
 <style>
   .giscus-wrapper {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .dark .giscus-wrapper {
-    border-top-color: #374151;
+    margin-top: var(--spacing-12);
+    padding-top: var(--spacing-8);
+    border-top: 1px solid var(--color-border-primary);
   }
 </style>

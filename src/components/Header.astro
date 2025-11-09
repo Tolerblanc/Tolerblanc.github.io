@@ -1,4 +1,6 @@
 ---
+import { Search } from './Search';
+
 const currentPath = Astro.url.pathname;
 
 const navItems = [
@@ -33,6 +35,7 @@ const navItems = [
     </div>
 
     <div class="nav-right">
+      <Search client:load />
       <button id="theme-toggle" class="theme-toggle" aria-label="다크 모드 토글">
         <svg class="theme-icon theme-icon-light" width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M10 3V1M10 19V17M17 10H19M1 10H3M15.657 15.657L17.071 17.071M2.929 2.929L4.343 4.343M15.657 4.343L17.071 2.929M2.929 17.071L4.343 15.657" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -46,50 +49,80 @@ const navItems = [
   </nav>
 </header>
 
-<script>
+<script is:inline>
   // 다크 모드 토글 스크립트
-  const themeToggle = document.getElementById('theme-toggle');
-  const html = document.documentElement;
+  function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
 
-  // 시스템 테마 감지 함수
-  function getSystemTheme(): 'light' | 'dark' {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
-
-  // 테마 적용 함수
-  function applyTheme(theme: 'light' | 'dark' | 'system') {
-    let actualTheme = theme;
-    if (theme === 'system') {
-      actualTheme = getSystemTheme();
+    if (!themeToggle) {
+      console.warn('Theme toggle button not found');
+      return;
     }
 
-    if (actualTheme === 'dark') {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
+    // 시스템 테마 감지 함수
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-  }
 
-  // 초기 테마 설정: localStorage > 시스템 설정 > 기본값(light)
-  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-  const initialTheme = savedTheme || 'light';
-  applyTheme(initialTheme);
+    // 테마 적용 함수
+    function applyTheme(theme) {
+      let actualTheme = theme;
+      if (theme === 'system') {
+        actualTheme = getSystemTheme();
+      }
 
-  // 테마 토글 버튼 이벤트
-  themeToggle?.addEventListener('click', () => {
-    html.classList.toggle('dark');
-    const isDark = html.classList.contains('dark');
-    const newTheme = isDark ? 'dark' : 'light';
-    localStorage.setItem('theme', newTheme);
-  });
+      if (actualTheme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    }
 
-  // 시스템 테마 변경 감지 (사용자가 시스템 설정 선택한 경우)
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    // 초기 테마 설정: localStorage > 시스템 설정 > 기본값(light)
     const savedTheme = localStorage.getItem('theme');
-    if (!savedTheme || savedTheme === 'system') {
-      applyTheme(e.matches ? 'dark' : 'light');
-    }
-  });
+    const initialTheme = savedTheme || 'light';
+    applyTheme(initialTheme);
+
+    // 기존 리스너 제거를 위해 클론 생성
+    const newToggle = themeToggle.cloneNode(true);
+    themeToggle.parentNode.replaceChild(newToggle, themeToggle);
+
+    // 테마 토글 버튼 이벤트 (새로운 버튼에 등록)
+    newToggle.addEventListener('click', function() {
+      // 테마 전환 애니메이션을 위한 클래스 추가
+      html.classList.add('theme-transitioning');
+
+      // 테마 전환
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      const newTheme = isDark ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+
+      // 200ms 후 전환 클래스 제거
+      setTimeout(() => {
+        html.classList.remove('theme-transitioning');
+      }, 200);
+    });
+
+    // 시스템 테마 변경 감지
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme || savedTheme === 'system') {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+  }
+
+  // 초기 로드
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeToggle);
+  } else {
+    initThemeToggle();
+  }
+
+  // View Transitions 지원: 페이지 전환 시 재초기화
+  document.addEventListener('astro:page-load', initThemeToggle);
 </script>
 
 <style>
@@ -180,6 +213,9 @@ const navItems = [
   }
 
   .nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
     flex-shrink: 0;
   }
 

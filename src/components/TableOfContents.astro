@@ -1,0 +1,312 @@
+---
+export interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// depth 2, 3만 표시 (h2, h3)
+const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <nav class="toc" aria-label="목차">
+    <div class="toc-header">
+      <h2 class="toc-title">목차</h2>
+    </div>
+    <ul class="toc-list">
+      {filteredHeadings.map((heading) => (
+        <li class={`toc-item toc-depth-${heading.depth}`}>
+          <a
+            href={`#${heading.slug}`}
+            class="toc-link"
+            data-heading-id={heading.slug}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script>
+  // TOC 스크롤 스파이 (현재 섹션 하이라이트)
+  class TableOfContents {
+    private toc: HTMLElement | null;
+    private tocList: HTMLElement | null = null;
+    private headings: HTMLElement[] = [];
+    private links: NodeListOf<HTMLAnchorElement> | null = null;
+    private currentActiveLink: HTMLAnchorElement | null = null;
+    private observer: IntersectionObserver | null = null;
+    private isUserScrolling = false;
+    private scrollTimeout: number | null = null;
+
+    constructor() {
+      this.toc = document.querySelector('.toc');
+      if (!this.toc) return;
+
+      this.tocList = this.toc.querySelector('.toc-list');
+      this.headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+      this.links = this.toc.querySelectorAll('.toc-link');
+
+      if (this.headings.length === 0) return;
+
+      this.init();
+    }
+
+    init() {
+      // Intersection Observer 설정
+      const options: IntersectionObserverInit = {
+        rootMargin: '-100px 0px -66% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      };
+
+      this.observer = new IntersectionObserver((entries) => {
+        // 사용자가 클릭으로 스크롤 중이면 무시
+        if (this.isUserScrolling) return;
+
+        // 가장 많이 보이는 헤딩 찾기
+        const visibleEntries = entries.filter(entry => entry.isIntersecting);
+        if (visibleEntries.length > 0) {
+          // 교차 비율이 가장 높은 엔트리 선택
+          const mostVisible = visibleEntries.reduce((prev, current) =>
+            current.intersectionRatio > prev.intersectionRatio ? current : prev
+          );
+          this.setActiveLink(mostVisible.target.id);
+        }
+      }, options);
+
+      // 모든 헤딩 관찰
+      this.headings.forEach((heading) => {
+        this.observer?.observe(heading);
+      });
+
+      // 링크 클릭 시 부드러운 스크롤
+      if (this.links) {
+        this.links.forEach((link) => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // 사용자 스크롤 플래그 설정
+            this.isUserScrolling = true;
+
+            const targetId = link.getAttribute('href')?.slice(1);
+            if (targetId) {
+              const targetElement = document.getElementById(targetId);
+              if (targetElement) {
+                // 활성 링크 즉시 업데이트 (TOC 스크롤 없이)
+                this.setActiveLink(targetId, false);
+
+                // 헤딩으로 스크롤
+                const headerOffset = 100;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth',
+                });
+
+                // 스크롤 완료 후 플래그 해제 (약 1초)
+                if (this.scrollTimeout) {
+                  clearTimeout(this.scrollTimeout);
+                }
+                this.scrollTimeout = window.setTimeout(() => {
+                  this.isUserScrolling = false;
+                }, 1000);
+              }
+            }
+          });
+        });
+      }
+    }
+
+    setActiveLink(headingId: string, scrollIntoView = true) {
+      // 이전 활성 링크 제거
+      if (this.currentActiveLink) {
+        this.currentActiveLink.classList.remove('active');
+      }
+
+      // 새 활성 링크 추가
+      const newActiveLink = this.toc?.querySelector(
+        `.toc-link[data-heading-id="${headingId}"]`
+      ) as HTMLAnchorElement;
+
+      if (newActiveLink) {
+        newActiveLink.classList.add('active');
+        this.currentActiveLink = newActiveLink;
+
+        // TOC 내부 스크롤 (선택적, 그리고 TOC 컨테이너 내부에서만)
+        if (scrollIntoView && this.toc && this.tocList) {
+          const tocRect = this.toc.getBoundingClientRect();
+          const linkRect = newActiveLink.getBoundingClientRect();
+
+          // TOC 뷰포트 내에 링크가 완전히 보이지 않는 경우만 스크롤
+          if (linkRect.top < tocRect.top || linkRect.bottom > tocRect.bottom) {
+            // TOC 컨테이너 내에서만 스크롤 (페이지 스크롤에 영향 없음)
+            const tocScrollTop = this.toc.scrollTop;
+            const linkOffsetTop = newActiveLink.offsetTop;
+            const tocHeight = this.toc.clientHeight;
+            const linkHeight = newActiveLink.clientHeight;
+
+            // 링크를 TOC 중앙에 배치
+            const targetScrollTop = linkOffsetTop - tocHeight / 2 + linkHeight / 2;
+
+            this.toc.scrollTo({
+              top: targetScrollTop,
+              behavior: 'smooth',
+            });
+          }
+        }
+      }
+    }
+
+    destroy() {
+      this.observer?.disconnect();
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout);
+      }
+    }
+  }
+
+  // 초기화
+  let tocInstance: TableOfContents | null = null;
+
+  function initTOC() {
+    if (tocInstance) {
+      tocInstance.destroy();
+    }
+    tocInstance = new TableOfContents();
+  }
+
+  // DOM 로드 후 초기화
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTOC);
+  } else {
+    initTOC();
+  }
+
+  // View Transitions 지원: 페이지 전환 시 재초기화
+  document.addEventListener('astro:page-load', initTOC);
+</script>
+
+<style>
+  .toc {
+    position: sticky;
+    top: calc(var(--layout-header-height) + var(--spacing-6)); /* header + spacing */
+    max-height: calc(100vh - var(--layout-header-height) - var(--spacing-12)); /* 화면 높이 - header - 여유 공간 */
+    overflow-y: auto;
+    padding: var(--spacing-4);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-primary);
+    box-shadow: var(--shadow-card);
+  }
+
+  .toc-header {
+    padding-bottom: var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+
+  .toc-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .toc-item {
+    position: relative;
+  }
+
+  .toc-depth-2 {
+    padding-left: 0;
+  }
+
+  .toc-depth-3 {
+    padding-left: var(--spacing-4);
+  }
+
+  .toc-link {
+    display: block;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    line-height: var(--line-height-tight);
+    position: relative;
+  }
+
+  .toc-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 0;
+    background-color: var(--color-accent-primary);
+    transition: height var(--transition-fast);
+  }
+
+  .toc-link:hover {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  .toc-link.active {
+    color: var(--color-accent-primary);
+    background-color: var(--color-accent-tertiary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .toc-link.active::before {
+    height: 100%;
+  }
+
+  /* Scrollbar styling */
+  .toc::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .toc::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .toc::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-primary);
+    border-radius: var(--radius-sm);
+  }
+
+  .toc::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-tertiary);
+  }
+
+  /* 모바일에서는 숨김 */
+  @media (max-width: 1280px) {
+    .toc {
+      display: none;
+    }
+  }
+</style>

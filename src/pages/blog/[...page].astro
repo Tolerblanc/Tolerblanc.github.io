@@ -1,0 +1,83 @@
+---
+/**
+ * Blog List with Pagination
+ *
+ * URL 구조:
+ * - /experimental/blog → 첫 페이지
+ * - /experimental/blog/2 → 두 번째 페이지
+ * - /experimental/blog/3 → 세 번째 페이지
+ */
+
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths, Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlogPostCard } from '@/components/ui/blog-post-card';
+import { BlogPagination } from '@/components/ui/blog-pagination';
+import { Separator } from '@/components/ui/separator';
+import { calculateReadingTime } from '@/utils/readingTime';
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  // 페이지당 9개 포스트
+  return paginate(allPosts, { pageSize: 9 });
+};
+
+type Props = {
+  page: Page<CollectionEntry<'blog'>>;
+};
+
+const { page } = Astro.props;
+const { data: posts, currentPage, lastPage, url } = page;
+
+const title = currentPage === 1
+  ? "블로그 - Tolerblanc's Blog"
+  : `블로그 (${currentPage}/${lastPage}) - Tolerblanc's Blog`;
+const description = "Tolerblanc의 기술 블로그 포스트 목록";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header -->
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        📚 블로그
+      </h1>
+      <p class="text-lg text-muted-foreground">
+        총 {lastPage * 9 - (9 - posts.length)}개의 포스트
+      </p>
+    </header>
+
+    <Separator className="mb-8" />
+
+    <!-- Post Grid -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post) => (
+        <BlogPostCard
+          title={post.data.title}
+          excerpt={post.data.excerpt}
+          date={post.data.date}
+          slug={post.id}
+          categories={post.data.categories}
+          tags={post.data.tags}
+          readingTime={post.body ? calculateReadingTime(post.body) : '1분'}
+          client:load
+        />
+      ))}
+    </div>
+
+    <!-- Pagination -->
+    <BlogPagination
+      currentPage={currentPage}
+      totalPages={lastPage}
+      baseUrl="/experimental/blog"
+      client:load
+    />
+  </div>
+</BaseLayout>
+
+<style>
+  /* 추가 스타일이 필요하면 여기에 작성 */
+</style>

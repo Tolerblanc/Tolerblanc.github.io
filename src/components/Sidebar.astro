@@ -13,64 +13,181 @@ const currentCategory = currentPath.includes('/blog/category/')
   : null;
 ---
 
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <a href="/experimental" class="blog-title">
-      <span class="title-text">Tolerblanc's Blog</span>
+<aside class="sidebar" data-mode="fixed">
+  <!-- 사이드바 컨트롤 -->
+  <!-- Compact Profile -->
+  <div class="sidebar-profile">
+    <a href="/experimental" class="profile-link" aria-label="홈으로 이동">
+      <div class="profile-avatar">
+        <span class="avatar-initial">T</span>
+      </div>
+      <span class="profile-name">Tolerblanc</span>
+      <svg class="profile-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
     </a>
   </div>
 
-  <!-- Recent Posts Section -->
-  <section class="sidebar-section">
-    <h2 class="section-title">Recent Posts</h2>
-    <ul class="recent-posts-list">
-      {recentPosts.map(post => (
-        <li>
-          <a
-            href={`/experimental/blog/${post.slug}`}
-            class="recent-post-link"
-          >
-            <span class="post-title">{post.title}</span>
-            <span class="post-date">
-              {post.date.toLocaleDateString('ko-KR', {
-                month: 'short',
-                day: 'numeric'
-              })}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+  <!-- Recent Posts Section (접기/펼치기 가능) -->
+  <section class="sidebar-section" data-section="recent-posts" data-collapsed="false">
+    <button class="section-header" aria-expanded="true">
+      <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <h2 class="section-title">Recent Posts</h2>
+      <svg class="section-icon chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="section-content">
+      <ul class="recent-posts-list">
+        {recentPosts.map(post => (
+          <li>
+            <a
+              href={`/experimental/blog/${post.slug}`}
+              class="recent-post-link"
+            >
+              <span class="post-title">{post.title}</span>
+              <span class="post-date">
+                {post.date.toLocaleDateString('ko-KR', {
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </section>
 
-  <!-- Categories Section (2-depth 구조) -->
-  <section class="sidebar-section">
-    <h2 class="section-title">Categories</h2>
-    <nav class="categories-nav">
-      {categoryGroups.map(group => (
-        <div class="category-group">
-          <div class="group-header">
-            <span class="group-name">{group.name}</span>
-            <span class="group-count">{group.totalPosts}</span>
+  <!-- Categories Section (2-depth 구조, 접기/펼치기 가능) -->
+  <section class="sidebar-section" data-section="categories" data-collapsed="false">
+    <button class="section-header" aria-expanded="true">
+      <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      <h2 class="section-title">Categories</h2>
+      <svg class="section-icon chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="section-content">
+      <nav class="categories-nav">
+        {categoryGroups.map(group => (
+          <div class="category-group">
+            <div class="group-header">
+              <span class="group-name">{group.name}</span>
+              <span class="group-count">{group.totalPosts}</span>
+            </div>
+            <ul class="category-list">
+              {group.children.map(category => (
+                <li>
+                  <a
+                    href={category.path}
+                    class={`category-link ${currentCategory === category.id ? 'active' : ''}`}
+                  >
+                    <span class="category-name">{category.name}</span>
+                    <span class="category-count">{category.postCount}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul class="category-list">
-            {group.children.map(category => (
-              <li>
-                <a
-                  href={category.path}
-                  class={`category-link ${currentCategory === category.id ? 'active' : ''}`}
-                >
-                  <span class="category-name">{category.name}</span>
-                  <span class="category-count">{category.postCount}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
+        ))}
+      </nav>
+    </div>
   </section>
 </aside>
+
+<script is:inline>
+  // Simplified Sidebar State Management
+  const STORAGE_KEY = 'sidebar-sections';
+
+  // Load section states from localStorage
+  function loadSectionStates() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {}
+    }
+    return {
+      'recent-posts': true,
+      'categories': true,
+    };
+  }
+
+  // Save section states to localStorage
+  function saveSectionStates(states) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+  }
+
+  // Toggle section collapse/expand
+  function toggleSection(section, states) {
+    const sectionName = section.getAttribute('data-section');
+    if (!sectionName) return;
+
+    const isCollapsed = section.getAttribute('data-collapsed') === 'true';
+    const newCollapsed = !isCollapsed;
+
+    section.setAttribute('data-collapsed', String(newCollapsed));
+    const header = section.querySelector('.section-header');
+    if (header) {
+      header.setAttribute('aria-expanded', String(!newCollapsed));
+    }
+
+    states[sectionName] = !newCollapsed;
+    saveSectionStates(states);
+  }
+
+  // Initialize sidebar
+  function initSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    const states = loadSectionStates();
+
+    // Apply section states
+    const sections = sidebar.querySelectorAll('.sidebar-section');
+    sections.forEach((section) => {
+      const sectionName = section.getAttribute('data-section');
+      if (sectionName && states[sectionName] !== undefined) {
+        const isExpanded = states[sectionName];
+        section.setAttribute('data-collapsed', String(!isExpanded));
+        const header = section.querySelector('.section-header');
+        if (header) {
+          header.setAttribute('aria-expanded', String(isExpanded));
+        }
+      }
+    });
+
+    // Clone and replace section headers to remove old listeners
+    const sectionHeaders = sidebar.querySelectorAll('.section-header');
+    sectionHeaders.forEach((header) => {
+      const newHeader = header.cloneNode(true);
+      header.parentNode.replaceChild(newHeader, header);
+
+      newHeader.addEventListener('click', function() {
+        const section = this.closest('.sidebar-section');
+        if (section) {
+          toggleSection(section, states);
+        }
+      });
+    });
+  }
+
+  // Initialize on DOM load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebar);
+  } else {
+    initSidebar();
+  }
+
+  // Re-initialize on View Transitions
+  document.addEventListener('astro:page-load', initSidebar);
+</script>
 
 <style>
   .sidebar {
@@ -85,39 +202,124 @@ const currentCategory = currentPath.includes('/blog/category/')
     padding: var(--spacing-6);
     border-right: 1px solid var(--color-border-primary);
     transition: background-color var(--transition-base), border-color var(--transition-base);
+    z-index: var(--z-sticky);
   }
 
-  .sidebar-header {
-    margin-bottom: var(--spacing-8);
+  /* Compact Profile Section */
+  .sidebar-profile {
+    margin-bottom: var(--spacing-6);
     padding-bottom: var(--spacing-4);
     border-bottom: 1px solid var(--color-border-secondary);
   }
 
-  .blog-title {
+  .profile-link {
     display: flex;
     align-items: center;
+    gap: var(--spacing-2);
     text-decoration: none;
-    color: var(--color-text-primary);
-    font-size: var(--font-size-xl);
+    padding: var(--spacing-2);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+  }
+
+  .profile-link:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .profile-link:hover .profile-arrow {
+    transform: translateX(2px);
+  }
+
+  .profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary, #6366f1));
+    flex-shrink: 0;
+  }
+
+  .avatar-initial {
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
-    transition: color var(--transition-fast);
+    color: #ffffff;
   }
 
-  .blog-title:hover {
-    color: var(--color-accent-primary);
+  .profile-name {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-tight);
   }
 
+  .profile-arrow {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+    transition: transform var(--transition-fast);
+  }
+
+  /* 섹션 스타일 */
   .sidebar-section {
-    margin-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-1);
+    border: none;
+    background: none;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+    text-align: left;
+  }
+
+  .section-header:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .section-icon {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  .section-icon.chevron {
+    margin-left: auto;
+    transition: transform var(--transition-base);
+  }
+
+  .sidebar-section[data-collapsed="true"] .section-icon.chevron {
+    transform: rotate(-90deg);
   }
 
   .section-title {
+    flex: 1;
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--spacing-3);
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .section-content {
+    max-height: 2000px;
+    overflow: hidden;
+    transition: max-height var(--transition-slow), opacity var(--transition-base);
+    opacity: 1;
+  }
+
+  .sidebar-section[data-collapsed="true"] .section-content {
+    max-height: 0;
+    opacity: 0;
   }
 
   /* Recent Posts */
