@@ -13,6 +13,3 @@ node_modules/
 # IDE
 .vscode/
 .idea/
-
-# pnpm
-pnpm-lock.yaml
