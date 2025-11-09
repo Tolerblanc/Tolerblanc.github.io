@@ -73,109 +73,149 @@ const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3))
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
   </Fragment>
 
-  <article class="post-container">
-    <!-- Header -->
-    <header class="post-header">
-      {
-        series && (
-          <div class="series-info">
-            <span class="series-name">{series.name}</span> 시리즈 · 제{series.order}편
-          </div>
-        )
-      }
-
-      <h1 class="post-title">{title}</h1>
-
-      <div class="post-meta">
-        <time datetime={new Date(date).toISOString()}>
-          {formatDate(date)}
-        </time>
+  <div class="page-layout">
+    <article class="post-container">
+      <!-- Header -->
+      <header class="post-header">
         {
-          updatedDate && (
-            <span>
-              (수정: <time datetime={new Date(updatedDate).toISOString()}>{formatDate(updatedDate)}</time>)
-            </span>
-          )
-        }
-        <span>by {author}</span>
-      </div>
-
-      {
-        excerpt && (
-          <p class="post-excerpt">{excerpt}</p>
-        )
-      }
-
-      <!-- Categories and Tags -->
-      <div class="post-tags">
-        <div class="categories">
-          {
-            categories.map((cat) => (
-              <span class="category-tag">{cat}</span>
-            ))
-          }
-        </div>
-        {
-          tags.length > 0 && (
-            <div class="tags">
-              {tags.map((tag) => (
-                <span class="tag">#{tag}</span>
-              ))}
+          series && (
+            <div class="series-info">
+              <span class="series-name">{series.name}</span> 시리즈 · 제{series.order}편
             </div>
           )
         }
-      </div>
-    </header>
 
-    <div class="post-content-wrapper">
+        <h1 class="post-title">{title}</h1>
+
+        <div class="post-meta">
+          <time datetime={new Date(date).toISOString()}>
+            {formatDate(date)}
+          </time>
+          {
+            updatedDate && (
+              <span>
+                (수정: <time datetime={new Date(updatedDate).toISOString()}>{formatDate(updatedDate)}</time>)
+              </span>
+            )
+          }
+          <span>by {author}</span>
+        </div>
+
+        {
+          excerpt && (
+            <p class="post-excerpt">{excerpt}</p>
+          )
+        }
+
+        <!-- Categories and Tags -->
+        <div class="post-tags">
+          <div class="categories">
+            {
+              categories.map((cat) => (
+                <span class="category-tag">{cat}</span>
+              ))
+            }
+          </div>
+          {
+            tags.length > 0 && (
+              <div class="tags">
+                {tags.map((tag) => (
+                  <span class="tag">#{tag}</span>
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </header>
+
       <!-- Main Content -->
       <main class="post-content prose prose-lg dark:prose-invert">
         <slot />
       </main>
 
-      <!-- TOC Sidebar (Desktop only) -->
-      {
-        toc && tocHeadings.length > 0 && (
-          <aside class="toc-sidebar">
-            <TableOfContents headings={tocHeadings} />
-          </aside>
-        )
-      }
-    </div>
+      <!-- Comments Section -->
+      <GiscusComments />
 
-    <!-- Comments Section -->
-    <GiscusComments />
+      <!-- Footer -->
+      <footer class="post-footer">
+        <p>
+          © 2025 Tolerblanc. All rights reserved. |
+          <a
+            href="https://github.com/Tolerblanc/Tolerblanc.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </p>
+      </footer>
+    </article>
+
+    <!-- TOC Sidebar (Desktop only) - Fixed to right side -->
+    {
+      toc && tocHeadings.length > 0 && (
+        <aside class="toc-sidebar">
+          <TableOfContents headings={tocHeadings} />
+        </aside>
+      )
+    }
 
     <!-- UI Enhancement Components -->
     <ReadingProgress />
     <CodeCopyButton />
     <ScrollToTop />
-
-    <!-- Footer -->
-    <footer class="post-footer">
-      <p>
-        © 2025 Tolerblanc. All rights reserved. |
-        <a
-          href="https://github.com/Tolerblanc/Tolerblanc.github.io"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub
-        </a>
-      </p>
-    </footer>
-  </article>
+  </div>
 
 <style>
-  .post-container {
-    max-width: var(--layout-content-width); /* 672px */
-    margin: 0 auto;
+  /* 페이지 전체 레이아웃 */
+  .page-layout {
+    position: relative;
+    width: 100%;
   }
 
+  /* 포스트 본문 컨테이너 */
+  .post-container {
+    max-width: var(--layout-content-width); /* 800px */
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
+  }
+
+  /* TOC 사이드바 - 기본적으로 숨김 */
+  .toc-sidebar {
+    display: none;
+  }
+
+  /* 데스크톱: TOC를 오른쪽에 고정 */
   @media (min-width: 1280px) {
+    .page-layout {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-16); /* 64px */
+      padding: 0 var(--spacing-8);
+    }
+
     .post-container {
-      /* TOC를 포함한 전체 너비: 콘텐츠(672px) + gap(2rem) + TOC(256px) */
-      max-width: 1024px;
+      flex: 0 0 var(--layout-content-width); /* 800px 고정 */
+      max-width: var(--layout-content-width);
+      padding: 0;
+    }
+
+    .toc-sidebar {
+      display: block;
+      flex: 0 0 var(--layout-sidebar-width); /* 256px 고정 */
+      position: sticky;
+      top: calc(var(--layout-header-height) + var(--spacing-6));
+      height: fit-content;
+      max-height: calc(100vh - var(--layout-header-height) - var(--spacing-12));
+      align-self: flex-start; /* sticky가 제대로 동작하도록 */
+    }
+  }
+
+  /* 넓은 화면: TOC를 더 오른쪽으로 */
+  @media (min-width: 1536px) {
+    .page-layout {
+      gap: var(--spacing-20); /* 80px */
+      padding: 0 var(--spacing-12);
     }
   }
 
@@ -268,34 +308,8 @@ const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3))
   }
 
   /* ===== 콘텐츠 영역 ===== */
-  .post-content-wrapper {
-    display: flex;
-    gap: var(--spacing-8);
-    margin-bottom: var(--spacing-12);
-  }
-
   .post-content {
-    flex: 1;
-    min-width: 0;
-    max-width: var(--layout-content-width); /* 672px */
-  }
-
-  .toc-sidebar {
-    display: none;
-  }
-
-  @media (min-width: 1280px) {
-    .post-content-wrapper {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) var(--layout-sidebar-width);
-      gap: var(--spacing-8);
-    }
-
-    .toc-sidebar {
-      display: block;
-      position: relative;
-      height: fit-content;
-    }
+    margin-bottom: var(--spacing-12);
   }
 
   /* ===== 게시글 푸터 ===== */
