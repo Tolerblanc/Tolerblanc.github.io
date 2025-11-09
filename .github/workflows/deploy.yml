@@ -1,21 +1,21 @@
-name: Deploy to GitHub Pages
+name: Deploy Astro to /experimental
 
 on:
   push:
-    branches: [main, astro-experimental]
+    branches: [astro-experimental]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout astro-experimental
         uses: actions/checkout@v4
+        with:
+          ref: astro-experimental
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -31,21 +31,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build
+      - name: Build Astro
         run: pnpm run build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages /experimental
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: ./dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          destination_dir: experimental
+          keep_files: true
