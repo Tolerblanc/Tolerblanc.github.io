@@ -26,6 +26,10 @@ export const Search = () => {
       if (isOpen) {
         dialogRef.current.close();
         setIsOpen(false);
+        // 모달을 닫을 때 Pagefind UI 정리 (중첩 방지)
+        if (searchRef.current) {
+          searchRef.current.innerHTML = '';
+        }
       } else {
         dialogRef.current.showModal();
         setIsOpen(true);
@@ -117,7 +121,7 @@ export const Search = () => {
       {/* 검색 다이얼로그 */}
       <dialog
         ref={dialogRef}
-        className="backdrop:bg-black/50 bg-transparent border-0 p-0 m-0 max-w-2xl w-full rounded-lg shadow-2xl"
+        className="backdrop:bg-black/50 bg-transparent border-0 p-4 inset-0 m-auto max-w-2xl w-full max-h-[80vh] rounded-lg shadow-2xl overflow-visible"
         onClick={(e) => {
           // 배경 클릭 시 닫기
           if (e.target === dialogRef.current) {
@@ -125,7 +129,7 @@ export const Search = () => {
           }
         }}
       >
-        <div className="bg-background rounded-lg p-6 shadow-2xl">
+        <div className="bg-background rounded-lg p-6 shadow-2xl max-h-full overflow-auto">
           <div ref={searchRef} className="pagefind-search" />
         </div>
       </dialog>

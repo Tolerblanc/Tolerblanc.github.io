@@ -214,3 +214,71 @@
     padding-right: var(--layout-container-padding);
   }
 }
+
+/* ===== Pagefind 검색 UI 스타일 ===== */
+/* 라이트 모드 */
+:root {
+  --pagefind-ui-scale: 1;
+  --pagefind-ui-primary: hsl(222.2, 47.4%, 11.2%);
+  --pagefind-ui-text: hsl(222.2, 84%, 4.9%);
+  --pagefind-ui-background: hsl(0, 0%, 100%);
+  --pagefind-ui-border: hsl(214.3, 31.8%, 91.4%);
+  --pagefind-ui-tag: hsl(210, 40%, 96.1%);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 0.5rem;
+  --pagefind-ui-image-border-radius: 0.5rem;
+  --pagefind-ui-image-box-ratio: 3 / 2;
+  --pagefind-ui-font: var(--font-family-base);
+}
+
+/* 다크 모드 */
+.dark {
+  --pagefind-ui-primary: hsl(210, 40%, 98%);
+  --pagefind-ui-text: hsl(210, 40%, 98%);
+  --pagefind-ui-background: hsl(222.2, 84%, 4.9%);
+  --pagefind-ui-border: hsl(217.2, 32.6%, 17.5%);
+  --pagefind-ui-tag: hsl(217.2, 32.6%, 17.5%);
+}
+
+/* Pagefind UI 커스텀 스타일 */
+.pagefind-ui__search-input {
+  background-color: var(--pagefind-ui-background) !important;
+  color: var(--pagefind-ui-text) !important;
+  border-color: var(--pagefind-ui-border) !important;
+}
+
+.pagefind-ui__search-input::placeholder {
+  color: hsl(215.4, 16.3%, 46.9%) !important;
+}
+
+.dark .pagefind-ui__search-input::placeholder {
+  color: hsl(215, 20.2%, 65.1%) !important;
+}
+
+.pagefind-ui__result {
+  background-color: var(--pagefind-ui-background) !important;
+  border-color: var(--pagefind-ui-border) !important;
+}
+
+.pagefind-ui__result-title,
+.pagefind-ui__result-excerpt {
+  color: var(--pagefind-ui-text) !important;
+}
+
+.pagefind-ui__result-link {
+  color: var(--pagefind-ui-primary) !important;
+}
+
+.pagefind-ui__result:hover {
+  background-color: var(--pagefind-ui-tag) !important;
+}
+
+.pagefind-ui__message {
+  color: var(--pagefind-ui-text) !important;
+}
+
+.pagefind-ui__result-tag {
+  background-color: var(--pagefind-ui-tag) !important;
+  color: var(--pagefind-ui-text) !important;
+  border-color: var(--pagefind-ui-border) !important;
+}
