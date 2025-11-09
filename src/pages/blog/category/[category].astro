@@ -91,7 +91,7 @@ const label = categoryLabels[category] || category;
     <div class="posts-grid">
       {posts.map((post) => (
         <article class="post-card">
-          <a href={`/experimental/blog/${post.id}`}>
+          <a href={`/blog/${post.id}`}>
             <div class="post-card-header">
               <h2 class="post-card-title">{post.data.title}</h2>
               <time class="post-card-date" datetime={post.data.date.toISOString()}>

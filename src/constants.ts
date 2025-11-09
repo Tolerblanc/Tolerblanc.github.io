@@ -10,7 +10,7 @@ export const SITE_CONFIG = {
   TITLE: '인생은 B와 D사이 Code다',
   DESCRIPTION: 'Tolerblanc의 기술 블로그',
   URL: 'https://tolerblanc.github.io',
-  BASE_PATH: '/experimental',
+  BASE_PATH: '',
   AUTHOR: 'Tolerblanc',
   LANG: 'ko' as const,
 } as const;

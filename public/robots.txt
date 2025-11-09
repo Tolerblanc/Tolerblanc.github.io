@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tolerblanc.github.io/experimental/sitemap-index.xml
+Sitemap: https://tolerblanc.github.io/sitemap-index.xml

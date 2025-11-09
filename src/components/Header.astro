@@ -4,17 +4,17 @@ import { Search } from './Search';
 const currentPath = Astro.url.pathname;
 
 const navItems = [
-  { href: '/experimental', label: 'Home' },
-  { href: '/experimental/blog', label: 'Blog' },
-  { href: '/experimental/tags', label: 'Tags' },
-  { href: '/experimental/about', label: 'About' },
+  { href: '/', label: 'Home' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/tags', label: 'Tags' },
+  { href: '/about', label: 'About' },
 ];
 ---
 
 <header class="header">
   <nav class="nav-container">
     <div class="nav-left">
-      <a href="/experimental" class="logo">
+      <a href="/" class="logo">
         <span class="logo-text">인생은 B와 D사이 Code다</span>
       </a>
     </div>

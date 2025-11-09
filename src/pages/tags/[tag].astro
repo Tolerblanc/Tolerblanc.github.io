@@ -44,7 +44,7 @@ const { tag, posts } = Astro.props;
     <div class="posts-list">
       {posts.map((post) => (
         <article class="post-item">
-          <a href={`/experimental/blog/${post.id}`}>
+          <a href={`/blog/${post.id}`}>
             <div class="post-main">
               <h2 class="post-title">{post.data.title}</h2>
               {post.data.excerpt && (

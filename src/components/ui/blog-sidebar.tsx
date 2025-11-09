@@ -142,7 +142,7 @@ export function BlogSidebar({ recentPosts, categoryGroups, currentCategory }: Bl
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <a
-              href="/experimental"
+              href="/"
               className="flex items-center gap-2 text-lg font-bold hover:text-primary transition-colors"
             >
               <HomeIcon className="h-5 w-5" />
@@ -197,7 +197,7 @@ export function BlogSidebar({ recentPosts, categoryGroups, currentCategory }: Bl
                     {recentPosts.map((post) => (
                       <a
                         key={post.slug}
-                        href={`/experimental/blog/${post.slug}`}
+                        href={`/blog/${post.slug}`}
                         className="block p-2 rounded-md hover:bg-accent transition-colors"
                       >
                         <div className="text-sm font-medium line-clamp-2 mb-1">

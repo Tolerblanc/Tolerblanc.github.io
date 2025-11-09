@@ -27,7 +27,7 @@ export function BlogPostCard({
 }: BlogPostCardProps) {
   return (
     <Card className={cn("group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-primary/50", className)}>
-      <a href={`/experimental/blog/${slug}`} className="block">
+      <a href={`/blog/${slug}`} className="block">
         <CardHeader>
           <div className="flex items-start justify-between gap-2 mb-2">
             {categories.length > 0 && (

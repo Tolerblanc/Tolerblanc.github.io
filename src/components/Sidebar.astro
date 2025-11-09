@@ -17,7 +17,7 @@ const currentCategory = currentPath.includes('/blog/category/')
   <!-- 사이드바 컨트롤 -->
   <!-- Compact Profile -->
   <div class="sidebar-profile">
-    <a href="/experimental" class="profile-link" aria-label="홈으로 이동">
+    <a href="/" class="profile-link" aria-label="홈으로 이동">
       <div class="profile-avatar">
         <span class="avatar-initial">T</span>
       </div>
@@ -45,7 +45,7 @@ const currentCategory = currentPath.includes('/blog/category/')
         {recentPosts.map(post => (
           <li>
             <a
-              href={`/experimental/blog/${post.slug}`}
+              href={`/blog/${post.slug}`}
               class="recent-post-link"
             >
               <span class="post-title">{post.title}</span>

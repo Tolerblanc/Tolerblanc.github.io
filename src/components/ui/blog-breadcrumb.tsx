@@ -24,7 +24,7 @@ export function BlogBreadcrumb({ segments, className }: BlogBreadcrumbProps) {
     <Breadcrumb className={className}>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/experimental" className="flex items-center gap-1">
+          <BreadcrumbLink href="/" className="flex items-center gap-1">
             <HomeIcon className="h-3.5 w-3.5" />
             <span>Home</span>
           </BreadcrumbLink>
