@@ -10,7 +10,18 @@
 <script>
   function initReadingProgress() {
     const progressBar = document.querySelector('.reading-progress-bar') as HTMLElement;
-    if (!progressBar) return;
+    const progressContainer = document.querySelector('.reading-progress') as HTMLElement;
+    if (!progressBar || !progressContainer) return;
+
+    // Check if sidebar exists in the DOM
+    const hasSidebar = document.querySelector('.sidebar') !== null;
+
+    // Adjust position based on sidebar presence
+    if (hasSidebar) {
+      progressContainer.style.left = 'var(--layout-sidebar-width)';
+    } else {
+      progressContainer.style.left = '0';
+    }
 
     function updateProgress() {
       const windowHeight = window.innerHeight;
@@ -46,7 +57,7 @@
   .reading-progress {
     position: fixed;
     top: var(--layout-header-height);
-    left: var(--layout-sidebar-width);
+    left: 0;
     right: 0;
     height: 3px;
     background-color: var(--color-border-primary);
@@ -73,10 +84,10 @@
     }
   }
 
-  /* Mobile: 전체 너비 */
+  /* Mobile: Reset to full width */
   @media (max-width: 768px) {
     .reading-progress {
-      left: 0;
+      left: 0 !important; /* Override JavaScript adjustment on mobile */
     }
   }
 </style>
