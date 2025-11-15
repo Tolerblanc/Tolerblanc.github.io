@@ -20,6 +20,7 @@ import CodeCopyButton from '@/components/CodeCopyButton.astro';
 import ScrollToTop from '@/components/ScrollToTop.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
+import SeriesNavigation from '@/components/SeriesNavigation.astro';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -127,6 +128,9 @@ const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3))
           }
         </div>
       </header>
+
+      <!-- Series Navigation -->
+      {series && <SeriesNavigation currentPost={post} />}
 
       <!-- Main Content -->
       <main class="post-content prose prose-lg dark:prose-invert">

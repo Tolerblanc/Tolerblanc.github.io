@@ -1,0 +1,117 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SeriesCard } from '@/components/ui/series-card';
+import { Separator } from '@/components/ui/separator';
+import { BookOpen } from 'lucide-react';
+
+// 모든 포스트 가져오기
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// 시리즈별로 그룹화
+interface SeriesInfo {
+  name: string;
+  posts: typeof allPosts;
+  slug: string;
+  description: string;
+  category?: string;
+  lastUpdated: Date;
+}
+
+const seriesMap = new Map<string, SeriesInfo>();
+
+allPosts.forEach(post => {
+  if (post.data.series) {
+    const seriesName = post.data.series.name;
+
+    if (!seriesMap.has(seriesName)) {
+      // slug 생성 (공백을 하이픈으로 변환하고 소문자로)
+      const slug = seriesName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-가-힣]/g, '');
+
+      seriesMap.set(seriesName, {
+        name: seriesName,
+        posts: [],
+        slug,
+        description: '',
+        category: post.data.categories[0],
+        lastUpdated: post.data.date,
+      });
+    }
+
+    const series = seriesMap.get(seriesName)!;
+    series.posts.push(post);
+
+    // 가장 최근 업데이트 날짜 추적
+    if (post.data.date > series.lastUpdated) {
+      series.lastUpdated = post.data.date;
+    }
+  }
+});
+
+// 시리즈별로 포스트 정렬 및 설명 생성
+const seriesList = Array.from(seriesMap.values()).map(series => {
+  // 포스트를 order 순으로 정렬
+  series.posts.sort((a, b) =>
+    (a.data.series?.order || 0) - (b.data.series?.order || 0)
+  );
+
+  // 첫 번째 포스트의 excerpt를 시리즈 설명으로 사용
+  if (series.posts.length > 0) {
+    series.description = series.posts[0].data.excerpt;
+  }
+
+  return series;
+});
+
+// 마지막 업데이트 날짜 순으로 정렬
+seriesList.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime());
+
+const title = "시리즈 - Tolerblanc's Blog";
+const description = "연재 중인 시리즈 목록";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header -->
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+        <BookOpen size={40} />
+        시리즈
+      </h1>
+      <p class="text-lg text-muted-foreground">
+        총 {seriesList.length}개의 시리즈
+      </p>
+    </header>
+
+    <Separator className="mb-8" />
+
+    <!-- Series Grid -->
+    {seriesList.length === 0 ? (
+      <div class="text-center py-16 text-muted-foreground">
+        <BookOpen size={48} className="mx-auto mb-4 opacity-50" />
+        <p>아직 등록된 시리즈가 없습니다.</p>
+      </div>
+    ) : (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {seriesList.map((series) => (
+          <SeriesCard
+            name={series.name}
+            description={series.description}
+            slug={series.slug}
+            postCount={series.posts.length}
+            category={series.category}
+            lastUpdated={series.lastUpdated}
+            client:load
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  /* 추가 스타일이 필요하면 여기에 작성 */
+</style>
