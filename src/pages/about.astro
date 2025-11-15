@@ -7,145 +7,68 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   description="Tolerblanc 소개 및 블로그 정보"
   currentPath={Astro.url.pathname}
 >
-  <div class="about-page">
-    <header class="about-header">
-      <h1 class="about-title">👤 About</h1>
-      <p class="about-subtitle">Tolerblanc's Tech Blog</p>
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    <header class="text-center mb-12 pb-8 border-b-2 border-gray-300 dark:border-gray-700">
+      <h1 class="text-4xl font-black text-gray-900 dark:text-gray-100 mb-2">👤 About</h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400">Tolerblanc's Tech Blog</p>
     </header>
 
-    <div class="about-content">
-      <section class="about-section">
-        <h2>인생은 B와 D사이 Code다</h2>
-        <p>
+    <div class="flex flex-col gap-10">
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">인생은 B와 D사이 Code다</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
           개인 공부 기록용 기술 블로그입니다. 웹 개발, 알고리즘, CS 기초 등
           다양한 주제를 다루고 있습니다.
         </p>
       </section>
 
-      <section class="about-section">
-        <h2>🚧 현재 진행 중</h2>
-        <p>Jekyll → Astro 마이그레이션 실험 버전입니다.</p>
-        <ul>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">🚧 현재 진행 중</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">Jekyll → Astro 마이그레이션 실험 버전입니다.</p>
+        <ul class="list-disc pl-6 text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
           <li>✅ Phase 1-3 완료: 기본 인프라, 콘텐츠 시스템, 핵심 기능</li>
           <li>🔄 Phase 4 진행 중: 네비게이션 UI</li>
           <li>⏳ Phase 5 예정: 최적화 및 검증</li>
         </ul>
       </section>
 
-      <section class="about-section">
-        <h2>📬 Contact</h2>
-        <ul class="contact-list">
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">📬 Contact</h2>
+        <ul class="list-none pl-0 space-y-2">
           <li>
-            <a href="https://github.com/Tolerblanc" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://github.com/Tolerblanc"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:underline transition-colors"
+            >
               GitHub: @Tolerblanc
             </a>
           </li>
           <li>
-            <a href="https://tolerblanc.github.io" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://tolerblanc.github.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:underline transition-colors"
+            >
               Main Blog: tolerblanc.github.io
             </a>
           </li>
         </ul>
       </section>
 
-      <section class="about-section">
-        <h2>⚡ Tech Stack</h2>
-        <div class="tech-stack">
-          <span class="tech-badge">Astro 5.x</span>
-          <span class="tech-badge">TypeScript</span>
-          <span class="tech-badge">MDX</span>
-          <span class="tech-badge">Tailwind CSS</span>
-          <span class="tech-badge">KaTeX</span>
-          <span class="tech-badge">Giscus</span>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">⚡ Tech Stack</h2>
+        <div class="flex flex-wrap gap-3">
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">Astro 5.x</span>
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">TypeScript</span>
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">MDX</span>
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">Tailwind CSS</span>
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">KaTeX</span>
+          <span class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full text-sm font-semibold">Giscus</span>
         </div>
       </section>
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .about-page {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .about-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #333;
-  }
-
-  .about-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .about-subtitle {
-    font-size: 1.25rem;
-    color: #9ca3af;
-  }
-
-  .about-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-  }
-
-  .about-section h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 1rem;
-  }
-
-  .about-section p {
-    color: #d1d5db;
-    line-height: 1.8;
-    margin-bottom: 1rem;
-  }
-
-  .about-section ul {
-    list-style: disc;
-    padding-left: 1.5rem;
-    color: #d1d5db;
-    line-height: 1.8;
-  }
-
-  .about-section li {
-    margin-bottom: 0.5rem;
-  }
-
-  .contact-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .contact-list a {
-    color: #60a5fa;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .contact-list a:hover {
-    color: #93c5fd;
-    text-decoration: underline;
-  }
-
-  .tech-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .tech-badge {
-    padding: 0.5rem 1rem;
-    background: #1e40af;
-    color: #fff;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-</style>
