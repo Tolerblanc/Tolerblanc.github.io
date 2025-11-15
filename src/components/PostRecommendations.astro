@@ -1,0 +1,242 @@
+---
+/**
+ * Post Recommendations Component
+ *
+ * 현재 게시글과 관련된 다른 게시글을 추천합니다.
+ *
+ * 추천 로직:
+ * 1. 같은 카테고리의 게시글 우선
+ * 2. 같은 태그를 많이 공유하는 게시글
+ * 3. 최대 3개까지 표시
+ */
+
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { formatDateShort } from '@/utils/formatDate';
+import { calculateReadingTime } from '@/utils/readingTime';
+
+interface Props {
+  currentPost: CollectionEntry<'blog'>;
+}
+
+const { currentPost } = Astro.props;
+
+// 모든 게시글 가져오기 (초안 제외)
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// 현재 게시글을 제외한 게시글들
+const otherPosts = allPosts.filter((post) => post.id !== currentPost.id);
+
+// 추천 점수 계산 함수
+function calculateRecommendationScore(post: CollectionEntry<'blog'>): number {
+  let score = 0;
+
+  // 같은 카테고리면 높은 점수
+  const sharedCategories = post.data.categories.filter((cat) =>
+    currentPost.data.categories.includes(cat)
+  );
+  score += sharedCategories.length * 10;
+
+  // 같은 태그면 점수 추가
+  const sharedTags = post.data.tags.filter((tag) => currentPost.data.tags.includes(tag));
+  score += sharedTags.length * 3;
+
+  // 최신 게시글에 약간의 보너스 (시간이 가까울수록 높은 점수)
+  const daysDiff = Math.abs(
+    (new Date(post.data.date).getTime() - new Date(currentPost.data.date).getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+  score += Math.max(0, 5 - daysDiff / 30); // 30일마다 1점 감소
+
+  return score;
+}
+
+// 추천 게시글 계산
+const recommendedPosts = otherPosts
+  .map((post) => ({
+    post,
+    score: calculateRecommendationScore(post),
+  }))
+  .filter(({ score }) => score > 0) // 점수가 있는 것만
+  .sort((a, b) => b.score - a.score) // 점수 높은 순
+  .slice(0, 3) // 최대 3개
+  .map(({ post }) => ({
+    ...post,
+    readingTime: calculateReadingTime(post.body || ''),
+  }));
+
+// 추천할 게시글이 없으면 컴포넌트를 렌더링하지 않음
+if (recommendedPosts.length === 0) {
+  return null;
+}
+---
+
+<section class="post-recommendations">
+  <h2 class="recommendations-title">추천 게시글</h2>
+  <p class="recommendations-subtitle">이 글과 관련된 다른 게시글을 확인해보세요</p>
+
+  <div class="recommendations-grid">
+    {
+      recommendedPosts.map((post) => (
+        <a href={`/${post.id}`} class="recommendation-card">
+          <div class="card-content">
+            <div class="card-categories">
+              {post.data.categories.map((cat) => (
+                <span class="category-badge">{cat}</span>
+              ))}
+            </div>
+
+            <h3 class="card-title">{post.data.title}</h3>
+
+            <p class="card-excerpt">{post.data.excerpt}</p>
+
+            <div class="card-meta">
+              <time datetime={new Date(post.data.date).toISOString()}>
+                {formatDateShort(post.data.date)}
+              </time>
+              <span class="meta-separator">·</span>
+              <span>{post.readingTime}</span>
+            </div>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .post-recommendations {
+    margin-top: var(--spacing-16);
+    margin-bottom: var(--spacing-12);
+    padding-top: var(--spacing-12);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .recommendations-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.02em;
+  }
+
+  .recommendations-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--spacing-8);
+  }
+
+  .recommendations-grid {
+    display: grid;
+    gap: var(--spacing-6);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .recommendations-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .recommendations-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .recommendation-card {
+    display: block;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    height: 100%;
+  }
+
+  .recommendation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--color-accent-primary);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: var(--spacing-1) var(--spacing-3);
+    background-color: var(--color-accent-primary);
+    color: var(--color-bg-primary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-full);
+    line-height: 1.4;
+  }
+
+  .card-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-3);
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.01em;
+    word-break: keep-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-excerpt {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--spacing-4);
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    margin-top: auto;
+  }
+
+  .meta-separator {
+    color: var(--color-text-tertiary);
+  }
+
+  /* 반응형 */
+  @media (max-width: 640px) {
+    .post-recommendations {
+      margin-top: var(--spacing-12);
+      padding-top: var(--spacing-8);
+    }
+
+    .recommendations-title {
+      font-size: var(--font-size-xl);
+    }
+
+    .recommendation-card {
+      padding: var(--spacing-5);
+    }
+  }
+</style>
