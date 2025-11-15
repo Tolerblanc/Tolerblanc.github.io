@@ -20,6 +20,7 @@ import CodeCopyButton from '@/components/CodeCopyButton.astro';
 import ScrollToTop from '@/components/ScrollToTop.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
+import PostRecommendations from '@/components/PostRecommendations.astro';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -135,6 +136,9 @@ const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3))
 
       <!-- Comments Section -->
       <GiscusComments />
+
+      <!-- Recommended Posts -->
+      <PostRecommendations currentPost={post} />
 
       <!-- Footer -->
       <footer class="post-footer">
