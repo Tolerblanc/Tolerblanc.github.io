@@ -3,11 +3,10 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { BlogPostCard } from '@/components/ui/blog-post-card';
+import { SeriesPostList } from '@/components/ui/series-post-list';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, List } from 'lucide-react';
-import { calculateReadingTime } from '@/utils/readingTime';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -70,7 +69,7 @@ const category = posts[0]?.data.categories[0];
 <BaseLayout title={title} description={description}>
   <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Header -->
-    <header class="mb-12">
+    <header class="mb-8">
       <div class="flex items-center gap-2 mb-4">
         <a
           href="/series"
@@ -103,41 +102,16 @@ const category = posts[0]?.data.categories[0];
 
     <!-- Series Description -->
     {posts[0] && (
-      <div class="mb-12 p-6 rounded-lg bg-muted/30 border">
-        <h2 class="text-lg font-semibold mb-2">시리즈 소개</h2>
-        <p class="text-muted-foreground">
+      <div class="mb-10 p-5 rounded-lg bg-muted/30 border">
+        <h2 class="text-base font-semibold mb-3 text-foreground">시리즈 소개</h2>
+        <p class="text-muted-foreground leading-relaxed">
           {posts[0].data.excerpt}
         </p>
       </div>
     )}
 
-    <!-- Posts List -->
-    <div class="space-y-6">
-      <h2 class="text-2xl font-bold mb-6">전체 포스트</h2>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post, index) => (
-          <div class="relative">
-            {/* Series Order Badge */}
-            <div class="absolute -left-2 -top-2 z-10">
-              <div class="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-md">
-                {index + 1}
-              </div>
-            </div>
-
-            <BlogPostCard
-              title={post.data.title}
-              excerpt={post.data.excerpt}
-              date={post.data.date}
-              slug={post.id}
-              categories={post.data.categories}
-              tags={post.data.tags}
-              readingTime={post.body ? calculateReadingTime(post.body) : '1분'}
-              client:load
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+    <!-- Posts List with Sort -->
+    <SeriesPostList posts={posts} client:load />
 
     <!-- Back to Series List -->
     <div class="mt-12 text-center">

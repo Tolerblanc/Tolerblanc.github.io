@@ -20,7 +20,8 @@ import CodeCopyButton from '@/components/CodeCopyButton.astro';
 import ScrollToTop from '@/components/ScrollToTop.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
-import SeriesNavigation from '@/components/SeriesNavigation.astro';
+import { SeriesNavigation } from '@/components/ui/series-navigation';
+import { getCollection } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -42,6 +43,34 @@ const formatDate = (date: Date) => {
 
 // TOC를 위한 필터링된 헤딩 (tocDepth에 따라)
 const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3));
+
+// 시리즈 데이터 준비
+let seriesData = null;
+if (series) {
+  const allPosts = await getCollection('blog', ({ data }) =>
+    !data.draft && data.series?.name === series.name
+  );
+
+  const sortedPosts = allPosts
+    .sort((a, b) => (a.data.series?.order || 0) - (b.data.series?.order || 0))
+    .map(p => ({
+      id: p.id,
+      title: p.data.title,
+      order: p.data.series?.order || 0
+    }));
+
+  const seriesSlug = series.name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-가-힣]/g, '');
+
+  seriesData = {
+    seriesName: series.name,
+    seriesSlug,
+    posts: sortedPosts,
+    currentPostId: post.id
+  };
+}
 ---
 
 <BaseLayout title={`${title} | Tolerblanc's Blog`} description={description || excerpt}>
@@ -130,7 +159,15 @@ const tocHeadings = headings.filter((h) => h.depth <= (post.data.tocDepth || 3))
       </header>
 
       <!-- Series Navigation -->
-      {series && <SeriesNavigation currentPost={post} />}
+      {seriesData && (
+        <SeriesNavigation
+          seriesName={seriesData.seriesName}
+          seriesSlug={seriesData.seriesSlug}
+          posts={seriesData.posts}
+          currentPostId={seriesData.currentPostId}
+          client:load
+        />
+      )}
 
       <!-- Main Content -->
       <main class="post-content prose prose-lg dark:prose-invert">
