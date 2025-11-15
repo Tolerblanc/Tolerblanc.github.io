@@ -249,9 +249,9 @@ if (series) {
       display: block;
       flex: 0 0 var(--layout-sidebar-width); /* 256px 고정 */
       position: sticky;
-      top: calc(var(--layout-header-height) + var(--spacing-6));
+      top: calc(var(--layout-header-height) + var(--spacing-2)); /* 테마 토글과 정렬 */
       height: fit-content;
-      max-height: calc(100vh - var(--layout-header-height) - var(--spacing-12));
+      max-height: calc(100vh - var(--layout-header-height) - var(--spacing-6));
       align-self: flex-start; /* sticky가 제대로 동작하도록 */
     }
   }
