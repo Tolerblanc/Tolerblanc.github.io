@@ -1,0 +1,268 @@
+---
+/**
+ * Series Navigation Component
+ *
+ * 시리즈 포스트의 전체 목록과 현재 포스트 위치를 표시하는 컴포넌트
+ */
+
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { BookOpen, ChevronRight } from 'lucide-react';
+
+interface Props {
+  currentPost: CollectionEntry<'blog'>;
+}
+
+const { currentPost } = Astro.props;
+const series = currentPost.data.series;
+
+if (!series) {
+  return null;
+}
+
+// 같은 시리즈의 모든 포스트 가져오기
+const allPosts = await getCollection('blog', ({ data }) =>
+  !data.draft && data.series?.name === series.name
+);
+
+// order 순으로 정렬
+const sortedPosts = allPosts.sort((a, b) =>
+  (a.data.series?.order || 0) - (b.data.series?.order || 0)
+);
+
+// 시리즈 slug 생성
+const seriesSlug = series.name
+  .toLowerCase()
+  .replace(/\s+/g, '-')
+  .replace(/[^\w\-가-힣]/g, '');
+---
+
+<div class="series-navigation">
+  <div class="series-header">
+    <div class="series-title-container">
+      <BookOpen className="series-icon" size={20} />
+      <div class="series-title-text">
+        <a href={`/series/${seriesSlug}`} class="series-title-link">
+          {series.name}
+        </a>
+        <span class="series-subtitle">
+          {sortedPosts.length}편의 시리즈
+        </span>
+      </div>
+    </div>
+    <a href={`/series/${seriesSlug}`} class="view-all-link">
+      전체보기
+      <ChevronRight size={16} />
+    </a>
+  </div>
+
+  <div class="series-posts-list">
+    {sortedPosts.map((post, index) => {
+      const isCurrent = post.id === currentPost.id;
+      const postUrl = `/${post.id}`;
+
+      return (
+        <a
+          href={postUrl}
+          class={`series-post-item ${isCurrent ? 'current' : ''}`}
+          aria-current={isCurrent ? 'page' : undefined}
+        >
+          <div class="post-order">{index + 1}</div>
+          <div class="post-info">
+            <div class="post-title">{post.data.title}</div>
+            {isCurrent && <div class="current-badge">현재 글</div>}
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .series-navigation {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin: var(--spacing-8) 0;
+  }
+
+  /* ===== 시리즈 헤더 ===== */
+  .series-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .series-title-container {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    flex: 1;
+  }
+
+  .series-icon {
+    color: var(--color-accent-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .series-title-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .series-title-link {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .series-title-link:hover {
+    color: var(--color-accent-primary);
+  }
+
+  .series-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+  }
+
+  .view-all-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-accent-primary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+  }
+
+  .view-all-link:hover {
+    color: var(--color-accent-secondary);
+    gap: var(--spacing-2);
+  }
+
+  /* ===== 포스트 목록 ===== */
+  .series-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .series-post-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+  }
+
+  .series-post-item:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-primary);
+  }
+
+  .series-post-item.current {
+    background: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+  }
+
+  .post-order {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+  }
+
+  .series-post-item.current .post-order {
+    background: var(--color-bg-primary);
+    color: var(--color-accent-primary);
+  }
+
+  .post-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+  }
+
+  .post-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    transition: color var(--transition-fast);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .series-post-item:hover .post-title {
+    color: var(--color-accent-primary);
+  }
+
+  .series-post-item.current .post-title {
+    color: var(--color-bg-primary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .current-badge {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-bg-primary);
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+
+  /* ===== 반응형 ===== */
+  @media (max-width: 640px) {
+    .series-navigation {
+      padding: var(--spacing-4);
+    }
+
+    .series-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .view-all-link {
+      align-self: flex-end;
+    }
+
+    .post-title {
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    .series-post-item {
+      align-items: flex-start;
+    }
+
+    .post-order {
+      margin-top: 2px;
+    }
+  }
+</style>

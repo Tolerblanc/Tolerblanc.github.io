@@ -1,0 +1,131 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SeriesPostList } from '@/components/ui/series-post-list';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, List } from 'lucide-react';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+  // 시리즈별로 그룹화
+  const seriesMap = new Map<string, {
+    name: string;
+    posts: CollectionEntry<'blog'>[];
+  }>();
+
+  allPosts.forEach(post => {
+    if (post.data.series) {
+      const seriesName = post.data.series.name;
+
+      if (!seriesMap.has(seriesName)) {
+        seriesMap.set(seriesName, {
+          name: seriesName,
+          posts: [],
+        });
+      }
+
+      seriesMap.get(seriesName)!.posts.push(post);
+    }
+  });
+
+  // 각 시리즈에 대한 경로 생성
+  return Array.from(seriesMap.entries()).map(([_, series]) => {
+    const slug = series.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-가-힣]/g, '');
+
+    // 포스트를 order 순으로 정렬
+    series.posts.sort((a, b) =>
+      (a.data.series?.order || 0) - (b.data.series?.order || 0)
+    );
+
+    return {
+      params: { slug },
+      props: { series },
+    };
+  });
+};
+
+type Props = {
+  series: {
+    name: string;
+    posts: CollectionEntry<'blog'>[];
+  };
+};
+
+const { series } = Astro.props;
+const { name, posts } = series;
+
+const title = `${name} - Tolerblanc's Blog`;
+const description = `${name} 시리즈의 모든 포스트`;
+const category = posts[0]?.data.categories[0];
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header -->
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <a
+          href="/series"
+          class="text-muted-foreground hover:text-primary transition-colors text-sm flex items-center gap-1"
+        >
+          <BookOpen size={16} />
+          시리즈
+        </a>
+        <span class="text-muted-foreground">/</span>
+        <span class="text-sm text-muted-foreground">{name}</span>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold mb-3">
+            {name}
+          </h1>
+          <div class="flex items-center gap-3">
+            {category && <Badge variant="secondary">{category}</Badge>}
+            <div class="flex items-center gap-1 text-muted-foreground">
+              <List size={16} />
+              <span>{posts.length}편</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <Separator className="mb-8" />
+
+    <!-- Series Description -->
+    {posts[0] && (
+      <div class="mb-10 p-5 rounded-lg bg-muted/30 border">
+        <h2 class="text-base font-semibold mb-3 text-foreground">시리즈 소개</h2>
+        <p class="text-muted-foreground leading-relaxed">
+          {posts[0].data.excerpt}
+        </p>
+      </div>
+    )}
+
+    <!-- Posts List with Sort -->
+    <SeriesPostList posts={posts} client:load />
+
+    <!-- Back to Series List -->
+    <div class="mt-12 text-center">
+      <a
+        href="/series"
+        class="inline-flex items-center gap-2 text-primary hover:underline"
+      >
+        <BookOpen size={20} />
+        모든 시리즈 보기
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* 추가 스타일이 필요하면 여기에 작성 */
+</style>
