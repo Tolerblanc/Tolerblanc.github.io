@@ -51,7 +51,7 @@ export function BlogPostCard({
             {excerpt}
           </CardDescription>
         </CardContent>
-        <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col items-start gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <CalendarIcon className="h-3.5 w-3.5" />
             <time dateTime={date.toISOString()}>
@@ -64,14 +64,14 @@ export function BlogPostCard({
           </div>
           {tags.length > 0 && (
             <div className="flex gap-1 flex-wrap">
-              {tags.slice(0, 2).map((tag) => (
+              {tags.slice(0, 3).map((tag) => (
                 <Badge key={tag} variant="outline" className="text-xs">
                   #{tag}
                 </Badge>
               ))}
-              {tags.length > 2 && (
+              {tags.length > 3 && (
                 <Badge variant="outline" className="text-xs">
-                  +{tags.length - 2}
+                  +{tags.length - 3}
                 </Badge>
               )}
             </div>
