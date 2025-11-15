@@ -10,17 +10,44 @@
  * - category: Announcements
  * - categoryId: DIC_kwDOJ01Eac4Cerab
  * - mapping: pathname (URL 기반 매핑으로 기존 댓글 유지)
- * - theme: dark_dimmed (다크 테마)
+ * - theme: 동적 (light ↔ dark_dimmed)
  * - lang: ko (한국어)
  *
  * ⚠️ View Transitions 호환성:
  * astro:page-load 이벤트를 활용하여 페이지 전환 시에도 Giscus를 재초기화합니다.
+ *
+ * 🎨 테마 동기화:
+ * 블로그의 라이트/다크 모드에 따라 Giscus 테마도 자동으로 전환됩니다.
  */
 ---
 
 <div class="giscus-wrapper" id="giscus-container"></div>
 
 <script>
+  // 현재 테마에 맞는 Giscus 테마 반환
+  function getGiscusTheme() {
+    const isDark = document.documentElement.classList.contains('dark');
+    return isDark ? 'dark_dimmed' : 'light';
+  }
+
+  // Giscus iframe에 테마 변경 메시지 전송
+  function updateGiscusTheme() {
+    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+    if (!iframe) return;
+
+    const theme = getGiscusTheme();
+    iframe.contentWindow?.postMessage(
+      {
+        giscus: {
+          setConfig: {
+            theme: theme,
+          },
+        },
+      },
+      'https://giscus.app'
+    );
+  }
+
   function loadGiscus() {
     const container = document.getElementById('giscus-container');
     if (!container) return;
@@ -37,6 +64,9 @@
       existingScript.remove();
     }
 
+    // 현재 테마에 맞는 Giscus 테마 설정
+    const theme = getGiscusTheme();
+
     // 새로운 Giscus 스크립트 생성
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
@@ -49,7 +79,7 @@
     script.setAttribute('data-reactions-enabled', '1');
     script.setAttribute('data-emit-metadata', '0');
     script.setAttribute('data-input-position', 'bottom');
-    script.setAttribute('data-theme', 'dark_dimmed');
+    script.setAttribute('data-theme', theme);
     script.setAttribute('data-lang', 'ko');
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
@@ -62,6 +92,22 @@
 
   // View Transitions 페이지 전환 시 재초기화
   document.addEventListener('astro:page-load', loadGiscus);
+
+  // 테마 변경 감지 (MutationObserver 사용)
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        // 테마가 변경되면 Giscus도 업데이트
+        updateGiscusTheme();
+      }
+    });
+  });
+
+  // <html> 요소의 class 속성 변화 감지
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
 </script>
 
 <style>

@@ -3,6 +3,10 @@ dist/
 .astro/
 node_modules/
 
+# Package managers (pnpm만 사용)
+package-lock.json
+yarn.lock
+
 # System
 .DS_Store
 

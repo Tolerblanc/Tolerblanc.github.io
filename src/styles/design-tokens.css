@@ -96,7 +96,7 @@
 
   /* ===== 레이아웃 시스템 ===== */
   --layout-sidebar-width: 256px;
-  --layout-content-width: 800px;  /* 672px → 800px (가독성 향상) */
+  --layout-content-width: 900px;  /* 800px → 900px (가독성 향상) */
   --layout-header-height: 64px;
   --layout-max-content-width: 1280px;
   --layout-container-padding: var(--spacing-6);

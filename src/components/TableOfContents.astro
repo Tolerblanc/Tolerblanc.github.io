@@ -200,8 +200,8 @@ const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 <style>
   .toc {
     position: sticky;
-    top: calc(var(--layout-header-height) + var(--spacing-6)); /* header + spacing */
-    max-height: calc(100vh - var(--layout-header-height) - var(--spacing-12)); /* 화면 높이 - header - 여유 공간 */
+    top: calc(var(--layout-header-height) + var(--spacing-2)); /* header + 8px (테마 토글과 정렬) */
+    max-height: calc(100vh - var(--layout-header-height) - var(--spacing-6)); /* 화면 높이 - header - 여유 공간 */
     overflow-y: auto;
     padding: var(--spacing-4);
     background-color: var(--color-bg-secondary);
