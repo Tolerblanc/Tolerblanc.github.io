@@ -103,3 +103,17 @@ export const DATE_FORMAT = {
   SHORT: 'YYYY.MM.DD',
   ISO: 'YYYY-MM-DD',
 } as const;
+
+// ===== 인기 글 (수동 관리) =====
+/**
+ * Google Analytics 조회수 기준 인기 글 목록
+ * 주기적으로 GA 데이터를 확인하여 수동으로 업데이트
+ *
+ * ⚠️ 주의: Astro glob loader는 파일 ID를 소문자로 변환합니다.
+ * 예: python-for-PS.mdx → python/python-for-ps
+ */
+export const POPULAR_POSTS = [
+  'review/toss-next-developer-challenge',
+  'programmers/programmers-mountain-tiling',
+  'python/python-for-ps',  // 소문자로 수정
+] as const;
