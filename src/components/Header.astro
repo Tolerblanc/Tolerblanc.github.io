@@ -1,5 +1,7 @@
 ---
 import { Search } from './Search';
+import { MobileMenu } from './MobileMenu';
+import { getNavigationCategoryGroups, getRecentPosts } from '@/utils/navigation';
 
 const currentPath = Astro.url.pathname;
 
@@ -10,16 +12,42 @@ const navItems = [
   { href: '/tags', label: 'Tags' },
   { href: '/about', label: 'About' },
 ];
+
+// 모바일 메뉴를 위한 데이터
+const categoryGroups = await getNavigationCategoryGroups();
+const recentPosts = await getRecentPosts();
+
+// 날짜 포맷팅
+const formattedRecentPosts = recentPosts.map(post => ({
+  slug: post.slug,
+  title: post.title,
+  date: post.date.toLocaleDateString('ko-KR', {
+    month: 'short',
+    day: 'numeric'
+  })
+}));
 ---
 
 <header class="header">
   <nav class="nav-container">
     <div class="nav-left">
+      <!-- Mobile Menu (모바일에서만 표시) -->
+      <div class="mobile-menu-wrapper">
+        <MobileMenu
+          currentPath={currentPath}
+          recentPosts={formattedRecentPosts}
+          categoryGroups={categoryGroups}
+          client:load
+        />
+      </div>
+
+      <!-- Logo -->
       <a href="/" class="logo">
         <span class="logo-text">인생은 B와 D사이 Code다</span>
       </a>
     </div>
 
+    <!-- Desktop Navigation (데스크톱에서만 표시) -->
     <div class="nav-center">
       <ul class="nav-links">
         {navItems.map(item => (
@@ -150,7 +178,14 @@ const navItems = [
   }
 
   .nav-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
     flex-shrink: 0;
+  }
+
+  .mobile-menu-wrapper {
+    display: none;
   }
 
   .logo {
@@ -259,10 +294,44 @@ const navItems = [
     display: none;
   }
 
-  /* Mobile: 헤더가 전체 너비 차지 */
+  /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
     .header {
       left: 0;
+      padding: 0;
+    }
+
+    .nav-container {
+      padding: 0 var(--spacing-4);
+    }
+
+    .mobile-menu-wrapper {
+      display: block;
+    }
+
+    .logo-text {
+      display: inline;
+      font-size: var(--font-size-base);
+    }
+
+    /* 데스크톱 네비게이션 숨기기 */
+    .nav-center {
+      display: none;
+    }
+  }
+
+  /* 작은 모바일 화면 */
+  @media (max-width: 480px) {
+    .logo-text {
+      font-size: var(--font-size-sm);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .nav-container {
+      padding: 0 var(--spacing-3);
     }
   }
 </style>

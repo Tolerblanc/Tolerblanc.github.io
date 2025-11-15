@@ -12,14 +12,32 @@
  * - mapping: pathname (URL 기반 매핑으로 기존 댓글 유지)
  * - theme: dark_dimmed (다크 테마)
  * - lang: ko (한국어)
+ *
+ * ⚠️ View Transitions 호환성:
+ * astro:page-load 이벤트를 활용하여 페이지 전환 시에도 Giscus를 재초기화합니다.
  */
 ---
 
 <div class="giscus-wrapper" id="giscus-container"></div>
 
-<script is:inline>
-  // Giscus 스크립트 동적 로드
-  (function() {
+<script>
+  function loadGiscus() {
+    const container = document.getElementById('giscus-container');
+    if (!container) return;
+
+    // 기존 Giscus 제거 (재초기화를 위해)
+    const existingGiscus = container.querySelector('.giscus');
+    if (existingGiscus) {
+      existingGiscus.remove();
+    }
+
+    // 기존 스크립트 제거
+    const existingScript = container.querySelector('script');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // 새로운 Giscus 스크립트 생성
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
     script.setAttribute('data-repo', 'Tolerblanc/Tolerblanc.github.io');
@@ -36,11 +54,14 @@
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
 
-    const container = document.getElementById('giscus-container');
-    if (container) {
-      container.appendChild(script);
-    }
-  })();
+    container.appendChild(script);
+  }
+
+  // 초기 로드
+  loadGiscus();
+
+  // View Transitions 페이지 전환 시 재초기화
+  document.addEventListener('astro:page-load', loadGiscus);
 </script>
 
 <style>
