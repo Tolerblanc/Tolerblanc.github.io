@@ -1,0 +1,7 @@
+---
+import { redirect } from 'astro/runtime/server';
+
+// 기존 SEO가 /python-for-PS 로 되어있어서, 새 블로그 메뉴로 리다이렉트 시키기 위한 조치
+// Astro glob loader는 파일 ID를 소문자로 변환
+redirect(301, '/python/python-for-ps');
+---
