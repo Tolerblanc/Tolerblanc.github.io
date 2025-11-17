@@ -1,7 +1,19 @@
 ---
-import { redirect } from 'astro/runtime/server';
-
-// 기존 SEO가 /python-for-PS 로 되어있어서, 새 블로그 메뉴로 리다이렉트 시키기 위한 조치
-// Astro glob loader는 파일 ID를 소문자로 변환
-redirect(301, '/python/python-for-ps');
+import { useEffect } from 'react';
 ---
+<html lang="ko">
+  <head>
+    <meta http-equiv="refresh" content="0;url=/python/python-for-ps" />
+    <script>
+      window.location.replace('/python/python-for-ps');
+    </script>
+    <!-- SEO, canonical 등 원하면 추가 -->
+  </head>
+  <body>
+    <p>옮겨가는 중... <a href="/python/python-for-ps">여기를 클릭</a></p>
+  </body>
+</html>
+
+---
+// Astro glob loader는 파일 ID를 소문자로 변환
+// 기존 SEO가 /python-for-PS 로 되어있어서, 새 블로그 메뉴로 리다이렉트 시키기 위한 조치
