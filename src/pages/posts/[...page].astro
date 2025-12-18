@@ -30,7 +30,7 @@ type Props = {
 };
 
 const { page } = Astro.props;
-const { data: posts, currentPage, lastPage, url } = page;
+const { data: posts, currentPage, lastPage } = page;
 
 const title = currentPage === 1
   ? "블로그 - Tolerblanc's Blog"
