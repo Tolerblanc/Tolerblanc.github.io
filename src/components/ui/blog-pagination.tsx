@@ -62,7 +62,7 @@ export function BlogPagination({
     if (page === 1) {
       return baseUrl
     }
-    return `${baseUrl}/page/${page}`
+    return `${baseUrl}/${page}`
   }
 
   if (totalPages <= 1) {
