@@ -10,7 +10,10 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
   site: 'https://tolerblanc.github.io',
   integrations: [
-    mdx(),
+    mdx({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex],
+    }),
     react(),
     sitemap(),
     tailwind({
