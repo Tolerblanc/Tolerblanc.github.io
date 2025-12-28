@@ -1,0 +1,50 @@
+---
+/**
+ * Steps Component
+ *
+ * 단계별 절차를 시각적으로 보여주는 컴포넌트입니다.
+ * 내부의 h3, h4 태그 등을 자동으로 감지하여 단계로 표시하는 CSS 스타일링을 적용합니다.
+ */
+---
+
+<div class="steps-container my-8 ml-4 border-l pl-8 [counter-reset:step]">
+  <slot />
+</div>
+
+<style is:global>
+  .steps-container > h3,
+  .steps-container > h4 {
+    position: relative;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .steps-container > h3::before,
+  .steps-container > h4::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: -49px; /* pl-8(32px) + border(1px) + circle-radius(16px) approx */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    z-index: 10;
+  }
+
+  /* 연결선 가림 방지 */
+  .steps-container > h3:first-child,
+  .steps-container > h4:first-child {
+    margin-top: 0;
+  }
+</style>

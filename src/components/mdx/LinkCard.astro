@@ -1,0 +1,63 @@
+---
+/**
+ * LinkCard Component
+ *
+ * 외부 링크를 풍부한 카드로 보여주는 컴포넌트입니다.
+ *
+ * Props:
+ * - href: 링크 주소 (필수)
+ * - title: 제목 (필수)
+ * - description: 설명 (선택)
+ * - host: 도메인/호스트명 (선택)
+ * - image: 썸네일 이미지 경로 (선택)
+ */
+
+import { ExternalLink } from 'lucide-react';
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  host?: string;
+  image?: string;
+}
+
+const { href, title, description, host, image } = Astro.props;
+
+// host가 없으면 href에서 추출
+const displayHost = host || new URL(href).hostname;
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="group my-4 flex w-full overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md no-underline"
+>
+  <div class="flex flex-1 flex-col justify-between p-4">
+    <div class="space-y-2">
+      <h3 class="font-semibold leading-snug tracking-tight group-hover:text-primary transition-colors">
+        {title}
+      </h3>
+      {description && (
+        <p class="text-sm text-muted-foreground line-clamp-2">
+          {description}
+        </p>
+      )}
+    </div>
+    <div class="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+      <ExternalLink size={12} />
+      <span>{displayHost}</span>
+    </div>
+  </div>
+  {image && (
+    <div class="relative w-1/3 min-w-[120px] max-w-[200px] bg-muted">
+      <img
+        src={image}
+        alt=""
+        class="absolute inset-0 h-full w-full object-cover"
+        loading="lazy"
+      />
+    </div>
+  )}
+</a>

@@ -1,0 +1,37 @@
+---
+/**
+ * Folder Component
+ *
+ * FileTree 내부에서 폴더를 나타냅니다.
+ *
+ * Props:
+ * - name: 폴더 이름 (필수)
+ * - open: 기본 열림 상태 (기본값: false)
+ */
+
+import { Folder as FolderIcon, FolderOpen } from 'lucide-react';
+
+interface Props {
+  name: string;
+  open?: boolean;
+}
+
+const { name, open = false } = Astro.props;
+---
+
+<details class="group/folder" open={open}>
+  <summary class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors select-none list-none">
+    <FolderIcon className="size-4 group-open/folder:hidden" />
+    <FolderOpen className="size-4 hidden group-open/folder:block text-blue-500" />
+    <span>{name}</span>
+  </summary>
+  <div class="ml-4 border-l border-border pl-2 mt-1 flex flex-col gap-1">
+    <slot />
+  </div>
+</details>
+
+<style>
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+/**
+ * Figure Component
+ *
+ * 이미지와 캡션을 함께 보여주는 컴포넌트입니다.
+ *
+ * Props:
+ * - src: 이미지 경로 (필수)
+ * - alt: 대체 텍스트 (필수)
+ * - caption: 이미지 설명 (선택)
+ * - width: 이미지 너비 (선택)
+ */
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  width?: string | number;
+}
+
+const { src, alt, caption, width } = Astro.props;
+---
+
+<figure class="my-8 flex flex-col items-center">
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    class="rounded-lg border bg-muted"
+    loading="lazy"
+  />
+  {caption && (
+    <figcaption class="mt-3 text-center text-sm text-muted-foreground">
+      {caption}
+    </figcaption>
+  )}
+</figure>

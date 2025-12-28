@@ -1,0 +1,23 @@
+---
+/**
+ * TabItem Component
+ *
+ * Tabs 내부의 개별 탭 패널입니다.
+ *
+ * Props:
+ * - label: 탭 버튼에 표시될 이름 (필수)
+ * - value: 탭 식별자 (선택, 없으면 label 사용)
+ */
+
+interface Props {
+  label: string;
+  value?: string;
+}
+
+const { label, value } = Astro.props;
+const tabValue = value || label;
+---
+
+<div class="tab-panel hidden" data-label={label} data-value={tabValue} role="tabpanel" tabindex="0">
+  <slot />
+</div>

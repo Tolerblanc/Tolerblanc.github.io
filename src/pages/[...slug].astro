@@ -36,5 +36,18 @@ const { Content, headings } = await render(post);
 ---
 
 <PostLayout post={post} headings={headings}>
-  <Content components={{ Notice: (await import('@components/Notice.astro')).default }} />
+  <Content
+    components={{
+      Notice: (await import('@components/Notice.astro')).default,
+      Figure: (await import('@components/mdx/Figure.astro')).default,
+      Steps: (await import('@components/mdx/Steps.astro')).default,
+      LinkCard: (await import('@components/mdx/LinkCard.astro')).default,
+      Toggle: (await import('@components/mdx/Toggle.astro')).default,
+      FileTree: (await import('@components/mdx/FileTree.astro')).default,
+      Folder: (await import('@components/mdx/Folder.astro')).default,
+      File: (await import('@components/mdx/File.astro')).default,
+      Tabs: (await import('@components/mdx/Tabs.astro')).default,
+      TabItem: (await import('@components/mdx/TabItem.astro')).default,
+    }}
+  />
 </PostLayout>

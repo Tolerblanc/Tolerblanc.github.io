@@ -1,0 +1,23 @@
+---
+/**
+ * File Component
+ *
+ * FileTree 내부에서 파일을 나타냅니다.
+ *
+ * Props:
+ * - name: 파일 이름 (필수)
+ */
+
+import { File as FileIcon } from 'lucide-react';
+
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<div class="flex items-center gap-2 rounded-md px-2 py-1 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
+  <FileIcon className="size-4" />
+  <span>{name}</span>
+</div>
