@@ -1,0 +1,39 @@
+---
+/**
+ * Toggle Component (Notion-style)
+ *
+ * 접었다 폈다 할 수 있는 토글 목록입니다.
+ *
+ * Props:
+ * - title: 토글 제목 (필수)
+ * - open: 기본적으로 열려있을지 여부 (기본값: false)
+ */
+
+import { ChevronRight } from 'lucide-react';
+
+interface Props {
+  title: string;
+  open?: boolean;
+}
+
+const { title, open = false } = Astro.props;
+---
+
+<details class="toggle-group group my-4" open={open}>
+  <summary class="toggle-summary flex items-start gap-2 cursor-pointer list-none p-1 rounded hover:bg-secondary/50 transition-colors select-none">
+    <span class="toggle-icon mt-1 text-muted-foreground transition-transform duration-200 group-open:rotate-90">
+      <ChevronRight size={18} />
+    </span>
+    <span class="toggle-title font-medium text-foreground">{title}</span>
+  </summary>
+  <div class="toggle-content pl-7 mt-1 text-muted-foreground">
+    <slot />
+  </div>
+</details>
+
+<style>
+  /* 기본 summary 마커 숨김 */
+  .toggle-summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

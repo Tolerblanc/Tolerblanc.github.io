@@ -1,0 +1,99 @@
+---
+/**
+ * Tabs Component
+ *
+ * 여러 내용을 탭으로 구분하여 보여주는 컴포넌트입니다.
+ * Vanilla JS로 구현되어 별도의 프레임워크 없이 동작합니다.
+ *
+ * Props:
+ * - defaultValue: 처음에 보여줄 탭의 value (선택)
+ */
+
+interface Props {
+  defaultValue?: string;
+}
+
+const { defaultValue } = Astro.props;
+---
+
+<script>
+  class TabsComponent extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+
+    init() {
+      const tabList = this.querySelector('.tab-list');
+      const panels = Array.from(this.querySelectorAll('.tab-panel')) as HTMLElement[];
+      const defaultValue = this.dataset.default;
+
+      if (!tabList || panels.length === 0) return;
+
+      // 1. Generate Tab Buttons
+      panels.forEach((panel, index) => {
+        const label = panel.dataset.label || `Tab ${index + 1}`;
+        const value = panel.dataset.value || label;
+        
+        const button = document.createElement('button');
+        button.textContent = label;
+        button.className = 'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground';
+        button.setAttribute('role', 'tab');
+        button.setAttribute('data-value', value);
+        button.setAttribute('type', 'button');
+        
+        button.addEventListener('click', () => this.activateTab(value));
+        
+        tabList.appendChild(button);
+      });
+
+      // 2. Activate Default Tab
+      const initialTab = defaultValue || panels[0].dataset.value || '';
+      this.activateTab(initialTab);
+    }
+
+    activateTab(value: string) {
+      const buttons = Array.from(this.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(this.querySelectorAll('[role="tabpanel"]'));
+
+      // Deactivate all
+      buttons.forEach(btn => {
+        btn.setAttribute('data-state', 'inactive');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('tabindex', '-1');
+      });
+      panels.forEach(panel => {
+        panel.classList.add('hidden');
+        panel.setAttribute('data-state', 'inactive');
+      });
+
+      // Activate target
+      const targetButton = buttons.find(btn => (btn as HTMLElement).dataset.value === value);
+      const targetPanel = panels.find(panel => (panel as HTMLElement).dataset.value === value);
+
+      if (targetButton && targetPanel) {
+        targetButton.setAttribute('data-state', 'active');
+        targetButton.setAttribute('aria-selected', 'true');
+        targetButton.removeAttribute('tabindex');
+        
+        targetPanel.classList.remove('hidden');
+        targetPanel.setAttribute('data-state', 'active');
+      }
+    }
+  }
+
+  // Define Custom Element with safety check
+  if (!customElements.get('mdx-tabs')) {
+    customElements.define('mdx-tabs', TabsComponent);
+  }
+</script>
+
+<mdx-tabs class="block" data-default={defaultValue}>
+  <div class="tabs-component my-6 rounded-lg border bg-card text-card-foreground shadow-sm">
+    <div class="tab-list flex items-center gap-1 p-1 bg-muted rounded-t-lg overflow-x-auto" role="tablist">
+    </div>
+    <div class="tab-content p-4 bg-background rounded-b-lg">
+      <slot />
+    </div>
+  </div>
+</mdx-tabs>
