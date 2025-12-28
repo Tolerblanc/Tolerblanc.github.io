@@ -201,7 +201,17 @@ export class UserService {
 }
 ```
 
-위 예시와 같이 `UserModule` 안에 `UserController`, `UserService`, `UserRepository`를 묶어보면, 코드를 처음 보는 사람도 '아 여기서 사용자 관련 로직을 전부 관리하는구나' 라고 생각할 수 있는, 구조적 일관성이 생긴다. 자연스럽게 데코레이터들(클래스 위에 붙는 `@`)을 사용하고 있는데, 세부 구현을 몰라도 선언형으로 가져다 쓸 수 있는 물건이다. 데코레이터의 원리 자체는 [이 글](https://tolerblanc.github.io/python/what-is-decorator/)을 참고해보자. Python으로 적었지만, 큰 맥락에서 원리는 비슷하다고 볼 수 있다. 오히려 TypeScript의 데코레이터가 확장성이 더 좋아보이기도 한다. 이것도 따로 글을 적어 볼 것 이지만, 지금은 TypeScript 리플렉션(`Reflect.metadata`)을 통해 클래스/메서드/프로퍼티 정보를 읽고, NestJS 내부에서 이를 IoC 컨테이너에 등록한다는 원리만 알고있어도 문제없다. 즉, TypeScript의 데코레이터는 Python에서 제시하는 함수 합성의 개념보다는 Java에서의 어노테이션에 좀 더 가깝다.
+위 예시와 같이 `UserModule` 안에 `UserController`, `UserService`, `UserRepository`를 묶어보면, 코드를 처음 보는 사람도 '아 여기서 사용자 관련 로직을 전부 관리하는구나' 라고 생각할 수 있는, 구조적 일관성이 생긴다. 자연스럽게 데코레이터들(클래스 위에 붙는 `@`)을 사용하고 있는데, 세부 구현을 몰라도 선언형으로 가져다 쓸 수 있는 물건이다. 
+
+데코레이터의 원리 자체는 아래 글을 참고해보자. Python으로 적었지만, 큰 맥락에서 원리는 비슷하다고 볼 수 있다. 
+
+<LinkCard 
+  href="https://tolerblanc.github.io/python/what-is-decorator/" 
+  title="파이썬 데코레이터의 원리" 
+  description="함수를 인자로 받아 새로운 기능을 추가하는 데코레이터의 원리와 활용법" 
+/>
+
+오히려 TypeScript의 데코레이터가 확장성이 더 좋아보이기도 한다. 이것도 따로 글을 적어 볼 것 이지만, 지금은 TypeScript 리플렉션(`Reflect.metadata`)을 통해 클래스/메서드/프로퍼티 정보를 읽고, NestJS 내부에서 이를 IoC 컨테이너에 등록한다는 원리만 알고있어도 문제없다. 즉, TypeScript의 데코레이터는 Python에서 제시하는 함수 합성의 개념보다는 Java에서의 어노테이션에 좀 더 가깝다.
 
 ### **Singleton, Global, Dynamic Module**
 
@@ -219,7 +229,17 @@ export class UserService {
 
 ## NestJS는 어떻게 의존성을 관리하는가?
 
-NestJS에서 가장 돋보이는 기능 중 하나가 **의존성 주입(DI)** 이다. 규모가 커질수록, “이 클래스가 저 클래스를 생성해야 한다”는 식의 직접적인 의존 관계가 늘어나면 코드가 점점 복잡해진다. NestJS는 이를 DI 컨테이너가 대신 처리해주므로, 개발자가 일일이 객체를 새로 만들 필요가 없다. 왜 필요한지는 [여기](https://tolerblanc.github.io/javascript/loose-coupled-with-ncp/)를 참고하면 좋다. 이걸 개발자가 직접 처리하려면, 수많은 클래스의 의존관계를 전부 파악하고 있어야 하며, 관계에 따라 적절히 코드로 작성해줘야 한다.
+NestJS에서 가장 돋보이는 기능 중 하나가 **의존성 주입(DI)** 이다. 규모가 커질수록, “이 클래스가 저 클래스를 생성해야 한다”는 식의 직접적인 의존 관계가 늘어나면 코드가 점점 복잡해진다. NestJS는 이를 DI 컨테이너가 대신 처리해주므로, 개발자가 일일이 객체를 새로 만들 필요가 없다. 
+
+의존성 관리에 대한 자세한 배경은 아래 글에서 확인할 수 있다.
+
+<LinkCard 
+  href="https://tolerblanc.github.io/javascript/loose-coupled-with-ncp/" 
+  title="느슨한 결합과 DI" 
+  description="의존성 주입을 통해 객체 간의 결합도를 낮추는 이유와 방법" 
+/>
+
+이걸 개발자가 직접 처리하려면, 수많은 클래스의 의존관계를 전부 파악하고 있어야 하며, 관계에 따라 적절히 코드로 작성해줘야 한다.
 
 ### 의존성 주입(DI)이란 무엇일까?
 
@@ -252,24 +272,40 @@ export class UserController {
 
 세세한 내부 구현은 [공식 레포의 packages/core/injector 디렉터리](https://github.com/nestjs/nest/tree/master/packages/core/injector)에서 확인할 수 있다. 코드까지 끌어와서 설명하면 글이 너무 무겁고 복잡해질 것 같으니, 1편에서는 핵심 파일을 추려보고 그 역할에 대해서 요약만 하려고 한다.
 
-1. `container.ts`
-- 각 모듈(Module)과 그 안에 등록된 프로바이더(Provider)·컨트롤러(Controller)를 트리(tree) 구조로 관리하는 핵심 컨테이너 로직
-- NestJS가 애플리케이션을 실행하면서 모듈 간 imports/exports 관계를 어떻게 연결하는지, 프로바이더를 어디서 가져와야 하는지를 정의
-2. `instance-loader.ts`
-- 말 그대로 "인스턴스를 로드"해주는 역할을 담당
-- 모든 모듈에 선언된 프로바이더(서비스, 리포지토리 등)를 순회하며, "아직 생성되지 않은" 프로바이더 인스턴스를 만들어 DI 컨테이너에 등록
-- `Injector`나 `ModuleRef`를 사용해 의존 관계를 추적하면서, 필요한 의존성을 재귀적으로 주입해주는 식으로 동작
-3. `module-ref.ts`
-- `ModuleRef` 클래스는 코드 상에서 "특정 모듈 내부"에 접근할 때 사용
-- 예: 어떤 프로바이더가 같은 모듈 안에 있는 다른 프로바이더를 가져올 때 또는, 전역/공유 모듈에서 프로바이더를 꺼낼 때 `ModuleRef`가 핵심 역할을 수행
-4. `injector.ts`, `module.ts`
-- `injector.ts`: 프로바이더(또는 컨트롤러) 인스턴스를 생성하고, 생성자 파라미터로 주입되어야 할 의존성을 찾아내는 로직이 들어 있음
-- `module.ts`: 모듈 단위로 프로바이더(Injectables), 컨트롤러, exports를 정리해서 보관하는 역할
+<FileTree>
+  <Folder name="packages/core/injector" open>
+    <File name="container.ts" />
+    <File name="instance-loader.ts" />
+    <File name="module-ref.ts" />
+    <File name="injector.ts" />
+    <File name="module.ts" />
+  </Folder>
+</FileTree>
+
+#### container.ts
+각 모듈(Module)과 그 안에 등록된 프로바이더(Provider)·컨트롤러(Controller)를 트리(tree) 구조로 관리하는 핵심 컨테이너 로직. NestJS가 애플리케이션을 실행하면서 모듈 간 imports/exports 관계를 어떻게 연결하는지, 프로바이더를 어디서 가져와야 하는지를 정의한다.
+
+#### instance-loader.ts
+말 그대로 "인스턴스를 로드"해주는 역할을 담당. 모든 모듈에 선언된 프로바이더(서비스, 리포지토리 등)를 순회하며, "아직 생성되지 않은" 프로바이더 인스턴스를 만들어 DI 컨테이너에 등록한다. `Injector`나 `ModuleRef`를 사용해 의존 관계를 추적하면서, 필요한 의존성을 재귀적으로 주입해주는 식으로 동작한다.
+
+#### module-ref.ts
+`ModuleRef` 클래스는 코드 상에서 "특정 모듈 내부"에 접근할 때 사용. 어떤 프로바이더가 같은 모듈 안에 있는 다른 프로바이더를 가져올 때 또는, 전역/공유 모듈에서 프로바이더를 꺼낼 때 `ModuleRef`가 핵심 역할을 수행한다.
+
+#### injector.ts & module.ts
+`injector.ts`는 프로바이더(또는 컨트롤러) 인스턴스를 생성하고, 생성자 파라미터로 주입되어야 할 의존성을 찾아내는 로직이 들어 있다. `module.ts`는 모듈 단위로 프로바이더(Injectables), 컨트롤러, exports를 정리해서 보관하는 역할을 한다.
 
 마지막으로, NestJS 애플리케이션을 실행할 때, 부트스트래핑 과정을 정리하려고 한다.
-1. **모듈 메타데이터 스캔** : AppModule부터 시작해 imports 배열을 순회하면서 모든 모듈을 찾고, 각 모듈의 providers, controllers, imports, exports 정보를 읽어 Container 내부에 구성해둔다.
-2. **인스턴스 로더(InstanceLoader)가 순회** :  InstanceLoader는 Container가 보유한 모든 모듈을 차례로 훑으며 모듈에 등록된 프로바이더를 확인하고, 아직 생성되지 않은 프로바이더가 있다면, `injector.ts` 내부 로직을 사용해 인스턴스를 생성한다.
-3. **생성자 의존 관계 확인 & 재귀 주입** :  프로바이더 클래스를 인스턴스화할 때, 그 클래스의 생성자 파라미터(의존 대상)를 추적한다. 파라미터에 매칭되는 프로바이더가 이미 있으면 그 인스턴스를 가져오고, 없으면 새로 만들어서 등록한다. (단, 스코프에 따라 생성 로직이 달라질 수 있다. 이 과정을 재귀적으로 반복하면서 전체 의존성 그래프를 해소한다.)
+
+<Steps>
+#### 모듈 메타데이터 스캔
+AppModule부터 시작해 imports 배열을 순회하면서 모든 모듈을 찾고, 각 모듈의 providers, controllers, imports, exports 정보를 읽어 Container 내부에 구성해둔다.
+
+#### 인스턴스 로더(InstanceLoader)가 순회
+InstanceLoader는 Container가 보유한 모든 모듈을 차례로 훑으며 모듈에 등록된 프로바이더를 확인하고, 아직 생성되지 않은 프로바이더가 있다면, `injector.ts` 내부 로직을 사용해 인스턴스를 생성한다.
+
+#### 생성자 의존 관계 확인 & 재귀 주입
+프로바이더 클래스를 인스턴스화할 때, 그 클래스의 생성자 파라미터(의존 대상)를 추적한다. 파라미터에 매칭되는 프로바이더가 이미 있으면 그 인스턴스를 가져오고, 없으면 새로 만들어서 등록한다. (단, 스코프에 따라 생성 로직이 달라질 수 있다. 이 과정을 재귀적으로 반복하면서 전체 의존성 그래프를 해소한다.)
+</Steps>
 
 ## 결론 및 요약, 다음편 예고
 

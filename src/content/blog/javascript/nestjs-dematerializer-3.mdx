@@ -30,34 +30,50 @@ series:
 
 ## Introduction
 
-지난 [2편](https://tolerblanc.github.io/javascript/nestjs-dematerializer-2/)에서는 동적 모듈과 프로바이더 스코프에 대해 알아보았다. 이번에는 NestJS의 실행 흐름을 제어하는 세 가지 핵심 구성 요소인 미들웨어(Middleware), 가드(Guard), **인터셉터(Interceptor)** 를 살펴보려고 한다. Express를 써보셨다면 미들웨어라는 개념이 어색하지 않을 텐데, NestJS는 여기서 한 발 더 나아가 가드와 인터셉터라는 개념을 제공한다. 이들은 각각 다른 시점에서 요청/응답을 가로채고 처리할 수 있게 해주는데, 이런 구조는 관점 지향 프로그래밍(AOP, Aspect-Oriented Programming)을 가능하게 하여, 대규모 애플리케이션에서 중복 로직 최소화, 단일 책임 분리에 큰 도움을 준다.
+지난 2편에서는 동적 모듈과 프로바이더 스코프에 대해 알아보았다. 
+
+<LinkCard 
+  href="https://tolerblanc.github.io/javascript/nestjs-dematerializer-2/" 
+  title="NestJS 해체분석기 2 - 동적 모듈과 프로바이더 스코프" 
+  description="환경에 따른 유연한 모듈 구성 방법과 인스턴스 생명주기 관리하기" 
+/>
+
+이번에는 NestJS의 실행 흐름을 제어하는 세 가지 핵심 구성 요소인 미들웨어(Middleware), 가드(Guard), **인터셉터(Interceptor)** 를 살펴보려고 한다. 
 
 ## 실행 순서부터 제대로 이해하기
 
-<img width="1920" alt="Image" src="https://github.com/user-attachments/assets/30768a2d-85b7-43fb-87f5-095b316737fa" />
-
-| 출처: [(1) 우형의 새로운 백엔드 개발 표준 #우아콘2023 #우아한형제들](https://www.youtube.com/watch?v=Z0d7ZrxY-i0)
+<Figure 
+  src="https://github.com/user-attachments/assets/30768a2d-85b7-43fb-87f5-095b316737fa" 
+  alt="NestJS 요청 처리 파이프라인" 
+  caption="그림 1. NestJS에 하나의 HTTP 요청이 들어올 때의 처리 순서 (출처: 우아콘2023)" 
+/>
 
 NestJS에 하나의 HTTP 요청이 들어오면, 다음과 같은 순서로 처리된다:
 
-1. **미들웨어 (Middleware)**
-2. **가드 (Guard)**
-3. **인터셉터 - 전처리 (Interceptor - Pre-processing)**
-4. **파이프 (Pipe)**
-5. **컨트롤러 (Controller)**
-6. **서비스 (Service)**
-7. **인터셉터 - 후처리 (Interceptor - Post-processing)**
-8. **예외 필터 (Exception Filter) - 에러 발생 시**
+<Steps>
+#### 미들웨어 (Middleware)
+가장 앞단에서 공통적으로 필요한 전처리를 수행 (예: 로깅, CORS 설정, Request Body 파싱 등)
 
-각 단계가 서로 다른 책임을 지닌다. 주로 다음과 같은 역할로 구분할 수 있다.
+#### 가드 (Guard)
+인증/인가(Authorization)나 접근 권한 같은 “조건 충족 여부”를 검사해, 특정 라우트 실행을 막거나 통과시키는 관문
 
--   미들웨어: 가장 앞단에서 공통적으로 필요한 전처리를 수행 (예: 로깅, CORS 설정, Request Body 파싱 등)
--   가드: 인증/인가(Authorization)나 접근 권한 같은 “조건 충족 여부”를 검사해, 특정 라우트 실행을 막거나 통과시키는 관문
--   인터셉터: 요청/응답을 변형(Transform)하거나 추가 로직(예: 캐싱, 로깅, 성능 측정 등)을 주입
--   파이프: 컨트롤러에 도달하기 직전, 입력 데이터(Parameters, Body 등) 검증/변환을 담당
--   예외 필터: 처리 과정에서 에러가 발생하면, 해당 에러를 가로채 적절히 변환해 응답
+#### 인터셉터 - 전처리 (Interceptor - Pre-processing)
+컨트롤러 진입 전 요청을 가로채 추가 로직 주입
 
-이번 글에서는 특히 미들웨어, 가드, 인터셉터에 집중하여 어떻게 NestJS에서 이 개념들을 구현하고, 실제로 어떻게 활용할 수 있는지 자세히 살펴보겠다.
+#### 파이프 (Pipe)
+컨트롤러에 도달하기 직전, 입력 데이터(Parameters, Body 등) 검증/변환을 담당
+
+#### 컨트롤러 (Controller) & 서비스 (Service)
+실제 비즈니스 로직을 수행하고 결과 반환
+
+#### 인터셉터 - 후처리 (Interceptor - Post-processing)
+응답을 변형하거나 추가 로직(예: 캐싱, 로깅, 성능 측정 등)을 주입
+
+#### 예외 필터 (Exception Filter)
+처리 과정에서 에러가 발생하면, 해당 에러를 가로채 적절히 변환해 응답
+</Steps>
+
+각 단계가 서로 다른 책임을 지닌다. 이번 글에서는 특히 미들웨어, 가드, 인터셉터에 집중하여 어떻게 NestJS에서 이 개념들을 구현하고, 실제로 어떻게 활용할 수 있는지 자세히 살펴보겠다.
 
 ## 미들웨어(Middleware): Express와는 어떻게 다를까?
 

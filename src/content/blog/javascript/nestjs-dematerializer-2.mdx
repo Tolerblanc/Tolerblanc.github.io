@@ -30,7 +30,15 @@ series:
 
 ## Introduction
 
-지난 [1편](https://tolerblanc.github.io/javascript/nestjs-demeterializer-1/)에서는 NestJS가 어떤 철학과 배경을 가지고 만들어졌는지, 그리고 모듈 시스템과 DI(의존성 주입)가 어떻게 돌아가는지를 살펴보았다. 이번에는 한 걸음 더 깊이 들어가서, NNestJS의 확장성과 유연성을 책임지는 두 가지 핵심 개념인 **동적 모듈(Dynamic Module)**과 **프로바이더 스코프(Provider Scope)**에 대해 구체적으로 알아볼 것이다. 동적 모듈은 환경별로 다른 설정이 필요하거나 테스트를 위해 특정 기능을 모킹(Mocking)해야 할 때 유용하다. 프로바이더 스코프는 인스턴스의 생명주기를 세밀하게 제어할 수 있게 해주어, 메모리 관리나 요청별 상태 관리에 있어 큰 도움이 된다.
+지난 1편에서는 NestJS가 어떤 철학과 배경을 가지고 만들어졌는지, 그리고 모듈 시스템과 DI(의존성 주입)가 어떻게 돌아가는지를 살펴보았다. 
+
+<LinkCard 
+  href="https://tolerblanc.github.io/javascript/nestjs-demeterializer-1/" 
+  title="NestJS 해체분석기 1 - NestJS의 철학과 모듈성" 
+  description="NestJS의 등장 배경, 핵심 철학, 그리고 기본적인 모듈 구조와 DI 시스템 이해하기" 
+/>
+
+이번에는 한 걸음 더 깊이 들어가서, NestJS의 확장성과 유연성을 책임지는 두 가지 핵심 개념인 **동적 모듈(Dynamic Module)** 과 **프로바이더 스코프(Provider Scope)** 에 대해 구체적으로 알아볼 것이다. 동적 모듈은 환경별로 다른 설정이 필요하거나 테스트를 위해 특정 기능을 모킹(Mocking)해야 할 때 유용하다. 프로바이더 스코프는 인스턴스의 생명주기를 세밀하게 제어할 수 있게 해주어, 메모리 관리나 요청별 상태 관리에 있어 큰 도움이 된다.
 
 ## 동적 모듈(Dynamic Module) 살펴보기
 
@@ -170,20 +178,20 @@ providers에서 `useFactory`를 활용하면, NestJS DI 컨테이너가 해당 �
 
 NestJS가 애플리케이션을 부트스트랩할 때, 동적 모듈은 다음과 같은 과정을 거친다:
 
-1. **모듈 스캔 단계**
+<Steps>
+#### 모듈 스캔 단계
+- `AppModule`부터 시작해 `imports` 배열을 재귀적으로 순회
+- 동적 모듈 메서드(`forRoot`/`forRootAsync`)를 만나면 실행하여 `DynamicModule` 객체를 얻음
 
-    - `AppModule`부터 시작해 `imports` 배열을 재귀적으로 순회
-    - 동적 모듈 메서드(`forRoot`/`forRootAsync`)를 만나면 실행하여 `DynamicModule` 객체를 얻음
+#### 의존성 해결 단계
+- `imports` 배열에 명시된 모듈들을 먼저 초기화
+- `providers` 배열의 `useFactory` 함수들을 실행하여 실제 값을 얻음
+- 이 과정에서 `inject` 배열에 명시된 의존성들이 주입됨
 
-2. **의존성 해결 단계**
-
-    - `imports` 배열에 명시된 모듈들을 먼저 초기화
-    - `providers` 배열의 `useFactory` 함수들을 실행하여 실제 값을 얻음
-    - 이 과정에서 `inject` 배열에 명시된 의존성들이 주입됨
-
-3. **인스턴스 생성 단계**
-    - 모든 설정값이 해결되면, 프로바이더 인스턴스들을 생성
-    - 생성된 인스턴스는 모듈의 컨텍스트에 저장되어 이후 주입 시 재사용
+#### 인스턴스 생성 단계
+- 모든 설정값이 해결되면, 프로바이더 인스턴스들을 생성
+- 생성된 인스턴스는 모듈의 컨텍스트에 저장되어 이후 주입 시 재사용
+</Steps>
 
 ```typescript
 // 실제 NestJS 코드 (간략화)
@@ -216,22 +224,23 @@ export interface ModuleMetadata {
 
 프로바이더 스코프는 NestJS가 프로바이더 인스턴스를 어떻게 생성하고 공유할지를 결정하는 설정이다. 이전 글에서 “NestJS는 기본적으로 프로바이더를 싱글톤으로 관리한다”고 언급했지만, 실제로는 서비스마다 다른 스코프를 지정할 수도 있다. NestJS에서는 다음 세 가지 스코프가 존재한다:
 
-1. **DEFAULT (싱글톤)**
-
+<Tabs>
+  <TabItem label="DEFAULT (싱글톤)">
     - 기본값
     - 전체 애플리케이션에서 하나의 인스턴스만 생성되어 공유
     - 메모리 효율적이며 상태 공유가 필요할 때 유용
-
-2. **REQUEST**
-
+  </TabItem>
+  <TabItem label="REQUEST">
     - 각 요청마다 새로운 인스턴스가 생성
     - 요청별로 독립된 상태를 유지해야 할 때 사용
     - 예: 트랜잭션 관리, 요청별 로깅
-
-3. **TRANSIENT**
+  </TabItem>
+  <TabItem label="TRANSIENT">
     - 주입될 때마다 새로운 인스턴스 생성
     - 프로바이더를 주입받는 각 컴포넌트가 독립된 인스턴스를 가짐
     - 메모리 사용량이 증가할 수 있으므로 신중히 사용
+  </TabItem>
+</Tabs>
 
 ```typescript
 // singleton.service.ts (기본값)
