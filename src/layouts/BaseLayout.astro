@@ -38,9 +38,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <script is:inline>
       // 페이지 로드 전에 테마 적용 (FOUC 방지)
       (function() {
-        const theme = localStorage.getItem('theme') || 'light';
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
+        function applyTheme() {
+          const theme = localStorage.getItem('theme') || 'light';
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+        
+        // 초기 로드 시 즉시 적용
+        applyTheme();
+        
+        // View Transitions: 페이지 전환 전에 테마 적용 (깜빡임 방지)
+        if (typeof document !== 'undefined') {
+          document.addEventListener('astro:before-swap', applyTheme);
         }
       })();
     </script>
@@ -95,7 +107,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     font-family: var(--font-family-base);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
-    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+
+  /* 다크모드 깜빡임 방지: 초기 배경색 설정 */
+  /* 스크립트 실행 전에도 다크모드일 경우 올바른 배경색 표시 */
+  html.dark {
+    background: #191f28; /* 다크모드 배경색 (design-tokens의 --color-bg-primary) */
   }
 
   body {
