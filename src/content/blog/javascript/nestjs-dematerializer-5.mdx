@@ -1,0 +1,81 @@
+---
+title: NestJS 해체분석기 5 - 마법의 원리 데코레이터와 리플렉션, 그리고 AOP
+excerpt: '12345678910'
+date: 2025-12-30T00:00:00.000Z
+categories:
+  - JavaScript
+tags:
+  - NodeJS
+  - NestJS
+toc: true
+tocDepth: 3
+draft: false
+lang: ko
+author: Tolerblanc
+updatedDate: 2025-02-23T00:00:00.000Z
+description: '12345678910'
+series:
+  name: NestJS 해체분석기
+  order: 5
+---
+
+<Notice type="info">
+👨‍💻 개인 공부 기록용 블로그 입니다. 
+
+💡 틀린 내용이나 오타는 댓글, 메일로 제보해주시면 감사하겠습니다!!  (__)
+</Notice>
+
+## Introduction
+
+지난 [4편](https://tolerblanc.github.io/javascript/nestjs-dematerializer-4/)에서는
+
+---
+
+1. Introduction: 우리는 아직 NestJS의 마법을 모른다
+습관적 사용의 이면: @Injectable, @Controller 등을 습관적으로 쓰지만, 이것들이 런타임에 어떻게 동작하는지 의문을 던짐.
+
+메타 프로그래밍(Meta-programming) 입문: 코드가 코드를 제어하는 메타 프로그래밍의 개념을 소개하고, NestJS가 이를 통해 개발자에게 '선언적 프로그래밍' 경험을 제공함을 설명.
+
+2. 데코레이터와 리플렉션: 단순 래핑을 넘어서
+Python 데코레이터 vs TS 데코레이터:
+
+Python: 함수를 인자로 받아 새로운 함수를 반환하는 고차 함수(HOC) 성격이 강함 (기존 포스팅 참조 링크 연결).
+
+NestJS(TS): 단순히 감싸는 것을 넘어, reflect-metadata를 이용해 '데이터(메타데이터)'를 남기는 행위에 집중함.
+
+실험실:
+
+아무 기능 없는 커스텀 데코레이터를 만들어보고, Reflect.getMetadata로 실제로 어떤 데이터가 남는지 확인.
+
+이 메타데이터를 IoC 컨테이너가 어떻게 읽어가는지 시각화하여 설명.
+
+3. 실무의 벽: Service 레이어 AOP와 순환 참조의 늪
+Why Service AOP?
+
+Controller 레벨(Interceptor)만으로는 부족한 경우들 (예: 내부 비즈니스 로직 단위의 캐싱, 정교한 트랜잭션 관리, 로깅).
+
+The Hard Way (직접 구현의 고통):
+
+DiscoveryService와 MetadataScanner를 사용해 모든 프로바이더를 뒤져서 래핑(Wrapping) 시도.
+
+결정적 문제: AOP를 적용하려는 대상이 다시 AOP 모듈을 의존하게 되는 순환 참조(Circular Dependency) 발생 시나리오 예시.
+
+"NestJS 서버가 시작조차 못 하고 죽어버리는 경험" 공유.
+
+4. 구원투수: toss/nestjs-aop 해부
+우아한 해결책: 라이브러리가 어떻게 LazyDecorator 패턴을 사용하여 순환 참조 문제를 우회하는지 개념적 설명.
+
+실전 구현:
+
+@Cacheable() 데코레이터 직접 구현.
+
+실제 Service 메서드 위에 붙여서 캐싱이 동작하는 모습 시연.
+
+Message: "바퀴를 다시 발명하지 말고, 원리를 이해하고 잘 만들어진 도구를 쓰자."
+
+5. Outro: 시리즈를 마치며 & Next Step
+해체분석기 요약: NestJS의 탄생 배경부터 모듈, DI, 파이프라인, 그리고 심연(Reflection)까지의 여정 정리.
+
+새로운 떡밥 (TS Decorators Phase 3): 지금 우리가 쓴 건 experimentalDecorators이며, 곧 표준(Standard) 데코레이터 시대가 오면 또 다른 변화가 있을 것임을 암시.
+
+Next Series Teaser: "프레임워크를 걷어내고, 본질인 언어 그 자체(JS/TS)로 들어갑니다."
