@@ -190,43 +190,50 @@ Guard는 Boolean을 반환해야 하며, `true`면 라우트에 진입을 허용
 
 역할(Role)에 따라 접근을 제어하는 예시를 간단히 살펴보자. `@Roles()` 데코레이터로 필요한 권한을 명시하고, Guard에서 이 정보를 읽어와 검사한다.
 
-```ts
-// roles.decorator.ts
-import { SetMetadata } from "@nestjs/common";
+<Tabs>
+  <TabItem label="roles.decorator.ts">
+    ```ts
+    import { SetMetadata } from "@nestjs/common";
 
-export const ROLES_KEY = "roles";
-export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+    export const ROLES_KEY = "roles";
+    export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+    ```
+  </TabItem>
+  <TabItem label="roles.guard.ts">
+    ```ts
+    @Injectable()
+    export class RolesGuard implements CanActivate {
+        constructor(private reflector: Reflector) {}
 
-// roles.guard.ts
-@Injectable()
-export class RolesGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
-
-    canActivate(context: ExecutionContext): boolean {
-        const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-            ROLES_KEY,
-            [context.getHandler(), context.getClass()]
-        );
-        if (!requiredRoles) {
-            return true; // 데코레이터 없으면 통과
+        canActivate(context: ExecutionContext): boolean {
+            const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+                ROLES_KEY,
+                [context.getHandler(), context.getClass()]
+            );
+            if (!requiredRoles) {
+                return true; // 데코레이터 없으면 통과
+            }
+            const request = context.switchToHttp().getRequest();
+            const user = request.user;
+            return requiredRoles.some((role) => user.roles?.includes(role));
         }
-        const request = context.switchToHttp().getRequest();
-        const user = request.user;
-        return requiredRoles.some((role) => user.roles?.includes(role));
     }
-}
-
-// admin.controller.ts
-@UseGuards(RolesGuard)
-@Controller("admin")
-export class AdminController {
-    @Roles("admin") // admin 권한 필요
-    @Get()
-    findAll() {
-        return "admin data!";
+    ```
+  </TabItem>
+  <TabItem label="admin.controller.ts">
+    ```ts
+    @UseGuards(RolesGuard)
+    @Controller("admin")
+    export class AdminController {
+        @Roles("admin") // admin 권한 필요
+        @Get()
+        findAll() {
+            return "admin data!";
+        }
     }
-}
-```
+    ```
+  </TabItem>
+</Tabs>
 
 `@Roles('admin')`로 "이 메서드는 admin 권한이 필요하다"고 선언한다.
 `RolesGuard`가 실행되면서, Reflector를 통해 필요한 권한(`'admin'`)을 읽어온 뒤, `request.user`가 가진 `roles` 배열에 `'admin'`이 있는지 검사하고, 일치하지 않으면 Guard가 false를 반환해 접근이 거부된다.

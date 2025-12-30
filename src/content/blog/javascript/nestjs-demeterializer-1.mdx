@@ -131,31 +131,38 @@ export class UserService {
 - RxJS 같은 라이브러리를 통해 **Observable** 방식으로 비동기 처리를 선언적으로 다룰 수 있다. -> Pub-Sub 패턴과 밀접한 연관이 있다.
 
 **예시**
-```ts
-@Controller('events')
-export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+<Tabs>
+  <TabItem label="events.controller.ts">
+    ```ts
+    @Controller('events')
+    export class EventsController {
+      constructor(private readonly eventsService: EventsService) {}
 
-  @Get()
-  getEvents(): Observable<Event[]> {
-    return this.eventsService.observeEvents(); // Observable<Event[]>
-  }
-}
+      @Get()
+      getEvents(): Observable<Event[]> {
+        return this.eventsService.observeEvents(); // Observable<Event[]>
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="events.service.ts">
+    ```ts
+    @Injectable()
+    export class EventsService {
+      private events$: Subject<Event[]> = new BehaviorSubject<Event[]>([]);
 
-@Injectable()
-export class EventsService {
-  private events$: Subject<Event[]> = new BehaviorSubject<Event[]>([]);
+      observeEvents(): Observable<Event[]> {
+        return this.events$.asObservable();
+      }
 
-  observeEvents(): Observable<Event[]> {
-    return this.events$.asObservable();
-  }
-
-  addEvent(newEvent: Event) {
-    const current = this.events$.getValue();
-    this.events$.next([...current, newEvent]);
-  }
-}
-```
+      addEvent(newEvent: Event) {
+        const current = this.events$.getValue();
+        this.events$.next([...current, newEvent]);
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
 - `BehaviorSubject`를 사용해 이벤트 목록을 스트림(Observable)으로 관리한다.
 - `EventsController`에서 `this.eventsService.observeEvents()`를 반환하면, 구독(subscribe)하는 쪽에서 이벤트 스트림을 실시간으로 받는다.
 - 데이터의 변화를 시간 흐름에 맞춰 반응형으로 처리할 수 있다.
@@ -171,35 +178,42 @@ NestJS에서 개발하는 코드는 **모듈(Module)** 을 중심으로 조직�
 - **프로바이더(Provider)** : 서비스, 리포지토리, 헬퍼 등 “비즈니스 로직이나 데이터 처리를 담당하는 클래스”를 통칭한다. 보통 `@Injectable()` 데코레이터를 붙여, NestJS DI 컨테이너에 의해 자동 주입될 수 있도록 만든다.
 
 간단한 `UserModule` 예시를 들어보자.
-```ts
-// user.module.ts
-@Module({
-  controllers: [UserController],
-  providers: [UserService, UserRepository],
-})
-export class UserModule {}
+<Tabs>
+  <TabItem label="user.module.ts">
+    ```ts
+    @Module({
+      controllers: [UserController],
+      providers: [UserService, UserRepository],
+    })
+    export class UserModule {}
+    ```
+  </TabItem>
+  <TabItem label="user.controller.ts">
+    ```ts
+    @Controller('users')
+    export class UserController {
+      constructor(private readonly userService: UserService) {}
 
-// user.controller.ts
-@Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+      @Get()
+      findAllUsers() {
+        return this.userService.findAll();
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="user.service.ts">
+    ```ts
+    @Injectable()
+    export class UserService {
+      constructor(private readonly userRepository: UserRepository) {}
 
-  @Get()
-  findAllUsers() {
-    return this.userService.findAll();
-  }
-}
-
-// user.service.ts
-@Injectable()
-export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
-
-  findAll() {
-    return this.userRepository.findAll();
-  }
-}
-```
+      findAll() {
+        return this.userRepository.findAll();
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
 
 위 예시와 같이 `UserModule` 안에 `UserController`, `UserService`, `UserRepository`를 묶어보면, 코드를 처음 보는 사람도 '아 여기서 사용자 관련 로직을 전부 관리하는구나' 라고 생각할 수 있는, 구조적 일관성이 생긴다. 자연스럽게 데코레이터들(클래스 위에 붙는 `@`)을 사용하고 있는데, 세부 구현을 몰라도 선언형으로 가져다 쓸 수 있는 물건이다. 
 

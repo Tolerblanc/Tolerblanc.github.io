@@ -109,58 +109,63 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
 하지만, 실제 애플리케이션에서는 `HttpException`만으로 에러 상황을 모두 처리하기 어렵다. 예를 들어, 사용자 정보가 존재하지 않는다면 `UserNotFoundException`과 같은 구체적인 예외를 만들어 관리하는 것이 좋다. 도메인(업무 로직)마다 예외를 분리하면 유지보수와 디버깅이 훨씬 수월해진다. 아래 예시를 보자:
 
-```typescript
-// business.exception.ts
-export class BusinessException extends HttpException {
-  constructor(
-    private readonly code: string,
-    message: string,
-    private readonly details?: Record<string, any>,
-    status: number = 400
-  ) {
-    super(
-      {
-        code,
-        message,
-        details,
-        status
-      },
-      status
-    );
-  }
+<Tabs>
+  <TabItem label="business.exception.ts">
+    ```typescript
+    export class BusinessException extends HttpException {
+      constructor(
+        private readonly code: string,
+        message: string,
+        private readonly details?: Record<string, any>,
+        status: number = 400
+      ) {
+        super(
+          {
+            code,
+            message,
+            details,
+            status
+          },
+          status
+        );
+      }
 
-  getCode(): string {
-    return this.code;
-  }
+      getCode(): string {
+        return this.code;
+      }
 
-  getDetails(): Record<string, any> | undefined {
-    return this.details;
-  }
-}
+      getDetails(): Record<string, any> | undefined {
+        return this.details;
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="user.exceptions.ts">
+    ```typescript
+    export class UserNotFoundException extends BusinessException {
+      constructor(userId: string | number) {
+        super(
+          'USER_NOT_FOUND',
+          `User with id ${userId} not found`,
+          { userId },
+          404
+        );
+      }
+    }
 
-// user.exceptions.ts
-export class UserNotFoundException extends BusinessException {
-  constructor(userId: string | number) {
-    super(
-      'USER_NOT_FOUND',
-      `User with id ${userId} not found`,
-      { userId },
-      404
-    );
-  }
-}
-
-export class DuplicateEmailException extends BusinessException {
-  constructor(email: string) {
-    super(
-      'DUPLICATE_EMAIL',
-      'Email already exists',
-      { email },
-      409
-    );
-  }
-}
-```
+    export class DuplicateEmailException extends BusinessException {
+      constructor(email: string) {
+        super(
+          'DUPLICATE_EMAIL',
+          'Email already exists',
+          { email },
+          409
+        );
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
 
 이러한 계층화된 예외 구조를 구축하면 다음과 같은 이점이 있다.
 
