@@ -175,8 +175,30 @@ const currentCategory = currentPath.includes('/category/')
     saveSectionStates(states);
   }
 
-  // Initialize sidebar
-  function initSidebar() {
+  // Apply state to the new document before it is swapped in (prevents FOUC on navigation)
+  function applyStateToNewDocument(event) {
+    const newDoc = event.newDocument;
+    const sidebar = newDoc.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    const states = loadSectionStates();
+    const sections = sidebar.querySelectorAll('.sidebar-section');
+    
+    sections.forEach((section) => {
+      const sectionName = section.getAttribute('data-section');
+      if (sectionName && states[sectionName] !== undefined) {
+        const isExpanded = states[sectionName];
+        section.setAttribute('data-collapsed', String(!isExpanded));
+        const header = section.querySelector('.section-header');
+        if (header) {
+          header.setAttribute('aria-expanded', String(isExpanded));
+        }
+      }
+    });
+  }
+
+  // Apply sidebar state immediately to prevent flicker on initial load
+  function applySidebarState() {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
@@ -195,6 +217,14 @@ const currentCategory = currentPath.includes('/category/')
         }
       }
     });
+  }
+
+  // Setup event listeners
+  function setupSidebarListeners() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    const states = loadSectionStates();
 
     // Clone and replace section headers to remove old listeners
     const sectionHeaders = sidebar.querySelectorAll('.section-header');
@@ -211,15 +241,14 @@ const currentCategory = currentPath.includes('/category/')
     });
   }
 
-  // Initialize on DOM load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSidebar);
-  } else {
-    initSidebar();
-  }
+  // Run immediately for initial load
+  applySidebarState();
 
-  // Re-initialize on View Transitions
-  document.addEventListener('astro:page-load', initSidebar);
+  // Apply to new document before swap (View Transitions)
+  document.addEventListener('astro:before-swap', applyStateToNewDocument);
+
+  // Setup listeners on page load (Initial + Navigation)
+  document.addEventListener('astro:page-load', setupSidebarListeners);
 </script>
 
 <style>
