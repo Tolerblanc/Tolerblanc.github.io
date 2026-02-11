@@ -1,0 +1,76 @@
+---
+import { Github, Linkedin, Mail, Rss } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+
+const currentYear = new Date().getFullYear();
+
+const socialLinks = [
+  { href: 'https://github.com/Tolerblanc', icon: Github, label: 'GitHub' },
+  { href: 'https://www.linkedin.com/in/hyunjun-kim-981a141aa', icon: Linkedin, label: 'LinkedIn' },
+  { href: 'mailto:tolerblanc@gmail.com', icon: Mail, label: 'Email' },
+  { href: '/rss.xml', icon: Rss, label: 'RSS' },
+];
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/posts', label: 'Blog' },
+  { href: '/series', label: 'Series' },
+  { href: '/tags', label: 'Tags' },
+  { href: '/about', label: 'About' },
+];
+---
+
+<footer class="mt-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div class="mx-auto w-full max-w-screen-xl px-4 py-12 md:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <div class="md:col-span-2">
+        <a href="/" class="flex items-center gap-2 mb-4">
+          <span class="text-xl font-bold tracking-tight">Tolerblanc</span>
+        </a>
+        <p class="text-sm text-muted-foreground max-w-xs leading-relaxed">
+          인생은 B와 D사이 Code다.<br/>
+          호기심 많은 개발자의 기록 공간입니다.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="font-semibold mb-4 text-sm">Sitemap</h3>
+        <ul class="flex flex-col gap-2.5 text-sm text-muted-foreground">
+          {links.map(link => (
+            <li>
+              <a href={link.href} class="hover:text-foreground transition-colors">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-4 text-sm">Social</h3>
+        <div class="flex gap-4">
+          {socialLinks.map(({ href, icon: Icon, label }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={label}
+            >
+              <Icon size={20} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <Separator className="my-8" />
+
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+      <p>© {currentYear} Tolerblanc. All rights reserved.</p>
+      <p class="text-xs">
+        Built with <a href="https://astro.build" target="_blank" rel="noreferrer" class="hover:text-foreground underline underline-offset-4">Astro</a> & <a href="https://ui.shadcn.com" target="_blank" rel="noreferrer" class="hover:text-foreground underline underline-offset-4">shadcn/ui</a>
+      </p>
+    </div>
+  </div>
+</footer>

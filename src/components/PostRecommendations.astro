@@ -71,30 +71,30 @@ if (recommendedPosts.length === 0) {
 }
 ---
 
-<section class="post-recommendations">
-  <h2 class="recommendations-title">추천 게시글</h2>
-  <p class="recommendations-subtitle">이 글과 관련된 다른 게시글을 확인해보세요</p>
+<section class="mt-16 mb-12 pt-12 border-t border-border">
+  <h2 class="text-2xl font-bold text-foreground mb-2 tracking-tight">추천 게시글</h2>
+  <p class="text-sm text-muted-foreground/70 mb-8">이 글과 관련된 다른 게시글을 확인해보세요</p>
 
-  <div class="recommendations-grid">
+  <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
     {
       recommendedPosts.map((post) => (
-        <a href={`/${post.id}`} class="recommendation-card">
-          <div class="card-content">
-            <div class="card-categories">
+        <a href={`/${post.id}`} class="block bg-card border border-border rounded-lg p-6 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-primary/50 h-full">
+          <div class="flex flex-col h-full">
+            <div class="flex flex-wrap gap-2 mb-3">
               {post.data.categories.map((cat) => (
-                <span class="category-badge">{cat}</span>
+                <span class="inline-block px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">{cat}</span>
               ))}
             </div>
 
-            <h3 class="card-title">{post.data.title}</h3>
+            <h3 class="text-lg font-semibold text-foreground mb-3 tracking-tight line-clamp-2 break-keep">{post.data.title}</h3>
 
-            <p class="card-excerpt">{post.data.excerpt}</p>
+            <p class="text-sm text-muted-foreground mb-4 flex-grow line-clamp-2">{post.data.excerpt}</p>
 
-            <div class="card-meta">
+            <div class="flex items-center gap-2 text-xs text-muted-foreground/70 mt-auto">
               <time datetime={new Date(post.data.date).toISOString()}>
                 {formatDateShort(post.data.date)}
               </time>
-              <span class="meta-separator">·</span>
+              <span>·</span>
               <span>{post.readingTime}</span>
             </div>
           </div>
@@ -103,140 +103,3 @@ if (recommendedPosts.length === 0) {
     }
   </div>
 </section>
-
-<style>
-  .post-recommendations {
-    margin-top: var(--spacing-16);
-    margin-bottom: var(--spacing-12);
-    padding-top: var(--spacing-12);
-    border-top: 1px solid var(--color-border-primary);
-  }
-
-  .recommendations-title {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
-    letter-spacing: -0.02em;
-  }
-
-  .recommendations-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--spacing-8);
-  }
-
-  .recommendations-grid {
-    display: grid;
-    gap: var(--spacing-6);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 768px) {
-    .recommendations-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .recommendations-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .recommendation-card {
-    display: block;
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
-    text-decoration: none;
-    transition: all var(--transition-normal);
-    height: 100%;
-  }
-
-  .recommendation-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card);
-    border-color: var(--color-accent-primary);
-  }
-
-  .card-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .card-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
-    margin-bottom: var(--spacing-3);
-  }
-
-  .category-badge {
-    display: inline-block;
-    padding: var(--spacing-1) var(--spacing-3);
-    background-color: var(--color-accent-primary);
-    color: var(--color-bg-primary);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-medium);
-    border-radius: var(--radius-full);
-    line-height: 1.4;
-  }
-
-  .card-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-3);
-    line-height: var(--line-height-tight);
-    letter-spacing: -0.01em;
-    word-break: keep-all;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-excerpt {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    line-height: var(--line-height-relaxed);
-    margin-bottom: var(--spacing-4);
-    flex-grow: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-    margin-top: auto;
-  }
-
-  .meta-separator {
-    color: var(--color-text-tertiary);
-  }
-
-  /* 반응형 */
-  @media (max-width: 640px) {
-    .post-recommendations {
-      margin-top: var(--spacing-12);
-      padding-top: var(--spacing-8);
-    }
-
-    .recommendations-title {
-      font-size: var(--font-size-xl);
-    }
-
-    .recommendation-card {
-      padding: var(--spacing-5);
-    }
-  }
-</style>

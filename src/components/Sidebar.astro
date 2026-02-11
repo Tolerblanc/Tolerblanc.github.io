@@ -13,124 +13,138 @@ const currentCategory = currentPath.includes('/category/')
   : null;
 ---
 
-<aside class="sidebar" data-mode="fixed">
-  <!-- 사이드바 컨트롤 -->
-  <!-- Profile Section (접기/펼치기 가능) -->
-  <section class="sidebar-section sidebar-profile" data-section="profile" data-collapsed="false">
-    <button class="section-header profile-header" aria-expanded="true">
-      <div class="profile-avatar">
-        <img src="https://avatars.githubusercontent.com/u/52883827?v=4" alt="Tolerblanc" class="avatar-image" />
-      </div>
-      <span class="profile-name">Tolerblanc</span>
-      <svg class="section-icon chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="section-content profile-content">
-      <div class="profile-bio">
-        🍀 GLHF
-      </div>
-      <ul class="profile-links">
-        <li>
-          <a href="https://github.com/Tolerblanc" target="_blank" rel="noopener noreferrer" class="profile-link-item">
-            <svg class="link-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            <span class="link-text">GitHub</span>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.linkedin.com/in/hyunjun-kim-981a141aa" target="_blank" rel="noopener noreferrer" class="profile-link-item">
-            <svg class="link-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-            <span class="link-text">LinkedIn</span>
-          </a>
-        </li>
-        <li>
-          <a href="mailto:tolerblanc@gmail.com" class="profile-link-item">
-            <svg class="link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="4" width="20" height="16" rx="2"/>
-              <path d="M22 7L12 13L2 7"/>
-            </svg>
-            <span class="link-text">Email</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Recent Posts Section (접기/펼치기 가능) -->
-  <section class="sidebar-section" data-section="recent-posts" data-collapsed="false">
-    <button class="section-header" aria-expanded="true">
-      <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-      </svg>
-      <h2 class="section-title">Recent Posts</h2>
-      <svg class="section-icon chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="section-content">
-      <ul class="recent-posts-list">
-        {recentPosts.map(post => (
-          <li>
-            <a
-              href={`/${post.slug}`}
-              class="recent-post-link"
-            >
-              <span class="post-title">{post.title}</span>
-              <span class="post-date">
-                {post.date.toLocaleDateString('ko-KR', {
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  <!-- Categories Section (2-depth 구조, 접기/펼치기 가능) -->
-  <section class="sidebar-section" data-section="categories" data-collapsed="false">
-    <button class="section-header" aria-expanded="true">
-      <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-      </svg>
-      <h2 class="section-title">Categories</h2>
-      <svg class="section-icon chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="section-content">
-      <nav class="categories-nav">
-        {categoryGroups.map(group => (
-          <div class="category-group">
-            <div class="group-header">
-              <span class="group-name">{group.name}</span>
-              <span class="group-count">{group.totalPosts}</span>
-            </div>
-            <ul class="category-list">
-              {group.children.map(category => (
-                <li>
-                  <a
-                    href={category.path}
-                    class={`category-link ${currentCategory === category.id ? 'active' : ''}`}
-                  >
-                    <span class="category-name">{category.name}</span>
-                    <span class="category-count">{category.postCount}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
+<aside class="hidden md:flex h-screen w-64 flex-col fixed inset-y-0 z-50 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div class="flex flex-col h-full overflow-y-auto px-6 py-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/20 transition-colors" style="scrollbar-gutter: stable;">
+    <!-- Profile Section (접기/펼치기 가능) -->
+    <section class="group mb-6 pb-4 border-b sidebar-section" data-section="profile" data-collapsed="false">
+      <button class="flex items-center gap-2 w-full p-2 text-left rounded-md hover:bg-muted transition-colors section-header" aria-expanded="true">
+        <div class="flex items-center justify-center w-8 h-8 rounded-md overflow-hidden bg-muted">
+          <img src="https://avatars.githubusercontent.com/u/52883827?v=4" alt="Tolerblanc" class="w-full h-full object-cover" />
+        </div>
+        <span class="flex-1 text-sm font-semibold">Tolerblanc</span>
+        <svg class="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 section-icon chevron" viewBox="0 0 16 16" fill="none">
+          <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="section-content overflow-hidden transition-all duration-300 ease-in-out">
+        <div class="p-2 pt-1">
+          <div class="p-3 mb-2 text-sm text-muted-foreground bg-muted/50 rounded-md text-center">
+            🍀 GLHF
           </div>
-        ))}
-      </nav>
-    </div>
-  </section>
+          <ul class="flex flex-col gap-0.5">
+            <li>
+              <a href="https://github.com/Tolerblanc" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground rounded-md hover:bg-muted hover:text-foreground transition-colors">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span class="font-medium">GitHub</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/hyunjun-kim-981a141aa" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground rounded-md hover:bg-muted hover:text-foreground transition-colors">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                <span class="font-medium">LinkedIn</span>
+              </a>
+            </li>
+            <li>
+              <a href="mailto:tolerblanc@gmail.com" class="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground rounded-md hover:bg-muted hover:text-foreground transition-colors">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="M22 7L12 13L2 7"/>
+                </svg>
+                <span class="font-medium">Email</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Posts Section (접기/펼치기 가능) -->
+    <section class="mb-6 sidebar-section" data-section="recent-posts" data-collapsed="false">
+      <button class="flex items-center gap-2 w-full p-2 text-left rounded-md hover:bg-muted transition-colors section-header" aria-expanded="true">
+        <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <h2 class="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recent Posts</h2>
+        <svg class="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 section-icon chevron" viewBox="0 0 16 16" fill="none">
+          <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="section-content overflow-hidden transition-all duration-300 ease-in-out">
+        <ul class="flex flex-col gap-1 mt-1 px-2">
+          {recentPosts.map(post => (
+            <li>
+              <a
+                href={`/${post.slug}`}
+                class="block px-2 py-2 text-sm text-muted-foreground rounded-md hover:bg-muted hover:text-foreground transition-colors group"
+              >
+                <span class="block text-sm font-medium mb-0.5 group-hover:text-primary transition-colors leading-snug" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{post.title}</span>
+                <span class="block text-xs text-muted-foreground/70">
+                  {post.date.toLocaleDateString('ko-KR', {
+                    year: '2-digit',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Categories Section (2-depth 구조, 접기/펼치기 가능) -->
+    <section class="mb-6 sidebar-section" data-section="categories" data-collapsed="false">
+      <button class="flex items-center gap-2 w-full p-2 text-left rounded-md hover:bg-muted transition-colors section-header" aria-expanded="true">
+        <svg class="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <h2 class="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categories</h2>
+        <svg class="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 section-icon chevron" viewBox="0 0 16 16" fill="none">
+          <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="section-content overflow-hidden transition-all duration-300 ease-in-out">
+        <nav class="flex flex-col gap-4 mt-1 px-2">
+          {categoryGroups.map(group => (
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between px-2 py-1.5 text-sm font-semibold text-foreground">
+                <span>{group.name}</span>
+                <span class="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{group.totalPosts}</span>
+              </div>
+              <ul class="flex flex-col gap-0.5">
+                {group.children.map(category => (
+                  <li>
+                    <a
+                      href={category.path}
+                      class={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors ${
+                        currentCategory === category.id
+                          ? 'bg-primary text-primary-foreground font-medium'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <span class="flex-1">{category.name}</span>
+                      <span class={`text-xs px-2 py-0.5 rounded-full ${
+                        currentCategory === category.id
+                          ? 'bg-primary-foreground/20 text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {category.postCount}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </div>
+    </section>
+  </div>
 </aside>
 
 <script is:inline>
@@ -171,6 +185,24 @@ const currentCategory = currentPath.includes('/category/')
       header.setAttribute('aria-expanded', String(!newCollapsed));
     }
 
+    // Toggle content max-height for animation
+    const content = section.querySelector('.section-content');
+    if (content) {
+        if (newCollapsed) {
+            content.style.maxHeight = '0px';
+            content.style.opacity = '0';
+        } else {
+            content.style.maxHeight = '2000px';
+            content.style.opacity = '1';
+        }
+    }
+    
+    // Rotate chevron
+    const chevron = section.querySelector('.chevron');
+    if (chevron) {
+        chevron.style.transform = newCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+    }
+
     states[sectionName] = !newCollapsed;
     saveSectionStates(states);
   }
@@ -178,7 +210,7 @@ const currentCategory = currentPath.includes('/category/')
   // Apply state to the new document before it is swapped in (prevents FOUC on navigation)
   function applyStateToNewDocument(event) {
     const newDoc = event.newDocument;
-    const sidebar = newDoc.querySelector('.sidebar');
+    const sidebar = newDoc.querySelector('aside'); // Changed selector from .sidebar
     if (!sidebar) return;
 
     const states = loadSectionStates();
@@ -199,7 +231,7 @@ const currentCategory = currentPath.includes('/category/')
 
   // Apply sidebar state immediately to prevent flicker on initial load
   function applySidebarState() {
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('aside'); 
     if (!sidebar) return;
 
     const states = loadSectionStates();
@@ -211,9 +243,26 @@ const currentCategory = currentPath.includes('/category/')
       if (sectionName && states[sectionName] !== undefined) {
         const isExpanded = states[sectionName];
         section.setAttribute('data-collapsed', String(!isExpanded));
-        const header = section.querySelector('.section-header');
-        if (header) {
-          header.setAttribute('aria-expanded', String(isExpanded));
+        
+        const content = section.querySelector('.section-content');
+        const chevron = section.querySelector('.chevron');
+        
+        if (!isExpanded) {
+            if (content) {
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+            }
+            if (chevron) {
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        } else {
+            if (content) {
+                content.style.maxHeight = '2000px'; 
+                content.style.opacity = '1';
+            }
+            if (chevron) {
+                chevron.style.transform = 'rotate(0deg)';
+            }
         }
       }
     });
@@ -221,7 +270,7 @@ const currentCategory = currentPath.includes('/category/')
 
   // Setup event listeners
   function setupSidebarListeners() {
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('aside');
     if (!sidebar) return;
 
     const states = loadSectionStates();
@@ -250,327 +299,3 @@ const currentCategory = currentPath.includes('/category/')
   // Setup listeners on page load (Initial + Navigation)
   document.addEventListener('astro:page-load', setupSidebarListeners);
 </script>
-
-<style>
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: var(--layout-sidebar-width);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text-primary);
-    overflow-y: auto;
-    padding: var(--spacing-6);
-    border-right: 1px solid var(--color-border-primary);
-    z-index: var(--z-sticky);
-  }
-
-  /* Profile Section */
-  .sidebar-profile {
-    margin-bottom: var(--spacing-6);
-    padding-bottom: var(--spacing-4);
-    border-bottom: 1px solid var(--color-border-secondary);
-  }
-
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2);
-  }
-
-  .profile-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-md);
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  .avatar-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .profile-name {
-    flex: 1;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    line-height: var(--line-height-tight);
-  }
-
-  .profile-content {
-    padding: var(--spacing-2) var(--spacing-1);
-  }
-
-  .profile-bio {
-    padding: var(--spacing-3);
-    margin-bottom: var(--spacing-2);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    background-color: var(--color-bg-secondary);
-    border-radius: var(--radius-md);
-    text-align: center;
-  }
-
-  .profile-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .profile-link-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
-    font-size: var(--font-size-sm);
-  }
-
-  .profile-link-item:hover {
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-  }
-
-  .link-icon {
-    flex-shrink: 0;
-    color: var(--color-text-tertiary);
-  }
-
-  .profile-link-item:hover .link-icon {
-    color: var(--color-accent-primary);
-  }
-
-  .link-text {
-    flex: 1;
-    font-weight: var(--font-weight-medium);
-  }
-
-  /* 섹션 스타일 */
-  .sidebar-section {
-    margin-bottom: var(--spacing-6);
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    width: 100%;
-    padding: var(--spacing-2) var(--spacing-1);
-    border: none;
-    background: none;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-fast);
-    text-align: left;
-  }
-
-  .section-header:hover {
-    background-color: var(--color-bg-secondary);
-  }
-
-  .section-icon {
-    flex-shrink: 0;
-    color: var(--color-text-tertiary);
-  }
-
-  .section-icon.chevron {
-    margin-left: auto;
-    transition: transform var(--transition-base);
-  }
-
-  .sidebar-section[data-collapsed="true"] .section-icon.chevron {
-    transform: rotate(-90deg);
-  }
-
-  .section-title {
-    flex: 1;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0;
-  }
-
-  .section-content {
-    max-height: 2000px;
-    overflow: hidden;
-    transition: max-height var(--transition-slow), opacity var(--transition-base);
-    opacity: 1;
-  }
-
-  .sidebar-section[data-collapsed="true"] .section-content {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  /* Recent Posts */
-  .recent-posts-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .recent-posts-list li {
-    margin-bottom: var(--spacing-3);
-  }
-
-  .recent-post-link {
-    display: block;
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    padding: var(--spacing-2);
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
-  }
-
-  .recent-post-link:hover {
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-  }
-
-  .post-title {
-    display: block;
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-tight);
-    margin-bottom: var(--spacing-1);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
-  .post-date {
-    display: block;
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-  }
-
-  /* Categories (2-depth 구조) */
-  .categories-nav {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-4);
-  }
-
-  .category-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-1);
-  }
-
-  .group-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-2) var(--spacing-1);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .group-name {
-    flex: 1;
-  }
-
-  .group-count {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-    background-color: var(--color-bg-secondary);
-    padding: 0.125rem var(--spacing-2);
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .category-link {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
-    font-size: var(--font-size-sm);
-  }
-
-  .category-link:hover {
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-  }
-
-  .category-link.active {
-    background-color: var(--color-accent-primary);
-    color: #ffffff;
-  }
-
-  .category-link .category-name {
-    flex: 1;
-    font-weight: var(--font-weight-medium);
-  }
-
-  .category-link .category-count {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-    background-color: var(--color-bg-tertiary);
-    padding: 0.125rem var(--spacing-2);
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-semibold);
-    transition: all var(--transition-fast);
-  }
-
-  .category-link.active .category-count {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .sidebar {
-      display: none;
-    }
-  }
-
-  /* Scrollbar styling */
-  .sidebar::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .sidebar::-webkit-scrollbar-track {
-    background-color: var(--color-bg-primary);
-  }
-
-  .sidebar::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-primary);
-    border-radius: var(--radius-sm);
-  }
-
-  .sidebar::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-text-tertiary);
-  }
-</style>

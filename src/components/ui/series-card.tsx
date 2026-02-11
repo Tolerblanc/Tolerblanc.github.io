@@ -24,7 +24,7 @@ export function SeriesCard({
   className
 }: SeriesCardProps) {
   return (
-    <Card className={cn("group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-primary/50", className)}>
+    <Card className={cn("group hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300 ease-out hover:border-primary/30", className)}>
       <a href={`/series/${slug}`} className="block">
         <CardHeader>
           <div className="flex items-start justify-between gap-2 mb-2">

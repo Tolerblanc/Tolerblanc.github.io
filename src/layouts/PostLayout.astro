@@ -3,12 +3,6 @@
  * Blog Post Layout
  *
  * 블로그 포스트를 위한 레이아웃 컴포넌트
- *
- * 기능:
- * - SEO 메타데이터 (title, description, og:image)
- * - 포스트 메타 정보 표시 (날짜, 카테고리, 태그)
- * - TOC (Table of Contents) - 선택적
- * - 읽기 시간 표시 (계산된 경우)
  */
 
 import type { CollectionEntry } from 'astro:content';
@@ -30,8 +24,7 @@ interface Props {
 }
 
 const { post, headings } = Astro.props;
-const { title, excerpt, date, updatedDate, categories, tags, description, toc, author, series } =
-  post.data;
+const { title, excerpt, date, updatedDate, categories, tags, description, toc, author, series } = post.data;
 
 // 날짜 포맷팅
 const formatDate = (date: Date) => {
@@ -77,26 +70,18 @@ if (series) {
 <BaseLayout title={`${title} | Tolerblanc's Blog`} description={description || excerpt}>
   <Fragment slot="head">
     <meta name="author" content={author} />
-
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description || excerpt} />
-    {
-      post.data.ogImage && (
-        <>
-          <meta property="og:image" content={post.data.ogImage} />
-          <meta name="twitter:image" content={post.data.ogImage} />
-        </>
-      )
-    }
-
-    <!-- Twitter -->
+    {post.data.ogImage && (
+      <>
+        <meta property="og:image" content={post.data.ogImage} />
+        <meta name="twitter:image" content={post.data.ogImage} />
+      </>
+    )}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description || excerpt} />
-
-    <!-- Article Meta -->
     <meta property="article:published_time" content={new Date(date).toISOString()} />
     {updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
     <meta property="article:author" content={author} />
@@ -104,529 +89,93 @@ if (series) {
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
   </Fragment>
 
-  <div class="page-layout">
-    <article class="post-container">
+  <div class="relative w-full flex justify-center gap-12 xl:gap-16 px-4 md:px-8">
+    <article class="w-full max-w-3xl flex-shrink-0">
       <!-- Header -->
-      <header class="post-header">
-        {
-          series && (
-            <div class="series-info">
-              <span class="series-name">{series.name}</span> 시리즈 · 제{series.order}편
-            </div>
-          )
-        }
+      <header class="mb-12 border-b pb-8">
+        {series && (
+          <div class="mb-4 text-sm font-medium text-muted-foreground">
+            <span class="font-semibold text-primary">{series.name}</span> 시리즈 · 제{series.order}편
+          </div>
+        )}
 
-        <h1 class="post-title">{title}</h1>
+        <h1 class="mb-4 text-3xl md:text-4xl font-bold tracking-tight text-foreground break-keep">
+          {title}
+        </h1>
 
-        <div class="post-meta">
+        <div class="mb-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
           <time datetime={new Date(date).toISOString()}>
             {formatDate(date)}
           </time>
-          {
-            updatedDate && (
-              <span>
-                (수정: <time datetime={new Date(updatedDate).toISOString()}>{formatDate(updatedDate)}</time>)
-              </span>
-            )
-          }
+          {updatedDate && (
+            <span>
+              (수정: <time datetime={new Date(updatedDate).toISOString()}>{formatDate(updatedDate)}</time>)
+            </span>
+          )}
           <span>by {author}</span>
         </div>
 
-        {
-          excerpt && (
-            <p class="post-excerpt">{excerpt}</p>
-          )
-        }
+        {excerpt && <p class="mb-6 text-lg text-muted-foreground leading-relaxed">{excerpt}</p>}
 
         <!-- Categories and Tags -->
-        <div class="post-tags">
-          <div class="categories">
-            {
-              categories.map((cat) => (
-                <span class="category-tag">{cat}</span>
-              ))
-            }
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                {cat}
+              </span>
+            ))}
           </div>
-          {
-            tags.length > 0 && (
-              <div class="tags">
-                {tags.map((tag) => (
-                  <span class="tag">#{tag}</span>
-                ))}
-              </div>
-            )
-          }
+          {tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span class="px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 transition-colors">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
-      <!-- Series Navigation -->
+      <!-- Series Navigation (Collapsible or Card style) -->
       {seriesData && (
-        <SeriesNavigation
-          seriesName={seriesData.seriesName}
-          seriesSlug={seriesData.seriesSlug}
-          posts={seriesData.posts}
-          currentPostId={seriesData.currentPostId}
-          client:load
-        />
+        <div class="mb-10">
+           <SeriesNavigation
+            seriesName={seriesData.seriesName}
+            seriesSlug={seriesData.seriesSlug}
+            posts={seriesData.posts}
+            currentPostId={seriesData.currentPostId}
+            client:load
+          />
+        </div>
       )}
 
       <!-- Main Content -->
-      <main class="post-content prose prose-lg dark:prose-invert">
+      <main class="prose prose-lg dark:prose-invert max-w-none break-words">
         <slot />
       </main>
 
       <!-- Comments Section -->
-      <GiscusComments />
+      <div class="mt-16 pt-8 border-t">
+          <GiscusComments />
+      </div>
 
       <!-- Recommended Posts -->
       <PostRecommendations currentPost={post} />
 
-      <!-- Footer -->
-      <footer class="post-footer">
-        <p>
-          © 2025 Tolerblanc. All rights reserved. |
-          <a
-            href="https://github.com/Tolerblanc/Tolerblanc.github.io"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-        </p>
-      </footer>
     </article>
 
-    <!-- TOC Sidebar (Desktop only) - Fixed to right side -->
-    {
-      toc && tocHeadings.length > 0 && (
-        <aside class="toc-sidebar">
-          <TableOfContents headings={tocHeadings} />
-        </aside>
-      )
-    }
+    <!-- TOC Sidebar (Desktop only) -->
+    {toc && tocHeadings.length > 0 && (
+      <aside class="hidden xl:block w-64 flex-shrink-0 sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto">
+        <TableOfContents headings={tocHeadings} />
+      </aside>
+    )}
 
     <!-- UI Enhancement Components -->
     <ReadingProgress />
     <CodeCopyButton />
     <ScrollToTop />
   </div>
-
-<style>
-  /* 페이지 전체 레이아웃 */
-  .page-layout {
-    position: relative;
-    width: 100%;
-  }
-
-  /* 포스트 본문 컨테이너 */
-  .post-container {
-    max-width: var(--layout-content-width); /* 800px */
-    margin: 0 auto;
-    padding: 0 var(--spacing-6);
-  }
-
-  /* TOC 사이드바 - 기본적으로 숨김 */
-  .toc-sidebar {
-    display: none;
-  }
-
-  /* 데스크톱: TOC를 오른쪽에 고정 */
-  @media (min-width: 1280px) {
-    .page-layout {
-      display: flex;
-      justify-content: center;
-      gap: var(--spacing-16); /* 64px */
-      padding: 0 var(--spacing-8);
-    }
-
-    .post-container {
-      flex: 0 0 var(--layout-content-width); /* 800px 고정 */
-      max-width: var(--layout-content-width);
-      padding: 0;
-    }
-
-    .toc-sidebar {
-      display: block;
-      flex: 0 0 var(--layout-sidebar-width); /* 256px 고정 */
-      position: sticky;
-      top: calc(var(--layout-header-height) + var(--spacing-2)); /* 테마 토글과 정렬 */
-      height: fit-content;
-      max-height: calc(100vh - var(--layout-header-height) - var(--spacing-6));
-      align-self: flex-start; /* sticky가 제대로 동작하도록 */
-    }
-  }
-
-  /* 넓은 화면: TOC를 더 오른쪽으로 */
-  @media (min-width: 1536px) {
-    .page-layout {
-      gap: var(--spacing-20); /* 80px */
-      padding: 0 var(--spacing-12);
-    }
-  }
-
-  /* ===== 게시글 헤더 ===== */
-  .post-header {
-    margin-bottom: var(--spacing-12);
-    padding-bottom: var(--spacing-8);
-    border-bottom: 1px solid var(--color-border-primary);
-  }
-
-  .series-info {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--spacing-4);
-    font-weight: var(--font-weight-medium);
-  }
-
-  .series-name {
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-accent-primary);
-  }
-
-  .post-title {
-    font-size: var(--font-size-post-title); /* 36px */
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-post-title); /* 1.3 */
-    margin-bottom: var(--spacing-4);
-    color: var(--color-text-primary);
-    letter-spacing: -0.02em;
-    word-break: keep-all;
-  }
-
-  .post-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-4);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--spacing-5);
-  }
-
-  .post-excerpt {
-    font-size: var(--font-size-lg);
-    line-height: var(--line-height-relaxed);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-6);
-  }
-
-  /* ===== 카테고리 및 태그 ===== */
-  .post-tags {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-3);
-  }
-
-  .categories,
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
-  }
-
-  .category-tag {
-    padding: var(--spacing-2) var(--spacing-4);
-    background: var(--color-accent-primary);
-    color: var(--color-bg-primary);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    transition: background-color var(--transition-fast);
-  }
-
-  .category-tag:hover {
-    background: var(--color-accent-secondary);
-  }
-
-  .tag {
-    padding: var(--spacing-1) var(--spacing-3);
-    background: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-    border: 1px solid var(--color-border-primary);
-    transition: all var(--transition-fast);
-  }
-
-  .tag:hover {
-    background: var(--color-bg-tertiary);
-    border-color: var(--color-border-secondary);
-  }
-
-  /* ===== 콘텐츠 영역 ===== */
-  .post-content {
-    margin-bottom: var(--spacing-12);
-  }
-
-  /* ===== 게시글 푸터 ===== */
-  .post-footer {
-    margin-top: var(--spacing-12);
-    padding-top: var(--spacing-8);
-    border-top: 1px solid var(--color-border-primary);
-    text-align: center;
-  }
-
-  .post-footer p {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-  }
-
-  .post-footer a {
-    color: var(--color-accent-primary);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-  }
-
-  .post-footer a:hover {
-    color: var(--color-accent-secondary);
-    text-decoration: underline;
-  }
-
-  /* ===== 반응형 디자인 ===== */
-  @media (max-width: 640px) {
-    .post-title {
-      font-size: var(--font-size-3xl); /* 30px */
-    }
-
-    .post-header {
-      margin-bottom: var(--spacing-8);
-      padding-bottom: var(--spacing-6);
-    }
-
-    .post-content-wrapper {
-      margin-bottom: var(--spacing-8);
-    }
-  }
-</style>
-
-<style is:global>
-  .prose {
-    font-family: var(--font-family-base);
-    font-size: var(--font-size-post-body); /* 17px */
-    line-height: var(--line-height-post-body); /* 1.8 */
-    color: var(--color-text-primary);
-    word-break: keep-all;
-    word-wrap: break-word;
-  }
-
-  /* ===== 문단 스타일 ===== */
-  .prose p {
-    margin-top: 0;
-    margin-bottom: var(--spacing-paragraph); /* 1.5em */
-  }
-
-  .prose p:last-child {
-    margin-bottom: 0;
-  }
-
-  /* ===== 제목 스타일 - 토스피드 스타일 간격 ===== */
-  .prose h2 {
-    font-size: var(--font-size-2xl); /* 24px */
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-tight);
-    color: var(--color-text-primary);
-    margin-top: var(--spacing-heading-top); /* 2.5em */
-    margin-bottom: var(--spacing-heading-bottom); /* 1em */
-    scroll-margin-top: calc(var(--layout-header-height) + var(--spacing-4));
-    letter-spacing: -0.02em;
-  }
-
-  .prose h2:first-child {
-    margin-top: 0;
-  }
-
-  .prose h3 {
-    font-size: var(--font-size-xl); /* 20px */
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-tight);
-    color: var(--color-text-primary);
-    margin-top: calc(var(--spacing-heading-top) * 0.8); /* 2em */
-    margin-bottom: calc(var(--spacing-heading-bottom) * 0.8); /* 0.8em */
-    scroll-margin-top: calc(var(--layout-header-height) + var(--spacing-4));
-    letter-spacing: -0.01em;
-  }
-
-  .prose h4 {
-    font-size: var(--font-size-lg); /* 18px */
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--line-height-tight);
-    color: var(--color-text-primary);
-    margin-top: calc(var(--spacing-heading-top) * 0.6); /* 1.5em */
-    margin-bottom: calc(var(--spacing-heading-bottom) * 0.6); /* 0.6em */
-    scroll-margin-top: calc(var(--layout-header-height) + var(--spacing-4));
-  }
-
-  /* ===== 링크 스타일 ===== */
-  .prose a {
-    color: var(--color-accent-primary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    transition: color var(--transition-fast);
-  }
-
-  .prose a:hover {
-    color: var(--color-accent-secondary);
-  }
-
-  /* ===== 강조 스타일 ===== */
-  .prose strong {
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-  }
-
-  .prose em {
-    font-style: italic;
-    color: var(--color-text-secondary);
-  }
-
-  /* ===== 인라인 코드 스타일 ===== */
-  .prose code {
-    font-family: var(--font-family-mono);
-    font-size: 0.9em;
-    background-color: var(--color-code-inline-bg);
-    color: var(--color-code-inline-text);
-    padding: 0.15em 0.4em;
-    border-radius: var(--radius-sm);
-    font-weight: var(--font-weight-medium);
-  }
-
-  /* ===== 코드 블록 스타일 ===== */
-  .prose pre {
-    border: 1px solid var(--color-code-border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-4);
-    margin: var(--spacing-6) 0;
-    overflow-x: auto;
-    line-height: 1.6;
-    /* Shiki가 자동으로 배경색과 구문 강조 색상을 적용합니다 */
-  }
-
-  .prose pre code {
-    font-family: var(--font-family-mono);
-    font-size: 0.875rem; /* 14px */
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-    /* Shiki의 구문 강조를 위해 color 속성을 제거합니다 */
-  }
-
-  /* ===== 인용구 스타일 - 토스피드 스타일 ===== */
-  .prose blockquote {
-    border-left: 4px solid var(--color-accent-primary);
-    background-color: var(--color-bg-secondary);
-    padding: var(--spacing-4) var(--spacing-5);
-    margin: var(--spacing-6) 0;
-    border-radius: var(--radius-sm);
-  }
-
-  .prose blockquote p {
-    color: var(--color-text-secondary);
-    font-style: normal;
-    margin: 0;
-  }
-
-  .prose blockquote p:not(:last-child) {
-    margin-bottom: var(--spacing-3);
-  }
-
-  /* ===== 목록 스타일 ===== */
-  .prose ul,
-  .prose ol {
-    padding-left: var(--spacing-6);
-    margin: var(--spacing-5) 0;
-  }
-
-  .prose li {
-    margin: var(--spacing-2) 0;
-    line-height: var(--line-height-relaxed);
-  }
-
-  .prose li > p {
-    margin: var(--spacing-2) 0;
-  }
-
-  /* 중첩 목록 */
-  .prose ul ul,
-  .prose ul ol,
-  .prose ol ul,
-  .prose ol ol {
-    margin: var(--spacing-2) 0;
-  }
-
-  /* ===== 이미지 스타일 ===== */
-  .prose img {
-    border-radius: var(--radius-md);
-    margin: var(--spacing-8) auto;
-    display: block;
-    max-width: 100%;
-    height: auto;
-    box-shadow: var(--shadow-card);
-  }
-
-  /* ===== 테이블 스타일 ===== */
-  .prose table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: var(--spacing-6) 0;
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-normal);
-  }
-
-  .prose thead {
-    background-color: var(--color-bg-secondary);
-    border-bottom: 2px solid var(--color-border-primary);
-  }
-
-  .prose th {
-    padding: var(--spacing-3) var(--spacing-4);
-    text-align: left;
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-  }
-
-  .prose td {
-    padding: var(--spacing-3) var(--spacing-4);
-    border-bottom: 1px solid var(--color-border-primary);
-    color: var(--color-text-secondary);
-  }
-
-  .prose tbody tr:hover {
-    background-color: var(--color-bg-secondary);
-    transition: background-color var(--transition-fast);
-  }
-
-  /* ===== 구분선 ===== */
-  .prose hr {
-    border: none;
-    border-top: 1px solid var(--color-border-primary);
-    margin: var(--spacing-8) 0;
-  }
-
-  /* ===== 반응형 타이포그래피 ===== */
-  @media (max-width: 640px) {
-    .prose {
-      font-size: var(--font-size-base); /* 16px on mobile */
-    }
-
-    .prose h2 {
-      font-size: var(--font-size-xl); /* 20px */
-      margin-top: calc(var(--spacing-heading-top) * 0.7);
-    }
-
-    .prose h3 {
-      font-size: var(--font-size-lg); /* 18px */
-      margin-top: calc(var(--spacing-heading-top) * 0.6);
-    }
-
-    .prose h4 {
-      font-size: var(--font-size-base); /* 16px */
-      margin-top: calc(var(--spacing-heading-top) * 0.5);
-    }
-
-    .prose pre {
-      margin: var(--spacing-4) calc(-1 * var(--spacing-4));
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-    }
-  }
-</style>
+</BaseLayout>

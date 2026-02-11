@@ -76,19 +76,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Additional head content from pages -->
     <slot name="head" />
   </head>
-  <body>
-    <!-- 사이드바 열기 버튼 (사이드바가 닫혔을 때만 표시) -->
-    <button class="sidebar-open-btn" aria-label="사이드바 열기" title="사이드바 열기">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
+  <body class="min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground">
 
-    <div class="layout">
+    <div class="flex min-h-screen flex-col md:flex-row">
       <Sidebar currentPath={currentPath || Astro.url.pathname} />
-      <div class="main-wrapper">
+      <div class="flex-1 flex flex-col md:ml-64 transition-all duration-200 ease-in-out">
         <Header currentPath={currentPath || Astro.url.pathname} />
-        <main class="content">
+        <main class="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           <slot />
         </main>
       </div>
@@ -97,99 +91,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 </html>
 
 <style is:global>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    font-family: var(--font-family-base);
-    background: var(--color-bg-primary);
-    color: var(--color-text-primary);
-  }
-
-  /* 다크모드 깜빡임 방지: 초기 배경색 설정 */
-  /* 스크립트 실행 전에도 다크모드일 경우 올바른 배경색 표시 */
-  html.dark {
-    background: #191f28; /* 다크모드 배경색 (design-tokens의 --color-bg-primary) */
-  }
-
-  body {
-    line-height: var(--line-height-normal);
-  }
-
-  .layout {
-    display: flex;
-    min-height: 100vh;
-  }
-
-  .main-wrapper {
-    flex: 1;
-    margin-left: var(--layout-sidebar-width);
-    display: flex;
-    flex-direction: column;
-    transition: margin-left var(--transition-base);
-  }
-
-  .content {
-    flex: 1;
-    margin-top: var(--layout-header-height);
-    padding: var(--layout-container-padding);
-    max-width: var(--layout-max-content-width);
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  /* 테마 전환 시 부드러운 애니메이션 (성능 최적화) */
-  html.theme-transitioning,
-  html.theme-transitioning * {
-    transition: background-color 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease !important;
-  }
-
-  /* 사이드바 열기 버튼 (왼쪽 상단 고정) */
-  .sidebar-open-btn {
-    position: fixed;
-    top: var(--spacing-4);
-    left: var(--spacing-4);
-    z-index: calc(var(--z-modal) + 1);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: none;
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text-primary);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    box-shadow: var(--shadow-card);
-    transition: all var(--transition-fast);
-    border: 1px solid var(--color-border-primary);
-  }
-
-  .sidebar-open-btn:hover {
-    background-color: var(--color-bg-secondary);
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .sidebar-open-btn:active {
-    transform: scale(0.95);
-  }
-
-  /* 사이드바가 collapsed일 때만 표시 */
-  .sidebar-open-btn.visible {
-    display: flex;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .main-wrapper {
-      margin-left: 0;
-    }
+  /* 테마 전환 시 주요 컨테이너만 부드럽게 전환
+     주의: * 셀렉터는 Shiki 코드 블록의 수천 개 <span>에도 적용되어 심각한 성능 저하를 유발함 */
+  html.theme-transitioning body,
+  html.theme-transitioning header,
+  html.theme-transitioning aside,
+  html.theme-transitioning main {
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
   }
 </style>

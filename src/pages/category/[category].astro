@@ -89,16 +89,16 @@ const label = categoryLabels[category] || category;
   description={`${label} 카테고리의 모든 포스트 (${posts.length}개)`}
   currentPath={Astro.url.pathname}
 >
-  <div class="category-page">
-    <header class="category-header">
-      <div class="category-icon">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <header class="mb-12 text-center border-b pb-8">
+      <div class="inline-flex items-center justify-center p-3 mb-4 rounded-full bg-primary/10 text-primary">
         <Icon size={48} />
       </div>
-      <h1 class="category-title">{label}</h1>
-      <p class="category-count">{posts.length}개의 포스트</p>
+      <h1 class="text-4xl font-bold mb-2 tracking-tight">{label}</h1>
+      <p class="text-lg text-muted-foreground font-medium">{posts.length}개의 포스트</p>
     </header>
 
-    <div class="posts-grid">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {posts.map((post) => (
         <BlogPostCard
           title={post.data.title}
@@ -114,56 +114,3 @@ const label = categoryLabels[category] || category;
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .category-page {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  /* ===== 카테고리 헤더 ===== */
-  .category-header {
-    text-align: center;
-    margin-bottom: var(--spacing-12);
-    padding-bottom: var(--spacing-8);
-    border-bottom: 2px solid var(--color-border-primary);
-  }
-
-  .category-icon {
-    font-size: var(--font-size-5xl);
-    margin-bottom: var(--spacing-4);
-  }
-
-  .category-title {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
-    letter-spacing: -0.02em;
-  }
-
-  .category-count {
-    font-size: var(--font-size-lg);
-    color: var(--color-text-tertiary);
-    font-weight: var(--font-weight-medium);
-  }
-
-  /* ===== 게시글 그리드 ===== */
-  .posts-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-6);
-  }
-
-  @media (min-width: 768px) {
-    .posts-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .posts-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-</style>

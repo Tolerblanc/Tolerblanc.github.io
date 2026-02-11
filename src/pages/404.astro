@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('blog');
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
 const recentPosts = allPosts
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
@@ -13,206 +15,104 @@ const recentPosts = allPosts
   title="404 - 페이지를 찾을 수 없습니다"
   description="요청하신 페이지를 찾을 수 없습니다."
 >
-  <div class="error-page">
-    <div class="error-content">
-      <!-- 에러 코드 -->
-      <div class="error-code">404</div>
+  <div class="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-16">
+    <div class="max-w-2xl w-full text-center">
+      <!-- SVG Illustration: Broken chain -->
+      <div class="mb-8 flex justify-center">
+        <svg class="w-40 h-40 text-muted-foreground/30 animate-float" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Left chain link -->
+          <rect x="20" y="50" width="50" height="30" rx="15" stroke="currentColor" stroke-width="4" class="origin-center" />
+          <line x1="55" y1="65" x2="75" y2="65" stroke="currentColor" stroke-width="4" stroke-dasharray="6 4" opacity="0.5" />
+          <!-- Right chain link (offset to show break) -->
+          <rect x="85" y="55" width="50" height="30" rx="15" stroke="currentColor" stroke-width="4" class="origin-center" transform="rotate(8, 110, 70)" />
+          <!-- Spark lines showing break -->
+          <line x1="76" y1="58" x2="82" y2="52" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <line x1="78" y1="64" x2="86" y2="62" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <line x1="76" y1="72" x2="82" y2="78" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <!-- 404 text beneath -->
+          <text x="80" y="125" text-anchor="middle" fill="currentColor" font-size="32" font-weight="bold" font-family="monospace" opacity="0.6">404</text>
+        </svg>
+      </div>
 
-      <!-- 에러 메시지 -->
-      <h1 class="error-title">페이지를 찾을 수 없습니다</h1>
-      <p class="error-description">
+      <!-- Error message -->
+      <h1 class="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+        페이지를 찾을 수 없습니다
+      </h1>
+      <p class="text-lg text-muted-foreground mb-8 leading-relaxed">
         요청하신 페이지가 존재하지 않거나 이동되었습니다.
       </p>
 
-      <!-- 액션 버튼 -->
-      <div class="error-actions">
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12">
         <a href="/">
-          <Button size="lg" className="home-button">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="mr-2">
-              <path d="M10 3L2 9.5V18H7V13H13V18H18V9.5L10 3Z" fill="currentColor"/>
+          <Button size="lg" className="w-full sm:w-auto gap-2">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 3L2 9.5V18H7V13H13V18H18V9.5L10 3Z" />
             </svg>
             홈으로 돌아가기
           </Button>
         </a>
         <a href="/posts">
-          <Button variant="outline" size="lg" className="blog-button">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="mr-2">
-              <path d="M4 4H16V6H4V4ZM4 8H16V10H4V8ZM4 12H12V14H4V12Z" fill="currentColor"/>
+          <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M4 4H16V6H4V4ZM4 8H16V10H4V8ZM4 12H12V14H4V12Z" />
             </svg>
             블로그 보기
           </Button>
         </a>
       </div>
 
-      <!-- 최근 포스트 추천 -->
+      <!-- Recent posts -->
       {recentPosts.length > 0 && (
-        <div class="recent-posts">
-          <h2 class="recent-posts-title">최근 포스트를 확인해보세요</h2>
-          <ul class="recent-posts-list">
-            {recentPosts.map((post) => (
-              <li class="recent-post-item">
-                <a href={`/${post.id}`} class="recent-post-link">
-                  {post.data.categories && post.data.categories.length > 0 && (
-                    <div class="post-category">
-                      {post.data.categories[0]}
-                    </div>
-                  )}
-                  <h3 class="post-title">{post.data.title}</h3>
-                  <p class="post-description">{post.data.description}</p>
-                  <time class="post-date" datetime={post.data.date.toISOString()}>
-                    {post.data.date.toLocaleDateString('ko-KR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </time>
+        <>
+          <Separator className="mb-8" />
+          <div class="text-left">
+            <h2 class="text-lg font-semibold mb-4 text-foreground">최근 포스트를 확인해보세요</h2>
+            <div class="grid gap-3">
+              {recentPosts.map((post) => (
+                <a href={`/${post.id}`} class="block group">
+                  <Card className="transition-all duration-300 hover:shadow-md hover:border-primary/30 hover:-translate-y-0.5">
+                    <CardContent className="p-4">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                          {post.data.categories?.[0] && (
+                            <span class="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-primary text-primary-foreground mb-2">
+                              {post.data.categories[0]}
+                            </span>
+                          )}
+                          <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                            {post.data.title}
+                          </h3>
+                          {post.data.excerpt && (
+                            <p class="text-sm text-muted-foreground mt-1 line-clamp-1">{post.data.excerpt}</p>
+                          )}
+                        </div>
+                        <time class="text-xs text-muted-foreground whitespace-nowrap mt-1" datetime={post.data.date.toISOString()}>
+                          {post.data.date.toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </time>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   </div>
 </BaseLayout>
 
 <style>
-  .error-page {
-    min-height: calc(100vh - var(--layout-header-height));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-8) var(--spacing-6);
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
-
-  .error-content {
-    max-width: 800px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .error-code {
-    font-size: 8rem;
-    font-weight: var(--font-weight-black);
-    line-height: 1;
-    color: var(--color-accent-primary);
-    margin-bottom: var(--spacing-4);
-    font-family: var(--font-mono);
-    letter-spacing: -0.05em;
-  }
-
-  @media (max-width: 768px) {
-    .error-code {
-      font-size: 6rem;
-    }
-  }
-
-  .error-title {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-4);
-  }
-
-  .error-description {
-    font-size: var(--font-size-lg);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-8);
-    line-height: 1.6;
-  }
-
-  .error-actions {
-    display: flex;
-    gap: var(--spacing-4);
-    justify-content: center;
-    margin-bottom: var(--spacing-12);
-  }
-
-  @media (max-width: 640px) {
-    .error-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-
-  .home-button,
-  .blog-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .recent-posts {
-    margin-top: var(--spacing-12);
-    padding-top: var(--spacing-12);
-    border-top: 1px solid var(--color-border-primary);
-  }
-
-  .recent-posts-title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-6);
-    text-align: left;
-  }
-
-  .recent-posts-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: var(--spacing-4);
-  }
-
-  .recent-post-item {
-    text-align: left;
-  }
-
-  .recent-post-link {
-    display: block;
-    padding: var(--spacing-5);
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-  }
-
-  .recent-post-link:hover {
-    background-color: var(--color-bg-tertiary);
-    border-color: var(--color-accent-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .post-category {
-    display: inline-block;
-    padding: var(--spacing-1) var(--spacing-3);
-    background-color: var(--color-accent-primary);
-    color: #ffffff;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    border-radius: var(--radius-full);
-    margin-bottom: var(--spacing-2);
-  }
-
-  .post-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
-    line-height: 1.4;
-  }
-
-  .post-description {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-2);
-    line-height: 1.6;
-  }
-
-  .post-date {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
   }
 </style>

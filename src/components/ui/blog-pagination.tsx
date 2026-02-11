@@ -72,7 +72,7 @@ export function BlogPagination({
   const pageNumbers = getPageNumbers()
 
   return (
-    <Pagination className={cn("mt-8", className)}>
+    <Pagination className={cn("mt-8 py-8", className)}>
       <PaginationContent>
         {/* Previous Button */}
         {currentPage > 1 && (

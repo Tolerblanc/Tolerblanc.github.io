@@ -76,14 +76,23 @@ const description = "연재 중인 시리즈 목록";
 <BaseLayout title={title} description={description}>
   <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Header -->
-    <header class="mb-12 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
-        <BookOpen size={40} />
-        시리즈
-      </h1>
-      <p class="text-lg text-muted-foreground">
-        총 {seriesList.length}개의 시리즈
-      </p>
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-sm text-muted-foreground flex items-center gap-1">
+          <BookOpen size={16} />
+          Series
+        </span>
+      </div>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold mb-3">
+            시리즈
+          </h1>
+          <p class="text-muted-foreground">
+            총 {seriesList.length}개의 시리즈
+          </p>
+        </div>
+      </div>
     </header>
 
     <Separator className="mb-8" />

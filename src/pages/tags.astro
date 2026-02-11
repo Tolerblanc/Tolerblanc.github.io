@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Separator } from '@/components/ui/separator';
 import { Tag } from 'lucide-react';
 
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -25,16 +26,29 @@ const sortedTags = Array.from(tagCounts.entries())
   description="블로그의 모든 태그 목록"
   currentPath={Astro.url.pathname}
 >
-  <div class="tags-page">
-    <header class="tags-header">
-      <h1 class="tags-title flex items-center justify-center gap-3">
-        <Tag size={32} />
-        Tags
-      </h1>
-      <p class="tags-count">{sortedTags.length}개의 태그</p>
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-sm text-muted-foreground flex items-center gap-1">
+          <Tag className="w-4 h-4" />
+          Tags
+        </span>
+      </div>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold mb-3">
+            Tags
+          </h1>
+          <p class="text-muted-foreground">
+            {sortedTags.length}개의 태그
+          </p>
+        </div>
+      </div>
     </header>
 
-    <div class="tags-cloud">
+    <Separator className="mb-8" />
+
+    <div class="flex flex-wrap gap-4 justify-center items-center py-8">
       {sortedTags.map(({ tag, count }) => {
         // 태그 크기를 포스트 수에 따라 조정 (최소 0.875rem, 최대 1.5rem)
         const maxCount = sortedTags[0].count;
@@ -45,96 +59,16 @@ const sortedTags = Array.from(tagCounts.entries())
         return (
           <a
             href={`/tags/${tag}`}
-            class="tag-item"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-card border rounded-full text-muted-foreground transition-all hover:bg-secondary hover:border-primary hover:text-foreground hover:-translate-y-0.5 shadow-sm hover:shadow-md no-underline"
             style={`font-size: ${size}rem;`}
           >
-            <span class="tag-name">#{tag}</span>
-            <span class="tag-count">{count}</span>
+            <span class="font-semibold">#{tag}</span>
+            <span class="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full font-semibold border group-hover:bg-primary group-hover:text-primary-foreground transition-colors group-hover:border-primary">
+              {count}
+            </span>
           </a>
         );
       })}
     </div>
   </div>
 </BaseLayout>
-
-<style>
-  .tags-page {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  /* ===== 태그 헤더 ===== */
-  .tags-header {
-    text-align: center;
-    margin-bottom: var(--spacing-12);
-    padding-bottom: var(--spacing-8);
-    border-bottom: 2px solid var(--color-border-primary);
-  }
-
-  .tags-title {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
-    letter-spacing: -0.02em;
-  }
-
-  .tags-count {
-    font-size: var(--font-size-lg);
-    color: var(--color-text-tertiary);
-    font-weight: var(--font-weight-medium);
-  }
-
-  /* ===== 태그 클라우드 ===== */
-  .tags-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-4);
-    justify-content: center;
-    align-items: center;
-    padding: var(--spacing-8);
-  }
-
-  .tag-item {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-full);
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-card);
-  }
-
-  .tag-item:hover {
-    background: var(--color-bg-secondary);
-    border-color: var(--color-accent-primary);
-    color: var(--color-text-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .tag-name {
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .tag-count {
-    font-size: 0.75em;
-    color: var(--color-text-tertiary);
-    background: var(--color-bg-secondary);
-    padding: var(--spacing-1) var(--spacing-2);
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-semibold);
-    border: 1px solid var(--color-border-primary);
-    transition: all var(--transition-fast);
-  }
-
-  .tag-item:hover .tag-count {
-    background: var(--color-accent-primary);
-    color: var(--color-bg-primary);
-    border-color: var(--color-accent-primary);
-  }
-</style>

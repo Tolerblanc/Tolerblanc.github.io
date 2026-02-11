@@ -1,141 +1,45 @@
 ---
 // Reading progress indicator
-// Shows a progress bar at the top of the page indicating reading progress
 ---
 
-<div class="reading-progress">
-  <div class="reading-progress-bar"></div>
+<div id="reading-progress-container" class="fixed top-0 left-0 right-0 h-1 bg-transparent z-[100] pointer-events-none">
+  <div id="reading-progress-bar" class="h-full w-0 bg-primary shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-150 ease-out origin-left"></div>
 </div>
 
 <script>
-// Store cleanup function to prevent memory leaks
-let cleanupReadingProgress: (() => void) | null = null;
+  function initReadingProgress() {
+    const progressBar = document.getElementById('reading-progress-bar');
+    
+    if (!progressBar) return;
 
-function initReadingProgress() {
-  // Cleanup previous instance
-  if (cleanupReadingProgress) {
-    cleanupReadingProgress();
-  }
+    function updateProgress() {
+      if (!progressBar) return;
+      const scrollTotal = document.documentElement.scrollTop || document.body.scrollTop;
+      const heightWin = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scroll = (scrollTotal / heightWin) * 100;
 
-  const progressBar = document.querySelector('.reading-progress-bar') as HTMLElement;
-  const progressContainer = document.querySelector('.reading-progress') as HTMLElement;
-
-  if (!progressBar || !progressContainer) {
-    return;
-  }
-
-  // Check if sidebar exists in the DOM and adjust position
-  const hasSidebar = document.querySelector('.sidebar') !== null;
-  if (hasSidebar) {
-    const sidebarWidth = getComputedStyle(document.documentElement).getPropertyValue('--layout-sidebar-width');
-    progressContainer.style.left = sidebarWidth;
-  } else {
-    progressContainer.style.left = '0';
-  }
-
-  function updateProgress() {
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.scrollY || window.pageYOffset;
-    const scrollableHeight = documentHeight - windowHeight;
-
-    if (scrollableHeight <= 0) {
-      progressBar.style.width = '0%';
-      return;
+      const finalProgress = Math.min(Math.max(scroll, 0), 100);
+      progressBar.style.width = `${finalProgress}%`;
     }
 
-    const progress = (scrollTop / scrollableHeight) * 100;
-    const finalProgress = Math.min(Math.max(progress, 0), 100);
-    progressBar.style.width = `${finalProgress}%`;
+    // Optimize scroll event with requestAnimationFrame
+    let ticking = false;
+    const onScroll = () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateProgress();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateProgress, { passive: true });
+    
+    // Initial calculation
+    updateProgress();
   }
 
-  // Event listeners with requestAnimationFrame throttling
-  let ticking = false;
-  const scrollHandler = () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        updateProgress();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
-
-  window.addEventListener('scroll', scrollHandler, { passive: true });
-  window.addEventListener('resize', updateProgress, { passive: true });
-
-  // Initial update
-  updateProgress();
-
-  // Cleanup function
-  cleanupReadingProgress = () => {
-    window.removeEventListener('scroll', scrollHandler);
-    window.removeEventListener('resize', updateProgress);
-  };
-}
-
-// Initialize on load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initReadingProgress);
-} else {
-  initReadingProgress();
-}
-
-// Re-initialize on navigation (for View Transitions)
-document.addEventListener('astro:page-load', initReadingProgress);
-
-// Cleanup on before swap (for View Transitions)
-document.addEventListener('astro:before-swap', () => {
-  if (cleanupReadingProgress) {
-    cleanupReadingProgress();
-  }
-});
+  document.addEventListener('astro:page-load', initReadingProgress);
 </script>
-
-<style>
-  .reading-progress {
-    position: fixed;
-    top: 64px; /* Fixed header height */
-    left: 0;
-    right: 0;
-    height: 4px;
-    background-color: rgba(0, 0, 0, 0.1);
-    z-index: 9999;
-    overflow: hidden;
-    transition: left 0.3s ease;
-    pointer-events: none;
-  }
-
-  .reading-progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(
-      90deg,
-      #3b82f6 0%,
-      #2563eb 100%
-    );
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    transition: width 0.15s ease-out;
-    transform-origin: left;
-  }
-
-  /* Dark mode support */
-  :global(.dark) .reading-progress {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  /* Hide on very short pages */
-  @media (max-height: 600px) {
-    .reading-progress {
-      display: none;
-    }
-  }
-
-  /* Mobile: Reset to full width */
-  @media (max-width: 768px) {
-    .reading-progress {
-      left: 0 !important; /* Override JavaScript adjustment on mobile */
-      top: 56px; /* Mobile header height */
-    }
-  }
-</style>

@@ -1,12 +1,15 @@
 ---
 // Scroll to top button component
 // Shows when user scrolls down, hidden at top
+import { ChevronUp } from 'lucide-react';
 ---
 
-<button id="scroll-to-top" class="scroll-to-top" aria-label="맨 위로 이동">
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 15V5M10 5L5 10M10 5L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
+<button 
+  id="scroll-to-top" 
+  class="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg cursor-pointer transition-all duration-300 opacity-0 translate-y-4 invisible hover:bg-primary/90 hover:-translate-y-1 hover:shadow-xl active:translate-y-0"
+  aria-label="맨 위로 이동"
+>
+  <ChevronUp className="w-6 h-6" />
 </button>
 
 <script>
@@ -18,9 +21,11 @@
     function toggleButton() {
       if (!button) return;
       if (window.scrollY > 300) {
-        button.classList.add('visible');
+        button.classList.remove('opacity-0', 'translate-y-4', 'invisible');
+        button.classList.add('opacity-100', 'translate-y-0', 'visible');
       } else {
-        button.classList.remove('visible');
+        button.classList.add('opacity-0', 'translate-y-4', 'invisible');
+        button.classList.remove('opacity-100', 'translate-y-0', 'visible');
       }
     }
 
@@ -50,54 +55,3 @@
   // Re-initialize on navigation
   document.addEventListener('astro:page-load', initScrollToTop);
 </script>
-
-<style>
-  .scroll-to-top {
-    position: fixed;
-    bottom: var(--spacing-6);
-    right: var(--spacing-6);
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-full);
-    background-color: var(--color-accent-primary);
-    color: #ffffff;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-lg);
-    transition: all var(--transition-base);
-    z-index: var(--z-modal);
-
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px);
-  }
-
-  .scroll-to-top.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-
-  .scroll-to-top:hover {
-    background-color: var(--color-accent-hover);
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-2px);
-  }
-
-  .scroll-to-top:active {
-    transform: translateY(0);
-  }
-
-  /* Mobile adjustments */
-  @media (max-width: 768px) {
-    .scroll-to-top {
-      bottom: var(--spacing-4);
-      right: var(--spacing-4);
-      width: 44px;
-      height: 44px;
-    }
-  }
-</style>
